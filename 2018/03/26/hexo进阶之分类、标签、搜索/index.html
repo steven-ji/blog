@@ -87,7 +87,7 @@
 <meta property="og:description" content="hexo进阶之添加菜单分类、标签、搜索 工具：hexo + NexT   环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言上一篇已经搭建了最简单的博客，没有常见的菜单：分类、标签、音乐、搜索、RSS订阅、个人，这一篇就是完善这个菜单功能。 添加菜单">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcgy1fpqfg4dw6pj31kw0qzwma.jpg">
-<meta property="og:updated_time" content="2018-03-27T15:48:41.176Z">
+<meta property="og:updated_time" content="2018-03-28T09:07:59.256Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo进阶之添加分类、标签、搜索菜单">
 <meta name="twitter:description" content="hexo进阶之添加菜单分类、标签、搜索 工具：hexo + NexT   环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言上一篇已经搭建了最简单的博客，没有常见的菜单：分类、标签、音乐、搜索、RSS订阅、个人，这一篇就是完善这个菜单功能。 添加菜单">
@@ -394,7 +394,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  665
+                  671
                 </span>
               
 
@@ -444,8 +444,8 @@
 <h3 id="编辑页面显示的菜单中文名称"><a href="#编辑页面显示的菜单中文名称" class="headerlink" title="编辑页面显示的菜单中文名称"></a>编辑页面显示的菜单中文名称</h3><p>编辑Next目录下的languages/{language}.yml文件，{language}.yml为站点_config.yml中配置的languages: zh-Hans对应</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ vim /theme/next/languages/zh-Hans.yml</span><br><span class="line">menu:</span><br><span class="line">  home: 首页</span><br><span class="line">  archives: 归档</span><br><span class="line">  categories: 分类</span><br><span class="line">  tags: 标签</span><br><span class="line">  about: 关于</span><br><span class="line">  search: 搜索</span><br><span class="line">  schedule: 日程表</span><br><span class="line">  sitemap: 站点地图</span><br><span class="line">  commonweal: 公益404</span><br></pre></td></tr></table></figure>
 <p>到这里，已经添加了归档、分类等菜单，但是点击是没有效果的。</p>
-<h3 id="配置菜单对应内容"><a href="#配置菜单对应内容" class="headerlink" title="配置菜单对应内容"></a>配置菜单对应内容</h3><h4 id="分类菜单"><a href="#分类菜单" class="headerlink" title="分类菜单"></a>分类菜单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 创建categories页面</span><br><span class="line">$ hexo new page &quot;categories&quot;</span><br><span class="line">$ vim source/categories/index.md</span><br><span class="line">  title: All categories</span><br><span class="line">  date: 2018-03-26 12:39:04</span><br><span class="line">  type: &quot;categories&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="标签菜单"><a href="#标签菜单" class="headerlink" title="标签菜单"></a>标签菜单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 创建tags页面</span><br><span class="line">$ hexo new page &quot;tags&quot;</span><br><span class="line">$ vim source/tags/index.md</span><br><span class="line">  title: All tags</span><br><span class="line">  date: 2014-12-22 12:39:04</span><br><span class="line">  type: &quot;tags&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="配置菜单对应内容"><a href="#配置菜单对应内容" class="headerlink" title="配置菜单对应内容"></a>配置菜单对应内容</h3><h4 id="分类菜单"><a href="#分类菜单" class="headerlink" title="分类菜单"></a>分类菜单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">## 创建categories页面</span><br><span class="line">$ hexo new page &quot;categories&quot;</span><br><span class="line">$ vim source/categories/index.md</span><br><span class="line">  title: All categories</span><br><span class="line">  date: 2018-03-26 12:39:04</span><br><span class="line">  type: &quot;categories&quot;</span><br><span class="line">  comments: false</span><br></pre></td></tr></table></figure>
+<h4 id="标签菜单"><a href="#标签菜单" class="headerlink" title="标签菜单"></a>标签菜单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">## 创建tags页面</span><br><span class="line">$ hexo new page &quot;tags&quot;</span><br><span class="line">$ vim source/tags/index.md</span><br><span class="line">  title: All tags</span><br><span class="line">  date: 2014-12-22 12:39:04</span><br><span class="line">  type: &quot;tags&quot;</span><br><span class="line">  comments: false</span><br></pre></td></tr></table></figure>
 <p>注：分类和标签还没有和分类关联起来，需要在每篇文章头部添加categories和tags属性，这样就可以自动关联了，为了后续方便，修改scaffolds/post.md模版即可。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">title: hexo+github快速搭建博客</span><br><span class="line">date: 2018-03-25 14:12:32</span><br><span class="line">categories: hexo</span><br><span class="line">tags: </span><br><span class="line">- hexo+github+next</span><br><span class="line">- hexo</span><br></pre></td></tr></table></figure>
 <h4 id="搜索菜单"><a href="#搜索菜单" class="headerlink" title="搜索菜单"></a>搜索菜单</h4><p>采用Hexo提供的Local Search站内搜索,原理是通过hexo-generator-search插件在本地生成一个search.xml文件，搜索的时候从这个文件中根据关键字检索出相应的链接。</p>
@@ -465,6 +465,35 @@
 
     
 
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/blog/uploads/wechatpay.png" alt="溏溏爸爸 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/blog/uploads/alipay.png" alt="溏溏爸爸 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
     
 
     
@@ -490,8 +519,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/blog/2018/03/27/hexo进阶之添加评论/" rel="prev" title="hexo进阶之添加评论">
-                hexo进阶之添加评论 <i class="fa fa-chevron-right"></i>
+              <a href="/blog/2018/03/27/hexo进阶之局部优化/" rel="prev" title="hexo进阶之局部优化">
+                hexo进阶之局部优化 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -520,6 +549,11 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTI2Mi8xMTc5OA=="></div>
+    </div>
 
   
 
@@ -606,6 +640,16 @@
           
 
           
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/steven-ji" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
 
           
           
@@ -662,7 +706,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">2.4k</span>
+    <span title="Site words total count">2.9k</span>
   
 </div>
 
@@ -815,6 +859,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 

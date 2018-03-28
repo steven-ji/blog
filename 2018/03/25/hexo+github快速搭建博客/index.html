@@ -79,22 +79,22 @@
 
 
 
-<meta name="description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo + github pages + git 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, powered by Node.js. 一">
+<meta name="description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo 3.6.0 + github pages + git + NexT 5.1.4 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, po">
 <meta name="keywords" content="hexo+github+next,hexo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hexo+github快速搭建博客">
 <meta property="og:url" content="http://steven-ji.github.io/blog/2018/03/25/hexo+github快速搭建博客/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo + github pages + git 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, powered by Node.js. 一">
+<meta property="og:description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo 3.6.0 + github pages + git + NexT 5.1.4 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, po">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcgy1fppg7kxo0oj31880tcgq3.jpg">
 <meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcgy1fppg6lw3kwj31kw0fhdit.jpg">
 <meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcgy1fppg9ln06ej31ba0p678h.jpg">
 <meta property="og:image" content="https://ws2.sinaimg.cn/large/006tKfTcgy1fppgbjbizlj31780rugq9.jpg">
-<meta property="og:updated_time" content="2018-03-27T15:49:50.404Z">
+<meta property="og:updated_time" content="2018-03-28T09:07:50.856Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo+github快速搭建博客">
-<meta name="twitter:description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo + github pages + git 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, powered by Node.js. 一">
+<meta name="twitter:description" content="自建博客最佳实践本篇是自己实践记录。  工具：hexo 3.6.0 + github pages + git + NexT 5.1.4 环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)  前言开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？  hexo A fast, simple &amp;amp; powerful blog framework, po">
 <meta name="twitter:image" content="https://ws1.sinaimg.cn/large/006tKfTcgy1fppg7kxo0oj31880tcgq3.jpg">
 
 
@@ -398,7 +398,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,486
+                  1,493
                 </span>
               
 
@@ -437,7 +437,7 @@
       
         <h2 id="自建博客最佳实践"><a href="#自建博客最佳实践" class="headerlink" title="自建博客最佳实践"></a>自建博客最佳实践</h2><p>本篇是自己实践记录。</p>
 <ul>
-<li>工具：hexo + github pages + git</li>
+<li>工具：hexo 3.6.0 + github pages + git + NexT 5.1.4</li>
 <li>环境：mac(10.13.2)、node.js(9.4.0)、npm(5.6.0)</li>
 </ul>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>开始之前，先回答三个哲学问题，它是谁？它从哪里来？它要到哪里去？</p>
@@ -517,6 +517,35 @@
     
 
     
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/blog/uploads/wechatpay.png" alt="溏溏爸爸 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/blog/uploads/alipay.png" alt="溏溏爸爸 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
 
     
 
@@ -575,6 +604,11 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTI2Mi8xMTc5OA=="></div>
+    </div>
 
   
 
@@ -661,6 +695,16 @@
           
 
           
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/steven-ji" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
 
           
           
@@ -717,7 +761,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">2.4k</span>
+    <span title="Site words total count">2.9k</span>
   
 </div>
 
@@ -870,6 +914,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
