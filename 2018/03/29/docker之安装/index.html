@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcgy1fpttnn6256j31kw0p644u.jpg">
 <meta property="og:image" content="https://ws2.sinaimg.cn/large/006tKfTcgy1fpttodkc9dj31kw0g9782.jpg">
-<meta property="og:updated_time" content="2018-03-29T09:44:32.126Z">
+<meta property="og:updated_time" content="2018-03-29T09:46:15.552Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker之安装">
 <meta name="twitter:description" content="Docker之安装 环境：Centos6.5，Centos7前言1、EPEL（ Extra Packages for Enterprise Linux，企业版Linux的额外软件包)是yum的一个软件源，里面包含了许多基本源里没有的软件；2、docker要求服务CentOS6以上，kernel 版本必须2.6.32-431或更高；查看系统的版本和内核1234## 查看系统版本$ lsb_relea">
@@ -374,7 +374,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  792
+                  790
                 </span>
               
 
@@ -429,7 +429,7 @@
 <h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 启动</span><br><span class="line">$ service docker start</span><br><span class="line">## 配置开机启动</span><br><span class="line">$ chkconfig docker on</span><br><span class="line">## 下载镜像测试</span><br><span class="line">## docker pull hello-world</span><br></pre></td></tr></table></figure>
 <h2 id="Q-amp-A："><a href="#Q-amp-A：" class="headerlink" title="Q&amp;A："></a>Q&amp;A：</h2><h3 id="Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下："><a href="#Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下：" class="headerlink" title="Centos6.5安装好epel后，执行命令yum repolist报错，信息如下："></a>Centos6.5安装好epel后，执行命令yum repolist报错，信息如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ yum repolist</span><br><span class="line">Loaded plugins: product-id, security, subscription-manager</span><br><span class="line">Updating certificate-based repositories.</span><br><span class="line">Error: Cannot retrieve metalink for repository: epel. Please verify its path and try again</span><br></pre></td></tr></table></figure>
 <p>解决办法：vim /etc/yum.repos.d/epel.repo<br>编辑[epel]下的baseurl前的#号去掉，mirrorlist前添加#号。正确配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[epel]</span><br><span class="line">name=Extra Packages for Enterprise Linux 6 - $basearch</span><br><span class="line">baseurl=http://download.fedoraproject.org/pub/epel/6/$basearch</span><br><span class="line">#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6</span><br></pre></td></tr></table></figure></p>
-<p>再次执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$yum makecache</span><br></pre></td></tr></table></figure></p>
+<p>执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$yum makecache</span><br></pre></td></tr></table></figure></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://www.jianshu.com/p/3a4cd73e3272" target="_blank" rel="noopener">https://www.jianshu.com/p/3a4cd73e3272</a> CentOS7安装Docker</li>
 <li><a href="https://blog.csdn.net/Mr_OOO/article/details/67016309" target="_blank" rel="noopener">https://blog.csdn.net/Mr_OOO/article/details/67016309</a> Docker国内镜像源设置</li>
@@ -493,8 +493,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2018/03/28/hexo进阶之添加评论/" rel="next" title="hexo进阶之添加评论">
-                <i class="fa fa-chevron-left"></i> hexo进阶之添加评论
+              <a href="/blog/2018/03/29/Java基础之Collection/" rel="next" title="Java基础之Collection">
+                <i class="fa fa-chevron-left"></i> Java基础之Collection
               </a>
             
           </div>
@@ -502,10 +502,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/blog/2018/03/29/Java基础之Collection/" rel="prev" title="Java基础之Collection">
-                Java基础之Collection <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
