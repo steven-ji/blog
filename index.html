@@ -309,179 +309,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/03/29/docker之安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/03/29/docker之安装/" itemprop="url">Docker之安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T15:17:10+08:00">
-                2018-03-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  790
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  4
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Docker之安装"><a href="#Docker之安装" class="headerlink" title="Docker之安装"></a>Docker之安装</h2><ul>
-<li>环境：Centos6.5，Centos7<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>1、EPEL（ Extra Packages for Enterprise Linux，企业版Linux的额外软件包)是yum的一个软件源，里面包含了许多基本源里没有的软件；<br>2、docker要求服务CentOS6以上，kernel 版本必须2.6.32-431或更高；<h2 id="查看系统的版本和内核"><a href="#查看系统的版本和内核" class="headerlink" title="查看系统的版本和内核"></a>查看系统的版本和内核</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## 查看系统版本</span><br><span class="line">$ lsb_release -a</span><br><span class="line">## 查看内核版本</span><br><span class="line">$ uname -r</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Centos6-5安装docker"><a href="#Centos6-5安装docker" class="headerlink" title="Centos6.5安装docker"></a>Centos6.5安装docker</h2><p>要将Docker安装到CentOS上，要使用EPEL软件库，下载epel安装包并安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ wget http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm</span><br><span class="line">$ rpm -ivh epel-release-6-8.noarch.rpm</span><br></pre></td></tr></table></figure></p>
-<p>检查EPEL源<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$yum repolist</span><br><span class="line">Loaded plugins: fastestmirror</span><br><span class="line">Loading mirror speeds from cached hostfile</span><br><span class="line"> * base: mirrors.skyshe.cn</span><br><span class="line"> * epel: mirrors.opencas.cn</span><br><span class="line"> * extras: mirrors.skyshe.cn</span><br><span class="line"> * updates: centos.ustc.edu.cn</span><br><span class="line">repo id                                                                                    repo name                                                                                                                          status</span><br><span class="line">base                                                                                       CentOS-6 - Base                                                                                                                     6,575</span><br><span class="line">epel                                                                                       Extra Packages for Enterprise Linux 6 - x86_64                                                                                     12,234</span><br><span class="line">extras                                                                                     CentOS-6 - Extras                                                                                                                      62</span><br><span class="line">updates                                                                                    CentOS-6 - Updates                                                                                                                  1,580</span><br><span class="line">repolist: 20,451</span><br><span class="line">EPEL已经在repo列出，并显示提供12234个软件包，EPEL源的配置安装到了/etc/yum.repos.d/epel.repo</span><br></pre></td></tr></table></figure></p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y docker-io</span><br><span class="line">$ service docker start</span><br><span class="line">$ chkconfig docker on</span><br></pre></td></tr></table></figure>
-<h3 id="检查docker是否安装成功"><a href="#检查docker是否安装成功" class="headerlink" title="检查docker是否安装成功"></a>检查docker是否安装成功</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$docker info</span><br><span class="line">Containers: 0</span><br><span class="line">Images: 0</span><br><span class="line">Storage Driver: devicemapper</span><br><span class="line"> Pool Name: docker-8:3-276002-pool</span><br><span class="line"> Pool Blocksize: 65.54 kB</span><br><span class="line"> Backing Filesystem: extfs</span><br><span class="line"> Data file: /dev/loop0</span><br><span class="line"> Metadata file: /dev/loop1</span><br><span class="line"> Data Space Used: 305.7 MB</span><br><span class="line"> Data Space Total: 107.4 GB</span><br><span class="line"> Data Space Available: 4.873 GB</span><br><span class="line"> Metadata Space Used: 729.1 kB</span><br><span class="line"> Metadata Space Total: 2.147 GB</span><br><span class="line"> Metadata Space Available: 2.147 GB</span><br><span class="line"> Udev Sync Supported: true</span><br><span class="line"> Deferred Removal Enabled: false</span><br><span class="line"> Data loop file: /var/lib/docker/devicemapper/devicemapper/data</span><br><span class="line"> Metadata loop file: /var/lib/docker/devicemapper/devicemapper/metadata</span><br><span class="line"> Library Version: 1.02.95-RHEL6 (2015-09-08)</span><br><span class="line">Execution Driver: native-0.2</span><br><span class="line">Logging Driver: json-file</span><br><span class="line">Kernel Version: 2.6.32-431.el6.x86_64</span><br><span class="line">Operating System: &lt;unknown&gt;</span><br><span class="line">CPUs: 1</span><br><span class="line">Total Memory: 996.4 MiB</span><br><span class="line">Name: winter-01</span><br><span class="line">ID: KJ3G:XD6V:SDDV:5SGY:2TRQ:4XXR:XBPV:VLHE:XHHZ:F425:7G2B:G5D5</span><br></pre></td></tr></table></figure>
-<h2 id="Centos7安装docker"><a href="#Centos7安装docker" class="headerlink" title="Centos7安装docker"></a>Centos7安装docker</h2><p>centos7可以直接使用yum安装，不需要再添加其他软件源信息.</p>
-<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y docker</span><br></pre></td></tr></table></figure>
-<h3 id="添加镜像源"><a href="#添加镜像源" class="headerlink" title="添加镜像源"></a>添加镜像源</h3><p>使用daocloud的镜像加速器，在<a href="https://www.daocloud.io上注册账号，选择加速器" target="_blank" rel="noopener">https://www.daocloud.io上注册账号，选择加速器</a></p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fpttnn6256j31kw0p644u.jpg" alt="EE057A44-3793-488A-ABD9-525D8714316A"></p>
-<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fpttodkc9dj31kw0g9782.jpg" alt="CD7714F1-2A75-474B-B3FE-28CD7035D23C"></p>
-<p>正常情况下，直接执行上图的命令即可，但为了安全起见，执行后，查看/etc/docker/daemon.json，是否格式正确。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;http://5c00508c.m.daocloud.io&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;insecure-registries&quot;: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 启动</span><br><span class="line">$ service docker start</span><br><span class="line">## 配置开机启动</span><br><span class="line">$ chkconfig docker on</span><br><span class="line">## 下载镜像测试</span><br><span class="line">## docker pull hello-world</span><br></pre></td></tr></table></figure>
-<h2 id="Q-amp-A："><a href="#Q-amp-A：" class="headerlink" title="Q&amp;A："></a>Q&amp;A：</h2><h3 id="Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下："><a href="#Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下：" class="headerlink" title="Centos6.5安装好epel后，执行命令yum repolist报错，信息如下："></a>Centos6.5安装好epel后，执行命令yum repolist报错，信息如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ yum repolist</span><br><span class="line">Loaded plugins: product-id, security, subscription-manager</span><br><span class="line">Updating certificate-based repositories.</span><br><span class="line">Error: Cannot retrieve metalink for repository: epel. Please verify its path and try again</span><br></pre></td></tr></table></figure>
-<p>解决办法：vim /etc/yum.repos.d/epel.repo<br>编辑[epel]下的baseurl前的#号去掉，mirrorlist前添加#号。正确配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[epel]</span><br><span class="line">name=Extra Packages for Enterprise Linux 6 - $basearch</span><br><span class="line">baseurl=http://download.fedoraproject.org/pub/epel/6/$basearch</span><br><span class="line">#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6</span><br></pre></td></tr></table></figure></p>
-<p>执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$yum makecache</span><br></pre></td></tr></table></figure></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://www.jianshu.com/p/3a4cd73e3272" target="_blank" rel="noopener">https://www.jianshu.com/p/3a4cd73e3272</a> CentOS7安装Docker</li>
-<li><a href="https://blog.csdn.net/Mr_OOO/article/details/67016309" target="_blank" rel="noopener">https://blog.csdn.net/Mr_OOO/article/details/67016309</a> Docker国内镜像源设置</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/03/29/Java基础之Collection/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -585,6 +412,201 @@
         
           
             <h2 id="java基础之Collection"><a href="#java基础之Collection" class="headerlink" title="java基础之Collection"></a>java基础之Collection</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/03/29/docker之安装/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/03/29/docker之安装/" itemprop="url">Docker之安装</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T15:17:10+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  790
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Docker之安装"><a href="#Docker之安装" class="headerlink" title="Docker之安装"></a>Docker之安装</h2><ul>
+<li>环境：Centos6.5，Centos7<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>1、EPEL（ Extra Packages for Enterprise Linux，企业版Linux的额外软件包)是yum的一个软件源，里面包含了许多基本源里没有的软件；<br>2、docker要求服务CentOS6以上，kernel 版本必须2.6.32-431或更高；<h2 id="查看系统的版本和内核"><a href="#查看系统的版本和内核" class="headerlink" title="查看系统的版本和内核"></a>查看系统的版本和内核</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## 查看系统版本</span><br><span class="line">$ lsb_release -a</span><br><span class="line">## 查看内核版本</span><br><span class="line">$ uname -r</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Centos6-5安装docker"><a href="#Centos6-5安装docker" class="headerlink" title="Centos6.5安装docker"></a>Centos6.5安装docker</h2><p>要将Docker安装到CentOS上，要使用EPEL软件库，下载epel安装包并安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ wget http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm</span><br><span class="line">$ rpm -ivh epel-release-6-8.noarch.rpm</span><br></pre></td></tr></table></figure></p>
+<p>检查EPEL源<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$yum repolist</span><br><span class="line">Loaded plugins: fastestmirror</span><br><span class="line">Loading mirror speeds from cached hostfile</span><br><span class="line"> * base: mirrors.skyshe.cn</span><br><span class="line"> * epel: mirrors.opencas.cn</span><br><span class="line"> * extras: mirrors.skyshe.cn</span><br><span class="line"> * updates: centos.ustc.edu.cn</span><br><span class="line">repo id                                                                                    repo name                                                                                                                          status</span><br><span class="line">base                                                                                       CentOS-6 - Base                                                                                                                     6,575</span><br><span class="line">epel                                                                                       Extra Packages for Enterprise Linux 6 - x86_64                                                                                     12,234</span><br><span class="line">extras                                                                                     CentOS-6 - Extras                                                                                                                      62</span><br><span class="line">updates                                                                                    CentOS-6 - Updates                                                                                                                  1,580</span><br><span class="line">repolist: 20,451</span><br><span class="line">EPEL已经在repo列出，并显示提供12234个软件包，EPEL源的配置安装到了/etc/yum.repos.d/epel.repo</span><br></pre></td></tr></table></figure></p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y docker-io</span><br><span class="line">$ service docker start</span><br><span class="line">$ chkconfig docker on</span><br></pre></td></tr></table></figure>
+<h3 id="检查docker是否安装成功"><a href="#检查docker是否安装成功" class="headerlink" title="检查docker是否安装成功"></a>检查docker是否安装成功</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$docker info</span><br><span class="line">Containers: 0</span><br><span class="line">Images: 0</span><br><span class="line">Storage Driver: devicemapper</span><br><span class="line"> Pool Name: docker-8:3-276002-pool</span><br><span class="line"> Pool Blocksize: 65.54 kB</span><br><span class="line"> Backing Filesystem: extfs</span><br><span class="line"> Data file: /dev/loop0</span><br><span class="line"> Metadata file: /dev/loop1</span><br><span class="line"> Data Space Used: 305.7 MB</span><br><span class="line"> Data Space Total: 107.4 GB</span><br><span class="line"> Data Space Available: 4.873 GB</span><br><span class="line"> Metadata Space Used: 729.1 kB</span><br><span class="line"> Metadata Space Total: 2.147 GB</span><br><span class="line"> Metadata Space Available: 2.147 GB</span><br><span class="line"> Udev Sync Supported: true</span><br><span class="line"> Deferred Removal Enabled: false</span><br><span class="line"> Data loop file: /var/lib/docker/devicemapper/devicemapper/data</span><br><span class="line"> Metadata loop file: /var/lib/docker/devicemapper/devicemapper/metadata</span><br><span class="line"> Library Version: 1.02.95-RHEL6 (2015-09-08)</span><br><span class="line">Execution Driver: native-0.2</span><br><span class="line">Logging Driver: json-file</span><br><span class="line">Kernel Version: 2.6.32-431.el6.x86_64</span><br><span class="line">Operating System: &lt;unknown&gt;</span><br><span class="line">CPUs: 1</span><br><span class="line">Total Memory: 996.4 MiB</span><br><span class="line">Name: winter-01</span><br><span class="line">ID: KJ3G:XD6V:SDDV:5SGY:2TRQ:4XXR:XBPV:VLHE:XHHZ:F425:7G2B:G5D5</span><br></pre></td></tr></table></figure>
+<h2 id="Centos7安装docker"><a href="#Centos7安装docker" class="headerlink" title="Centos7安装docker"></a>Centos7安装docker</h2><p>centos7可以直接使用yum安装，不需要再添加其他软件源信息.</p>
+<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y docker</span><br></pre></td></tr></table></figure>
+<h3 id="添加镜像源"><a href="#添加镜像源" class="headerlink" title="添加镜像源"></a>添加镜像源</h3><p>使用daocloud的镜像加速器，在<a href="https://www.daocloud.io上注册账号，选择加速器" target="_blank" rel="noopener">https://www.daocloud.io上注册账号，选择加速器</a></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fpttnn6256j31kw0p644u.jpg" alt="EE057A44-3793-488A-ABD9-525D8714316A"></p>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fpttodkc9dj31kw0g9782.jpg" alt="CD7714F1-2A75-474B-B3FE-28CD7035D23C"></p>
+<p>正常情况下，直接执行上图的命令即可，但为了安全起见，执行后，查看/etc/docker/daemon.json，是否格式正确。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;http://5c00508c.m.daocloud.io&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;insecure-registries&quot;: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 启动</span><br><span class="line">$ service docker start</span><br><span class="line">## 配置开机启动</span><br><span class="line">$ chkconfig docker on</span><br><span class="line">## 下载镜像测试</span><br><span class="line">## docker pull hello-world</span><br></pre></td></tr></table></figure>
+<h2 id="Q-amp-A："><a href="#Q-amp-A：" class="headerlink" title="Q&amp;A："></a>Q&amp;A：</h2><h3 id="Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下："><a href="#Centos6-5安装好epel后，执行命令yum-repolist报错，信息如下：" class="headerlink" title="Centos6.5安装好epel后，执行命令yum repolist报错，信息如下："></a>Centos6.5安装好epel后，执行命令yum repolist报错，信息如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ yum repolist</span><br><span class="line">Loaded plugins: product-id, security, subscription-manager</span><br><span class="line">Updating certificate-based repositories.</span><br><span class="line">Error: Cannot retrieve metalink for repository: epel. Please verify its path and try again</span><br></pre></td></tr></table></figure>
+<p>解决办法：vim /etc/yum.repos.d/epel.repo<br>编辑[epel]下的baseurl前的#号去掉，mirrorlist前添加#号。正确配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[epel]</span><br><span class="line">name=Extra Packages for Enterprise Linux 6 - $basearch</span><br><span class="line">baseurl=http://download.fedoraproject.org/pub/epel/6/$basearch</span><br><span class="line">#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6</span><br></pre></td></tr></table></figure></p>
+<p>执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$yum makecache</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.jianshu.com/p/3a4cd73e3272" target="_blank" rel="noopener">https://www.jianshu.com/p/3a4cd73e3272</a> CentOS7安装Docker</li>
+<li><a href="https://blog.csdn.net/Mr_OOO/article/details/67016309" target="_blank" rel="noopener">https://blog.csdn.net/Mr_OOO/article/details/67016309</a> Docker国内镜像源设置</li>
+</ul>
+
           
         
       
@@ -1420,7 +1442,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1431,7 +1453,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
