@@ -519,6 +519,187 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/12/kubernetes之pause容器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/12/kubernetes之pause容器/" itemprop="url">kubernetes之pause容器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T22:29:12+08:00">
+                2018-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  408
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?<br>docker容器实际是利用Linux的namespace和cgroup达到容器化的目的.</p>
+<h2 id="Two-feature-of-Linux-kernel"><a href="#Two-feature-of-Linux-kernel" class="headerlink" title="Two feature of Linux kernel"></a>Two feature of Linux kernel</h2><p>linux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行隔离.<br>打个比方,就像你去买商品房,每套都是用混泥土墙隔开,保证别人不会闯到你家.这个可以类比为cgroup,而cgroup就是linux对机器的物理资源(cpu,内存,磁盘io)的隔离.买完了房子,那产权当然是属于你,而不是别人(可能有小三),另外,住进去后你要用水、用电、用网络,对其他人也一样,但是每户各自结算,这就像linux环境中的user namespace、network namespace等,属于环境的隔离.<br>由于能力有限,只能先这么去理解.这里罗列左耳朵耗子的文章.</p>
+<ul>
+<li><a href="https://coolshell.cn/articles/17010.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（上）</a></li>
+<li><a href="https://coolshell.cn/articles/17029.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（下）</a></li>
+<li><a href="https://coolshell.cn/articles/17049.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX CGROUP</a></li>
+</ul>
+<h2 id="AUFS-、DEVICEMAPPER"><a href="#AUFS-、DEVICEMAPPER" class="headerlink" title="AUFS 、DEVICEMAPPER"></a>AUFS 、DEVICEMAPPER</h2><p>对于这两个的理解,AUFS是文件管理系统,用于对文件进行分层.<br>具体可以看耗子叔的这两篇文章.<br><a href="https://coolshell.cn/articles/17061.html" target="_blank" rel="noopener">DOCKER基础技术：AUFS</a><br><a href="https://coolshell.cn/articles/17200.html" target="_blank" rel="noopener">DOCKER基础技术：DEVICEMAPPER</a></p>
+<h2 id="Pause"><a href="#Pause" class="headerlink" title="Pause"></a>Pause</h2><p>In Kubernetes, the pause container serves as the “parent container” for all of the containers in your pod. The pause container has two core responsibilities. First, it serves as the basis of Linux namespace sharing in the pod. And second, with PID (process ID) namespace sharing enabled, it serves as PID 1 for each pod and reaps zombie processes.<br>对于pause的理解</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="What-are-Kubernetes-Pods-Anyway"><a href="#What-are-Kubernetes-Pods-Anyway" class="headerlink" title="What are Kubernetes Pods Anyway?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">What are Kubernetes Pods Anyway?</a></h3><h3 id="The-Almighty-Pause-Container"><a href="#The-Almighty-Pause-Container" class="headerlink" title="The Almighty Pause Container"></a><a href="https://www.ianlewis.org/en/almighty-pause-container" target="_blank" rel="noopener">The Almighty Pause Container</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/11/kubernetes常见问题汇总/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -560,6 +741,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -1231,6 +1434,561 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/04/prometheus之监测服务器心跳/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/04/prometheus之监测服务器心跳/" itemprop="url">prometheus之监测服务器心跳</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:42:33+08:00">
+                2018-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
+                    <span itemprop="name">prometheus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  509
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>环境:centos7, prometheus 2.3.1, blackbox_export 0.12.0</li>
+<li>其他<a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener">exporter</a></li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>blackbox能支持什么协议:HTTP, HTTPS (via the http prober), DNS, TCP socket and ICMP.<br>对于机器可用性的监测,最简单的莫过于使用ping或者ssh的方式.这里使用blackbox_exporter,基于使用node_exporter的经验,可能会认为需要将blackbox_exporter部署到每个节点下,而实际上通过一个部署了blackbox_exporter的节点去检测其他机器.</p>
+<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/df0296f8-6c9a-4642-991a-8b3679667974/index_files/82906877.png" alt="img"></p>
+<h2 id="Execute-blackbox-exporter"><a href="#Execute-blackbox-exporter" class="headerlink" title="Execute blackbox_exporter"></a>Execute blackbox_exporter</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0</span><br></pre></td></tr></table></figure>
+<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/blackbox.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=blackbox.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable blackbox &amp;&amp; systemctl start blackbox</span><br></pre></td></tr></table></figure>
+<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># pwd指定宿主机配置文件路径,我一般都放在/data/blackbox_exporter/config目录下</span><br><span class="line">$ docker build -t blackbox_exporter .</span><br><span class="line">$ docker run -d -p 9115:9115 --name blackbox_exporter -v `pwd`:/config blackbox_exporter --config.file=/config/blackbox.yml</span><br></pre></td></tr></table></figure>
+<h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
+<li><a href="https://github.com/prometheus/blackbox_exporter/blob/master/example.yml" target="_blank" rel="noopener">blackbox_exporter example.yml</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 这里暂时只使用ping和ssh验证主机有效性的方式,其他配置可参看github上的example.yml</span><br><span class="line">$ vim blackbox.yml</span><br><span class="line"># probe探测频率由prometheus中的scripe_timeout决定.</span><br><span class="line">modules:</span><br><span class="line">  ssh_banner:</span><br><span class="line">    prober: tcp</span><br><span class="line">    timeout: 10s # 每次探测的网络超时时间,默认为10秒</span><br><span class="line">    tcp:</span><br><span class="line">      query_response:</span><br><span class="line">      - expect: &quot;^SSH-2.0-&quot;</span><br><span class="line">  icmp:</span><br><span class="line">    prober: icmp</span><br><span class="line">    timeout: 10s</span><br><span class="line">    icmp:</span><br><span class="line">      preferred_ip_protocol: &quot;ip4&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Test-Blackbox-Exporter"><a href="#Test-Blackbox-Exporter" class="headerlink" title="Test Blackbox Exporter"></a>Test Blackbox Exporter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 测试目标10.1.1.21的ping信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=icmp\&amp;target\=10.1.1.25</span><br><span class="line">......</span><br><span class="line">probe_success 0  # 目标主机ping失败</span><br><span class="line"># 测试目标10.1.1.21 22的ssh信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=ssh_banner\&amp;target\=10.1.1.21:22</span><br><span class="line">......</span><br><span class="line">probe_success 1  # 目标主机ssh通过</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="blackbox-exporter-github"><a href="#blackbox-exporter-github" class="headerlink" title="blackbox_exporter github"></a><a href="https://github.com/prometheus/blackbox_exporter" target="_blank" rel="noopener">blackbox_exporter github</a></h3><h3 id="用Prometheus进行网络质量ping"><a href="#用Prometheus进行网络质量ping" class="headerlink" title="用Prometheus进行网络质量ping"></a><a href="https://www.iamle.com/archives/2130.html" target="_blank" rel="noopener">用Prometheus进行网络质量ping</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/03/prometheus配置zookeeper服务发现机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/03/prometheus配置zookeeper服务发现机制/" itemprop="url">prometheus配置zookeeper服务发现机制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-03T21:39:13+08:00">
+                2018-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
+                    <span itemprop="name">prometheus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  409
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>环境:zookeeper 3.4.12, prometheus 2.3.1, centos7.3,node_exporter 0.16.0</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>prometheus监听时,一般时配置到prometheus.yml中.机器数量少还好,如果机器数量大,每次改动再重启,简直就是个噩梦.还好它支持服务发现.<br>如何文件、consul、zookeeper等.具体可以查看<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cazure_sd_config%3E" target="_blank" rel="noopener">官网配置</a>说明.</p>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="服务器及软件安装"><a href="#服务器及软件安装" class="headerlink" title="服务器及软件安装"></a>服务器及软件安装</h4><p>服务器    安装软件<br>10.1.1.25    prometheus,zookeeper<br>10.1.1.21<br>10.1.1.22<br>10.1.1.23    node_exporter<br>安装过程不在累述,自行百度即可.</p>
+<h3 id="Config-Prometheus-yml"><a href="#Config-Prometheus-yml" class="headerlink" title="Config Prometheus.yml"></a>Config Prometheus.yml</h3><p>现在我需要监听118.10.2.34服务器中的3台虚拟机10.1.1.21:9100,10.1.1.22:9100,10.1.1.23:9100<br>zookeeper中的路径设置如下:<br>/proxy/118.10.2.34:22/10.1.1.21:9100<br>/proxy/118.10.2.34:22/10.1.1.22:9100<br>/proxy/118.10.2.34:22/10.1.1.23:9100</p>
+<h4 id="promethues-yml"><a href="#promethues-yml" class="headerlink" title="promethues.yml"></a>promethues.yml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;proxy&apos;</span><br><span class="line">    honor_labels: true</span><br><span class="line">    serverset_sd_configs:</span><br><span class="line">    - servers:</span><br><span class="line">      - &apos;10.1.1.25:2181&apos; </span><br><span class="line">      paths:</span><br><span class="line">      - &apos;/proxy&apos;</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [&apos;__meta_serverset_path&apos;]    # 待抓取的服务器集合路径</span><br><span class="line">      regex: &apos;^/proxy/([^/]+)/([^/]+)&apos;                       # 路径匹配规则</span><br><span class="line">      target_label: &apos;meta_ip&apos;</span><br><span class="line">      replacement: &apos;$&#123;1&#125;&amp;$&#123;2&#125;&apos;</span><br><span class="line">    - source_labels: [&apos;meta_ip&apos;]</span><br><span class="line">      regex: &apos;(\d+.\d+.\d+.\d+):(\d+)&amp;(\d+.\d+.\d+.\d+):(\d+)&apos;  # 解析出ip</span><br><span class="line">      target_label: &apos;__address__&apos;</span><br><span class="line">      replacement: &apos;$&#123;1&#125;:$&#123;2&#125;&apos;   # 设置监听的服务器ip</span><br><span class="line">    - source_labels: [&apos;meta_ip&apos;]</span><br><span class="line">      regex: &apos;(\d+.\d+.\d+.\d+):(\d+)&amp;(\d+.\d+.\d+.\d+):(\d+)&apos;</span><br><span class="line">      target_label: &apos;machine&apos;    # 设置所属服务器,用于标识作用,便于以后分组</span><br><span class="line">      replacement: &apos;$&#123;3&#125;:$&#123;4&#125;&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="特别注意"><a href="#特别注意" class="headerlink" title="特别注意"></a>特别注意</h4><p>zookeeper中的节点,如10.1.1.26:9100其值必须设置为json格式,可以简单设置为{},否则prometheus不能解析到该节点.</p>
+<h3 id="效果检查"><a href="#效果检查" class="headerlink" title="效果检查"></a>效果检查</h3><p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/0545bc9a-a416-4c66-8245-963a34bbdde4/index_files/55493948.png" alt="img"></p>
+<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/0545bc9a-a416-4c66-8245-963a34bbdde4/index_files/55801785.png" alt="img"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Prometheus-Configuration"><a href="#Prometheus-Configuration" class="headerlink" title="Prometheus Configuration"></a><a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cserverset_sd_config%3E" target="_blank" rel="noopener">Prometheus Configuration</a></h3><h3 id="ZooKeeper-serverset-discovery-Issues"><a href="#ZooKeeper-serverset-discovery-Issues" class="headerlink" title="ZooKeeper serverset discovery Issues"></a><a href="https://github.com/prometheus/prometheus/issues/2758" target="_blank" rel="noopener">ZooKeeper serverset discovery Issues</a></h3><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h3><h4 id="Prometheus-Node-exporter"><a href="#Prometheus-Node-exporter" class="headerlink" title="Prometheus/Node_exporter"></a><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Prometheus/Node_exporter</a></h4><h4 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a><a href="http://zookeeper.apache.org/releases.html#download" target="_blank" rel="noopener">Zookeeper</a></h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/02/prometheus入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/02/prometheus入门/" itemprop="url">prometheus之入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-02T23:34:22+08:00">
+                2018-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
+                    <span itemprop="name">prometheus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  747
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>环境:prometheus 2.3.1, blackbox_exporter 0.12.0, alertmanager 0.15.1, centos 7</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>应用场景:监测500+主机是否存活(通过ping或ssh的方式检测),并报警.</p>
+<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><ul>
+<li>Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不必要的业务数据导出），尽量要使用SSD（这个很关键！），因为一旦Prometheus的内存使用量达到阈值会停止抓取数据！这个停止抓取的时间，至少是分钟级，甚至是无法恢复！所以只要有条件就要用SSD。</li>
+<li>Prometheus号称支持reload，但目测不是很好用，比如你修改了告警规则文件，重载之后，新旧告警规则似乎会一起计算执行….</li>
+</ul>
+<h2 id="Execute-Prometheus"><a href="#Execute-Prometheus" class="headerlink" title="Execute Prometheus"></a>Execute Prometheus</h2><h3 id="Build-with-Binary-And-Config"><a href="#Build-with-Binary-And-Config" class="headerlink" title="Build with Binary And Config"></a>Build with Binary And Config</h3><h4 id="Build-with-Binary"><a href="#Build-with-Binary" class="headerlink" title="Build with Binary"></a>Build with Binary</h4><ul>
+<li>Download<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/prometheus/releases/download/v2.3.2/prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv prometheus-2.3.2.linux-amd64 prometheus-2.3.2</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Config-prometheus-yml"><a href="#Config-prometheus-yml" class="headerlink" title="Config prometheus.yml"></a>Config prometheus.yml</h3><p>blackbox_exporter和alertmanager的安装可以参见另外两篇文章《alertmanager之初体验》、《blackbox_exporter之安装》<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 由于机器数量较多,使用prometheus的服务发现,将所有机器配置到单独的文件中.</span><br><span class="line">$ vim /opt/machine.json</span><br><span class="line">[</span><br><span class="line"> &#123;&quot;targets&quot;:[&quot;122.227.184.61:20065&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d9&quot;&#125;&#125;,</span><br><span class="line">&#123;&quot;targets&quot;:[&quot;122.227.184.61:20063&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d8&quot;&#125;&#125;,</span><br><span class="line">...</span><br><span class="line">]</span><br><span class="line"># 配置prometheus.yml</span><br><span class="line">$ vim /opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">global:</span><br><span class="line">  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.</span><br><span class="line">  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.</span><br><span class="line">  # scrape_timeout is set to the global default (10s).</span><br><span class="line"># Alertmanager configuration</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: [&quot;10.1.1.26:9093&quot;]  # alertmanager的地址.</span><br><span class="line"># Load rules once and periodically evaluate them according to the global &apos;evaluation_interval&apos;.</span><br><span class="line">rule_files:</span><br><span class="line">  - &quot;/opt/proxy_rules.yml&quot;  # 规则文件.</span><br><span class="line"># A scrape configuration containing exactly one endpoint to scrape:</span><br><span class="line"># Here it&apos;s Prometheus itself.</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;machine_heart&apos;</span><br><span class="line">    metrics_path: /probe</span><br><span class="line">    params:</span><br><span class="line">      module: [ssh_banner]</span><br><span class="line">    file_sd_configs:</span><br><span class="line">    - files: [&apos;/opt/machine.json&apos;]   # 机器地址列表文件</span><br><span class="line">      refresh_interval: 5m</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [address]</span><br><span class="line">      regex: (.*)</span><br><span class="line">      replacement: $&#123;1&#125;</span><br><span class="line">      target_label: __param_target  # 请求http://10.1.1.26:9155的请求参数target</span><br><span class="line">    - source_labels: [__param_target]</span><br><span class="line">      target_label: instance</span><br><span class="line">    - target_label: address</span><br><span class="line">      replacement: 10.1.1.26:9115  # blackbox_exporter的地址.</span><br></pre></td></tr></table></figure></p>
+<h3 id="Config-rules-yml"><a href="#Config-rules-yml" class="headerlink" title="Config rules.yml"></a>Config rules.yml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ vim /opt/proxy_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: machine_heart</span><br><span class="line">    rules:</span><br><span class="line">    - alert: &apos;ssh&apos;</span><br><span class="line">      expr: probe_success&#123;job=&quot;machine_heart&quot;&#125; &lt; 1</span><br><span class="line">      for: 1m</span><br><span class="line">      labels:</span><br><span class="line">        severity: critical</span><br><span class="line">      # team: &apos;proxy-team&apos;</span><br><span class="line">      annotations:</span><br><span class="line">        summary: &quot;Instance &#123;&#123; $labels.instance &#125;&#125; down.&quot;</span><br><span class="line">        description: &quot;&#123;&#123; $labels.instance &#125;&#125; of job &#123;&#123; $labels.job &#125;&#125; has been down for more than 1 minutes.&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=prometheus.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/prometheus-2.3.1/prometheus --config.file=/opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable prometheus &amp;&amp; systemctl start prometheus</span><br></pre></td></tr></table></figure>
+<h3 id="Test-Prometheus"><a href="#Test-Prometheus" class="headerlink" title="Test Prometheus"></a>Test Prometheus</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="基于Prometheus的分布式在线服务监控实践"><a href="#基于Prometheus的分布式在线服务监控实践" class="headerlink" title="基于Prometheus的分布式在线服务监控实践"></a><a href="https://zhuanlan.zhihu.com/p/24811652" target="_blank" rel="noopener">基于Prometheus的分布式在线服务监控实践</a></h3><h3 id="Prometheus-非官方中文手册"><a href="#Prometheus-非官方中文手册" class="headerlink" title="Prometheus 非官方中文手册"></a><a href="https://github.com/1046102779/prometheus" target="_blank" rel="noopener">Prometheus 非官方中文手册</a></h3><h3 id="使用Prometheus-grafana打造高逼格监控平台"><a href="#使用Prometheus-grafana打造高逼格监控平台" class="headerlink" title="使用Prometheus+grafana打造高逼格监控平台"></a><a href="http://blog.51cto.com/youerning/2050543" target="_blank" rel="noopener">使用Prometheus+grafana打造高逼格监控平台</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/05/24/自动化运维工具之OpsManage安装/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1394,826 +2152,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/05/02/架构之定义/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/05/02/架构之定义/" itemprop="url">架构之定义</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-02T09:23:31+08:00">
-                2018-05-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/架构/" itemprop="url" rel="index">
-                    <span itemprop="name">架构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  281
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="架构之定义"><a href="#架构之定义" class="headerlink" title="架构之定义"></a>架构之定义</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前嘴里常说架构师,但并没有去细究它的具体含义.偶然间看到别人分享了极客时间的《从0开始学架构》专栏.读了架构到底是什么这篇文章后,发现自己从来都没有思考过.(人最怕的就是<strong><em>不知道自己不知道</em></strong>)赶紧学习充电.</p>
-<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p><strong>架构:软件系统的顶层结构.</strong>(引用文章的结论).没有知识体系,理解这些概念真的很难.没办法,只能尝试去理解,强行记忆了.</p>
-<p>想要理解,需要几个概念进行比较理解.</p>
-<ul>
-<li><p>系统与子系统</p>
-<p>一些独立的“个体”,互相关联和协作.(个体可以是组件、子系统、模块)</p>
-</li>
-</ul>
-<ul>
-<li><p>模块与组件</p>
-<p>模块是从逻辑角度理解,进行职责上的划分.</p>
-<p>组件是从物理角度理解,便于复用.</p>
-</li>
-<li><p>框架</p>
-<p>1、组件规范;</p>
-<p>2、提供基础功能产品;</p>
-</li>
-</ul>
-<p>架构需要明确系统包含哪些“个体”,并且需要明确个体运作和协作的规则.</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fqwsgmsqhoj31cg0rkgoo.jpg" alt="66091B87-6F9C-4FAD-934A-C3472C2FB399"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/24/elasticsearch之基本命令/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/04/24/elasticsearch之基本命令/" itemprop="url">elasticsearch之基本命令</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-24T23:38:33+08:00">
-                2018-04-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/elaticsearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elaticsearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  580
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2><ul>
-<li>环境：Mac 10.13.4 、elasticsearch 5.5.1、jdk8</li>
-</ul>
-<h2 id="索引（Index）"><a href="#索引（Index）" class="headerlink" title="索引（Index）"></a>索引（Index）</h2><h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$ put http://[ip]:[port]/[索引名]</span><br><span class="line">## 创建时指定分片（3个主分片，2个副本分片）</span><br><span class="line">参数:</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot; : &#123;</span><br><span class="line">    &quot;index&quot; : &#123;&quot;number_of_shards&quot; : 3, &quot;number_of_replicas&quot; : 2&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">## 修改副本分片</span><br><span class="line">$ put http://[ip]:[port]/[索引名]/_settings</span><br><span class="line">参数:</span><br><span class="line">&#123;</span><br><span class="line">  &quot;number_of_replicas&quot; : 1&#125;</span><br><span class="line">&#125;</span><br><span class="line">## 创建索引，并添加log类型，字段为message，字段类型为string（已存在索引会失败）</span><br><span class="line">$ put http://[ip]:[port]/[索引名]</span><br><span class="line">参数：</span><br><span class="line">&#123;</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;log&quot; : &#123;</span><br><span class="line">      &quot;properties&quot; &#123;</span><br><span class="line">        &quot;message&quot; :&#123;&quot;type&quot; : &quot;string&quot;&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="查询索引"><a href="#查询索引" class="headerlink" title="查询索引"></a>查询索引</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ get http://[ip]:[port]/[索引名]/[_mapping,_settings,_aliase]</span><br><span class="line">&#123;</span><br><span class="line">  &quot;[索引名]&quot;: &#123;</span><br><span class="line">    &quot;aliases&quot;: &#123;&#125;,</span><br><span class="line">    &quot;mappings&quot;: &#123;&#125;,</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">      &quot;index&quot;: &#123;</span><br><span class="line">        &quot;creation_date&quot;: &quot;1524617001036&quot;,</span><br><span class="line">        &quot;number_of_shards&quot;: &quot;3&quot;,</span><br><span class="line">        &quot;number_of_replicas&quot;: &quot;1&quot;,</span><br><span class="line">        &quot;uuid&quot;: &quot;jk7IHv-jQpyd4jwOeo86ag&quot;,</span><br><span class="line">        &quot;version&quot;: &#123;</span><br><span class="line">          &quot;created&quot;: &quot;5050199&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;provided_name&quot;: &quot;[索引名]&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ delete http://[ip]:[port]/[索引名],[索引名],...</span><br><span class="line">或者使用_all或*删除全部索引（注意：务必要在配置文件中禁用 action.destructive_requires_name:true）</span><br></pre></td></tr></table></figure>
-<h3 id="修改索引"><a href="#修改索引" class="headerlink" title="修改索引"></a>修改索引</h3><h4 id="修改索引副本数量"><a href="#修改索引副本数量" class="headerlink" title="修改索引副本数量"></a>修改索引副本数量</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ put http://[ip]:[port]/[索引名]/_settings</span><br><span class="line">参数:</span><br><span class="line">&#123;</span><br><span class="line">  &quot;number_of_replicas&quot; : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="打开-关闭索引"><a href="#打开-关闭索引" class="headerlink" title="打开/关闭索引"></a>打开/关闭索引</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 因为关闭索引磁盘空间并不会释放，造成磁盘空间浪费，因此一般禁用该功能，settings,cluster.indices.close.enable:false</span><br><span class="line">$ post http://[ip]:[port]/[索引名]/[_open,_close]</span><br><span class="line">返回值：</span><br><span class="line">&#123;</span><br><span class="line">&quot;acknowledged&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><h3 id="修改字段"><a href="#修改字段" class="headerlink" title="修改字段"></a>修改字段</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">## name为对象类型（Object datatype）</span><br><span class="line">$ put http://[ip]:[port]/[索引名]/_mappings/user</span><br><span class="line">参数：</span><br><span class="line">&#123;</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;name&quot;: &#123;</span><br><span class="line">          &quot;properties&quot;: &#123;</span><br><span class="line">            &quot;last&quot;: &#123;&quot;type&quot; : &quot;string&quot;&#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;user_id&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;string&quot;,</span><br><span class="line">          &quot;index&quot;: &quot;not_analyzed&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="文档（Document）"><a href="#文档（Document）" class="headerlink" title="文档（Document）"></a>文档（Document）</h2><h3 id="增删改查"><a href="#增删改查" class="headerlink" title="增删改查"></a>增删改查</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">## 添加文档</span><br><span class="line">$ put/post http://[ip]:[port]/[索引名]/[类型]/[_id] </span><br><span class="line">参数：&#123;&quot;computer&quot;:&quot;huawei&quot;&#125;</span><br><span class="line">返回值：</span><br><span class="line">&#123;</span><br><span class="line">&quot;_index&quot;: &quot;index1_test&quot;,</span><br><span class="line">&quot;_type&quot;: &quot;test&quot;,</span><br><span class="line">&quot;_id&quot;: &quot;3&quot;,</span><br><span class="line">&quot;_version&quot;: 1,</span><br><span class="line">&quot;result&quot;: &quot;created&quot;,</span><br><span class="line">&quot;_shards&quot;: &#123; &quot;total&quot;: 2,&quot;successful&quot;: 1,&quot;failed&quot;: 0&#125;,</span><br><span class="line">&quot;created&quot;: true</span><br><span class="line">&#125;</span><br><span class="line">## 删除文档</span><br><span class="line">$ delete http://[ip]:[port]/[索引名]/[类型]/[_id]</span><br><span class="line">返回值：</span><br><span class="line">&#123;</span><br><span class="line">&quot;found&quot;: true,</span><br><span class="line">&quot;_index&quot;: &quot;index1_test&quot;,</span><br><span class="line">&quot;_type&quot;: &quot;test&quot;,</span><br><span class="line">&quot;_id&quot;: &quot;3&quot;,</span><br><span class="line">&quot;_version&quot;: 2,</span><br><span class="line">&quot;result&quot;: &quot;deleted&quot;,</span><br><span class="line">&quot;_shards&quot;: &#123; &quot;total&quot;: 2,&quot;successful&quot;: 1,&quot;failed&quot;: 0&#125;</span><br><span class="line">&#125;</span><br><span class="line">## 修改文档</span><br><span class="line">$ post http://[ip]:[port]/[索引名]/[类型]/[_id]/_update</span><br><span class="line">参数：</span><br><span class="line">&#123;</span><br><span class="line">	&quot;doc&quot; : &#123;</span><br><span class="line">  		&quot;computer&quot; : &quot;apple&quot;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">## 查询文档</span><br><span class="line">$ get http://[ip]:[port]/[索引名]/[类型]/[_id]</span><br><span class="line">返回值：</span><br><span class="line">&#123;</span><br><span class="line">&quot;_index&quot;: &quot;index1_test&quot;,</span><br><span class="line">&quot;_type&quot;: &quot;test1&quot;,</span><br><span class="line">&quot;_id&quot;: &quot;100&quot;,</span><br><span class="line">&quot;_version&quot;: 2,</span><br><span class="line">&quot;found&quot;: true,</span><br><span class="line">&quot;_source&quot;: &#123; &quot;computer&quot;: &quot;apple&quot;&#125;</span><br><span class="line">&#125;</span><br><span class="line">真的如上面这么简单，就不是es了。=!=</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/10/Swagger注解说明/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/04/10/Swagger注解说明/" itemprop="url">Swagger注解说明</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-10T11:15:39+08:00">
-                2018-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/swagger/" itemprop="url" rel="index">
-                    <span itemprop="name">swagger</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  910
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  4
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Swagger注解说明"><a href="#Swagger注解说明" class="headerlink" title="Swagger注解说明"></a>Swagger注解说明</h2><ul>
-<li>环境：swagger 2.7.0</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>使用swagger也有一段时间了，对于注解还是很混乱，这里做个记录，方便后续查阅。</p>
-<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><p>swagger的注解都在swagger-annotations中，当前版本总共27个注解。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;io.swagger&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.5.13&lt;/version&gt;</span><br><span class="line">      &lt;scope&gt;compile&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>现在逐一查看各个注解及使用。</p>
-<h3 id="Api"><a href="#Api" class="headerlink" title="@Api"></a>@Api</h3><p>作用于class或interface上（推荐定义在接口上），说明该接口的作用。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Api(tags = &#123;&quot;数据接口&quot;&#125;, description = &quot;推荐系统&quot;)</span><br><span class="line">public interface DataCollectControllerApi &#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>效果：</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq7f1lwq46j31kw0magrx.jpg" alt="40BF8CA4-03D2-4B05-B63D-520C9A849C05"></p>
-<h3 id="ApiOperation"><a href="#ApiOperation" class="headerlink" title="@ApiOperation"></a>@ApiOperation</h3><p>作用于方法上</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;查询用户行为&quot;, notes = &quot;查询用户行为数据&quot;)</span><br><span class="line">@PostMapping(value = &quot;/behavior&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">    ResultBean&lt;PageInfo&gt; queryUserBehaviorRecord(@RequestBody UserBehaviorReqDTO userBehaviorReqDTO);</span><br></pre></td></tr></table></figure>
-<p>效果：</p>
-<p><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq7gyiss2dj31kw07wtat.jpg" alt="31980D1F-54AA-436E-A3C7-D96D2A66600A"></p>
-<h3 id="ApiImplicitParams和-ApiImplicitParam（不建议使用）"><a href="#ApiImplicitParams和-ApiImplicitParam（不建议使用）" class="headerlink" title="@ApiImplicitParams和@ApiImplicitParam（不建议使用）"></a>@ApiImplicitParams和@ApiImplicitParam（不建议使用）</h3><p>作用于方法上，但是不建议使用（原因：This is the only way to define parameters when using Servlets or other non-JAX-RS* environments），建议使用@ApiParam</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;查询用户&quot;, notes = &quot;查询用户信息&quot;)</span><br><span class="line">   @ApiImplicitParams(&#123;</span><br><span class="line">           @ApiImplicitParam(name = &quot;userId&quot;, value = &quot;用户id&quot;, paramType = &quot;query&quot;, dataType = &quot;int&quot;),</span><br><span class="line">           @ApiImplicitParam(name = &quot;userName&quot;, value = &quot;用户名&quot;, paramType = &quot;query&quot;, dataType = &quot;string&quot;)</span><br><span class="line">   &#125;)</span><br><span class="line">   @PostMapping(value = &quot;/user&quot;)</span><br><span class="line">   @ResponseBody</span><br><span class="line">   ResultBean queryUserInfo(@RequestParam(&quot;userId&quot;) Integer userId,</span><br><span class="line">                    @RequestParam(&quot;userName&quot;) String userName);</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>name：参数名称，即下图的Parameter列</p>
-</li>
-<li><p>value：参数描述，即下图的Description列</p>
-</li>
-<li><p>paramType：参数类型，这里支持5种query,body,path,form,header，这里常用query和body。</p>
-<p>body表示该参数为json。</p>
-</li>
-<li><p>paramType：参数数据类型，目前只支持基本数据类型，int，float，long等</p>
-</li>
-</ul>
-<p>效果：</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fq7ie7m8hhj31jk0y0af3.jpg" alt="E0BA3ABA-3832-4C26-A9C5-9855D5E9A6B7"></p>
-<h3 id="ApiParam"><a href="#ApiParam" class="headerlink" title="@ApiParam"></a>@ApiParam</h3><p>作用于方法和参数上（只有一个参数时可以在方法上使用，但通常都会有多个参数，所以建议在参数上使用）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;查询用户&quot;, notes = &quot;查询用户信息&quot;)</span><br><span class="line">@PostMapping(value = &quot;/user&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">ResultBean queryUserInfo(</span><br><span class="line">            @ApiParam(name = &quot;userId&quot;, value = &quot;用户id&quot;, type = &quot;Integer&quot;)</span><br><span class="line">            @RequestParam(&quot;userId&quot;) Integer userId,</span><br><span class="line">            @ApiParam(name = &quot;userName&quot;, value = &quot;用户名称&quot;, type = &quot;String&quot;)</span><br><span class="line">            @RequestParam(&quot;userName&quot;) String userName);</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>name：参数名称，即下图的Parameter列</p>
-</li>
-<li><p>value：参数描述，即下图的Description列</p>
-</li>
-<li><p>type：参数数据类型，即下图的Data Type列。可以忽略，swagger会根据SpringMVC中的注解（RequestParam,RequestBody）自动匹配参数类型（Parameter Type列）和参数数据类型（Data Type列）。如下图，参数使用@RequestParam，则Parameter Type为query，Data Type为对应参数类型；</p>
-<p>参数使用@RequestBody，则Parameter Type为body，Data Type为对应参数类型；</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fq7ja2hsv4j31dc0dyjsw.jpg" alt="EE7527A9-9F9C-41CB-9585-A220B996D9D5"></p>
-</li>
-</ul>
-<p>效果：</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq7j2jzdi9j31ka0xqn1q.jpg" alt="B5BCA1A6-0C31-4BA0-8213-E6FCD3077135"></p>
-<h3 id="ApiResponses和-ApiResponse"><a href="#ApiResponses和-ApiResponse" class="headerlink" title="@ApiResponses和@ApiResponse"></a>@ApiResponses和@ApiResponse</h3><p>作用于方法上，一般用于描述错误的响应信息。@ApiResponses用户描述一组错误响应。@ApiResponse用户描述具体的错误响应。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;查询用户&quot;, notes = &quot;查询用户信息&quot;)</span><br><span class="line">@PostMapping(value = &quot;/user&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">@ApiResponses(&#123;</span><br><span class="line">    @ApiResponse(code = 1001, message = &quot;用户参数为空&quot;,responseHeaders = &#123;</span><br><span class="line"> 		@ResponseHeader(name = &quot;header-1&quot;, description = &quot;header-1描述&quot;, response = String.class),</span><br><span class="line">        @ResponseHeader(name = &quot;header-2&quot;, description = &quot;header-2描述&quot;, response = Integer.class),</span><br><span class="line">        @ResponseHeader(name = &quot;header-3&quot;, description = &quot;header-3描述&quot;, response = ResultBean.class)</span><br><span class="line">      	&#125;),</span><br><span class="line">     @ApiResponse(code = 1002, message = &quot;用户不存在&quot;, response = ResultBean.class),</span><br><span class="line">    &#125;)</span><br><span class="line">ResultBean queryUserInfo(</span><br><span class="line">            @ApiParam(name = &quot;userId&quot;, value = &quot;用户id&quot;)</span><br><span class="line">            @RequestBody Integer userId,</span><br><span class="line">            @ApiParam(name = &quot;userName&quot;, value = &quot;用户名称&quot;)</span><br><span class="line">            @RequestParam(&quot;userName&quot;) String userName);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>code：返回码，对应HTTP Status Code列</li>
-<li>message：返回码描述，对应Reason列</li>
-<li>response：返回值类型，对应Response Model列</li>
-<li>responseHeaders：返回值头信息，使用@ResponseHeader对返回值头的描述<ul>
-<li>name：响应头名称</li>
-<li>description：响应头描述</li>
-<li>response：响应头返回值类型</li>
-</ul>
-</li>
-</ul>
-<p>使用@ApiResponse时，如果同时使用response属性和responseHeaders属性，responseHeaders会失效（已测试）。另外，使用responseHeaders时，在使用@ResponseHeader时，ResponseHeader中的属性response使用类类型无效（已测试），默认为string</p>
-<p>效果：</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq7khwiw8aj31is0umtd2.jpg" alt="334B5658-FC90-41D9-BD46-C3D6B3204049"></p>
-<h3 id="ResponseHeader"><a href="#ResponseHeader" class="headerlink" title="@ResponseHeader"></a>@ResponseHeader</h3><p>ApiKeyAuthDefinition</p>
-<p>ApiModel</p>
-<p>ApiModelProperty</p>
-<p>Authorization</p>
-<p>AuthorizationScope</p>
-<p>BasicAuthDefinition</p>
-<p>Contact</p>
-<p>Example</p>
-<p>ExampleProperty</p>
-<p>Extension</p>
-<p>ExtensionProperty</p>
-<p>ExternalDocs</p>
-<p>Info</p>
-<p>License</p>
-<p>OAuth2Definition</p>
-<p>Scope</p>
-<p>SecurityDefinition</p>
-<p>SwaggerDefinition</p>
-<p>Tage</p>
-<h2 id="常用模版"><a href="#常用模版" class="headerlink" title="常用模版"></a>常用模版</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://my.oschina.net/zzuqiang/blog/793606" target="_blank" rel="noopener">https://my.oschina.net/zzuqiang/blog/793606</a> swagger注解类使用说明</li>
-<li><a href="http://www.cnblogs.com/softidea/p/6251249.html" target="_blank" rel="noopener">http://www.cnblogs.com/softidea/p/6251249.html</a> Swagger使用</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/08/Scala之IDEA创建/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/04/08/Scala之IDEA创建/" itemprop="url">Spark之IDEA创建Scala工程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-08T11:07:32+08:00">
-                2018-04-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spark/" itemprop="url" rel="index">
-                    <span itemprop="name">Spark</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  367
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Spark之IDEA创建Scala工程"><a href="#Spark之IDEA创建Scala工程" class="headerlink" title="Spark之IDEA创建Scala工程"></a>Spark之IDEA创建Scala工程</h2><ul>
-<li>环境：Mac 10.13.3，Intellij Idea 2016.3.5，scala 2.12.5</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>通过IDEA快速创建scala-maven工程，开发spark应用。</p>
-<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><h4 id="通过maven模板创建scala"><a href="#通过maven模板创建scala" class="headerlink" title="通过maven模板创建scala"></a>通过maven模板创建scala</h4><p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq52usxxfmj31h60ucwo2.jpg" alt="B54F78E7-ECE0-4D77-A319-FB3AC83BD89A"></p>
-<p>后面就是创建目录的指定，这里省略。</p>
-<p>注：由于这个模板比较老，所以要对pom做一些修改。</p>
-<h4 id="修改pom文件"><a href="#修改pom文件" class="headerlink" title="修改pom文件"></a>修改pom文件</h4><p>这里主要是修改scala的版本（默认的是2.7.0的，太老了），以及maven-scala-plugin版本。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  &lt;groupId&gt;com.bsd.scala&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;scala-003&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line"></span><br><span class="line">  &lt;properties&gt;</span><br><span class="line">    &lt;scala.version&gt;2.11.8&lt;/scala.version&gt;</span><br><span class="line">  &lt;/properties&gt;</span><br><span class="line"></span><br><span class="line">  &lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.scala-lang&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;scala-library&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;$&#123;scala.version&#125;&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;4.14&lt;/version&gt;</span><br><span class="line">      &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.specs&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;specs&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.2.5&lt;/version&gt;</span><br><span class="line">      &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">  &lt;/dependencies&gt;</span><br><span class="line"></span><br><span class="line">  &lt;build&gt;</span><br><span class="line">    &lt;sourceDirectory&gt;src/main/scala&lt;/sourceDirectory&gt;</span><br><span class="line">    &lt;testSourceDirectory&gt;src/test/scala&lt;/testSourceDirectory&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.scala-tools&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-scala-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.15.2&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;compile&lt;/goal&gt;</span><br><span class="line">              &lt;goal&gt;testCompile&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure>
-<p>以上基本的一个scala项目就好了。（另外再删除掉test下的相关类即可）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://cwiki.apachecn.org/display/Spark/Index" target="_blank" rel="noopener">http://cwiki.apachecn.org/display/Spark/Index</a> Spark翻译组</li>
-</ul>
-<hr>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2263,7 +2206,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2274,7 +2217,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2285,7 +2228,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2346,7 +2289,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">10.8k</span>
+    <span title="Site words total count">12.8k</span>
   
 </div>
 
