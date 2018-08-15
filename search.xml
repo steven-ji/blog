@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Blackbox_exporter之安装]]></title>
+    <url>%2Fblog%2F2018%2F08%2F15%2FBlackbox-exporter%E4%B9%8B%E5%AE%89%E8%A3%85%2F</url>
+    <content type="text"><![CDATA[环境:centos7, blackbox_exporter 0.12.0 前言这里使用blackbox_exporter的ssh和ping的检测功能. Build with Binary And Config SystemdBuild with Binary Download123$ cd /opt$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz &amp;&amp; mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0 Config blackbox.yml12345678910111213$ vim /opt/blackbox_exporter-0.12.0/blackbox.ymlmodules: ssh_banner: prober: tcp timeout: 15s tcp: query_response: - expect: &quot;^SSH-2.0-&quot; icmp: prober: icmp timeout: 5s icmp: preferred_ip_protocol: &quot;ip4&quot; Config Systemd123456789101112131415161718$ vim /usr/lib/systemd/system/blackbox.service[Unit]Description=blackbox.serviceWants=network-online.targetAfter=network-online.target[Service]Type=simpleExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.ymlRestart=on-failureExecReload=/bin/kill -s HUP $MAINPIDExecStop=/bin/kill -s QUIT $MAINPID[Install]WantedBy=multi-user.target# 启动$ systemctl enable blackbox &amp;&amp; systemctl start blackbox Test blackbox在浏览器中查看:http://10.1.1.26:9115 Build with Docker]]></content>
+      <categories>
+        <category>prometheus</category>
+      </categories>
+      <tags>
+        <tag>blackbox_exporter安装</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Kubernetes Pods指定镜像仓库]]></title>
     <url>%2Fblog%2F2018%2F08%2F15%2FKubernetes-Pods%E6%8C%87%E5%AE%9A%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%2F</url>
     <content type="text"><![CDATA[Foreward在创建pod时,image是从哪个仓库下载?应该如何指定公司的Regitry?最佳实践是什么?带着这些问题,记录自己的爬坑经历. 镜像建议 对每个镜像都指定明确的版本号(不要使用latest这样的版本号),减少去镜像仓库拉取的消耗.(可以学习kube的api,版本为X.Y.Z. X is the major version, Y is the minor version, and Z is the patch version) 使用镜像私仓 使用私仓时,需要配置认证信息. pod中指定私仓优先级高于node指定私仓. 在node节点中配置(推荐) 与在每个pod中使用ImagePullSecrets相比,少了重复的配置代码. 配置认证信息 docker添加私仓认证信息,可参考这里 一般使用docker时,默认都是从docker hub上拉取镜像.正常拉取是不需要认证信息的,但在上传时需要认证信息. 在每个节点上配置登录认证信息. 123# 默认docker hub的地址是:https://index.docker.io/v1$ echo [密码] | docker login --username [用户名] --password-stdin [私仓服务器地址]# 认证后,会在$HOME/.docker/下生成config.json文件.如果指定退出则会删除该文件. 认证信息优先级 {–root-dir:-/var/lib/kubelet}/config.json 默认config.json不存在 {cwd of kubelet}/config.json 指定kubelet的工作空间路径,这种方式暂不考虑. ${HOME}/.docker/config.json 默认config.json是不存在的 /.docker/config.json 默认该目录不存在 在pod中指定ImagePullSecrets创建secret12# 实际上在pull镜像时创建一个虚拟的.docker/config.json文件.$ kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL pod中使用imagePulSecrets123456789101112apiVersion: apps/v1 # 可以使用kubectl api-versions确定指定的版本kind: Podmetadata: name: foo namespace: awesomeappsspec: containers: - name: foo image: janedoe/awesomeapp:v1 imagePullSecrets: - name: myregistryke 以上两种方式,可以结合使用,建议每台node上都先配置认证信息,有需要再使用第二种方式. ReferenceImages]]></content>
@@ -65,6 +76,17 @@
       </categories>
       <tags>
         <tag>kubeadm安装</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[altermanager之初体验]]></title>
+    <url>%2Fblog%2F2018%2F08%2F05%2Faltermanager%E4%B9%8B%E5%88%9D%E4%BD%93%E9%AA%8C%2F</url>
+    <content type="text"><![CDATA[环境:centos7, alertmanager 0.15.1 github 前言刚入门alertmanager,权当记录. Execute AlertmanagerBuild with Binary and Config SystemdBuild Binary Download123456# 安装在/opt下.下载地址prometheus官网有提供.$ cd /opt$ wget https://github.com/prometheus/alertmanager/releases/download/v0.15.1/alertmanager-0.15.1.linux-amd64.tar.gz$ tar -xvf alertmanager-0.15.1.linux-amd64.tar.gz# 重命名$ mv alertmanager-0.15.1.linux-amd64 alertmanager-0.15.1 Config Systemd1234567891011121314151617$ vim /usr/lib/systemd/system/alertmanager.service[Unit]Description=alertmanager.serviceWants=network-online.targetAfter=network-online.target[Service]Type=simpleExecStart=/opt/alertmanager-0.15.1/alertmanager --config.file=/opt/alertmanager-0.15.1/alertmanager.ymlRestart=on-failureExecReload=/bin/kill -s HUP $MAINPIDExecStop=/bin/kill -s QUIT $MAINPID[Install]WantedBy=multi-user.target# 启动$ systemctl enable alertmanager &amp;&amp; systemctl start alertmanager Build with DockerConfiguration alertmanager.yml example123456789101112131415161718192021222324252627282930# $ vim /opt/alertmanager-0.15.1/alertmanager.ymlglobal: resolve_timeout: 5m smtp_smarthost: &apos;smtp.mxhichina.com:25&apos; smtp_from: &apos;xiaoxiangyoupin@basestonedata.com&apos; smtp_auth_username: &apos;xiaoxiangyoupin@basestonedata.com&apos; smtp_auth_password: &apos;Xiaoxiangyoupin1&apos;templates: - &apos;/tmp/alert_test.txt&apos; # 发送消息模版.route: group_by: [&apos;proxy&apos;] group_wait: 10s group_interval: 20s repeat_interval: 5m # 警告发送成功后,等待该配置时间后才再次发送. receiver: &apos;proxy-team&apos;# 以上配置会被routes标签继承或覆盖.# routes: receivers: # 接收方集合- name: &apos;proxy-team&apos; email_configs: - to: &apos;363054731@qq.com,jiangwe@basestonedata.com&apos; text: &apos;报警&apos;# 防止过度报警.#inhibit_rules:# - source_match:# severity: &apos;critical&apos;# target_match:# severity: &apos;warning&apos;# equal: [&apos;alertname&apos;, &apos;dev&apos;, &apos;instance&apos;]]]></content>
+      <categories>
+        <category>premetheus</category>
+      </categories>
+      <tags>
+        <tag>alertmanager之初体验</tag>
       </tags>
   </entry>
   <entry>
@@ -199,17 +221,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[Docker之安装]]></title>
-    <url>%2Fblog%2F2018%2F03%2F29%2Fdocker%E4%B9%8B%E5%AE%89%E8%A3%85%2F</url>
-    <content type="text"><![CDATA[Docker之安装 环境：Centos6.5，Centos7前言1、EPEL（ Extra Packages for Enterprise Linux，企业版Linux的额外软件包)是yum的一个软件源，里面包含了许多基本源里没有的软件；2、docker要求服务CentOS6以上，kernel 版本必须2.6.32-431或更高；查看系统的版本和内核1234## 查看系统版本$ lsb_release -a## 查看内核版本$ uname -r Centos6.5安装docker要将Docker安装到CentOS上，要使用EPEL软件库，下载epel安装包并安装12$ wget http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm$ rpm -ivh epel-release-6-8.noarch.rpm 检查EPEL源1234567891011121314$yum repolistLoaded plugins: fastestmirrorLoading mirror speeds from cached hostfile * base: mirrors.skyshe.cn * epel: mirrors.opencas.cn * extras: mirrors.skyshe.cn * updates: centos.ustc.edu.cnrepo id repo name statusbase CentOS-6 - Base 6,575epel Extra Packages for Enterprise Linux 6 - x86_64 12,234extras CentOS-6 - Extras 62updates CentOS-6 - Updates 1,580repolist: 20,451EPEL已经在repo列出，并显示提供12234个软件包，EPEL源的配置安装到了/etc/yum.repos.d/epel.repo 安装123$ yum install -y docker-io$ service docker start$ chkconfig docker on 检查docker是否安装成功12345678910111213141516171819202122232425262728$docker infoContainers: 0Images: 0Storage Driver: devicemapper Pool Name: docker-8:3-276002-pool Pool Blocksize: 65.54 kB Backing Filesystem: extfs Data file: /dev/loop0 Metadata file: /dev/loop1 Data Space Used: 305.7 MB Data Space Total: 107.4 GB Data Space Available: 4.873 GB Metadata Space Used: 729.1 kB Metadata Space Total: 2.147 GB Metadata Space Available: 2.147 GB Udev Sync Supported: true Deferred Removal Enabled: false Data loop file: /var/lib/docker/devicemapper/devicemapper/data Metadata loop file: /var/lib/docker/devicemapper/devicemapper/metadata Library Version: 1.02.95-RHEL6 (2015-09-08)Execution Driver: native-0.2Logging Driver: json-fileKernel Version: 2.6.32-431.el6.x86_64Operating System: &lt;unknown&gt;CPUs: 1Total Memory: 996.4 MiBName: winter-01ID: KJ3G:XD6V:SDDV:5SGY:2TRQ:4XXR:XBPV:VLHE:XHHZ:F425:7G2B:G5D5 Centos7安装dockercentos7可以直接使用yum安装，不需要再添加其他软件源信息. 安装1$ yum install -y docker 添加镜像源使用daocloud的镜像加速器，在https://www.daocloud.io上注册账号，选择加速器 正常情况下，直接执行上图的命令即可，但为了安全起见，执行后，查看/etc/docker/daemon.json，是否格式正确。 1234567$ vim /etc/docker/daemon.json&#123; &quot;registry-mirrors&quot;: [ &quot;http://5c00508c.m.daocloud.io&quot; ], &quot;insecure-registries&quot;: []&#125; 验证123456## 启动$ service docker start## 配置开机启动$ chkconfig docker on## 下载镜像测试## docker pull hello-world Q&amp;A：Centos6.5安装好epel后，执行命令yum repolist报错，信息如下：1234$ yum repolistLoaded plugins: product-id, security, subscription-managerUpdating certificate-based repositories.Error: Cannot retrieve metalink for repository: epel. Please verify its path and try again 解决办法：vim /etc/yum.repos.d/epel.repo编辑[epel]下的baseurl前的#号去掉，mirrorlist前添加#号。正确配置如下：12345678[epel]name=Extra Packages for Enterprise Linux 6 - $basearchbaseurl=http://download.fedoraproject.org/pub/epel/6/$basearch#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&amp;arch=$basearchfailovermethod=priorityenabled=1gpgcheck=1gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 执行1$yum makecache 参考 https://www.jianshu.com/p/3a4cd73e3272 CentOS7安装Docker https://blog.csdn.net/Mr_OOO/article/details/67016309 Docker国内镜像源设置]]></content>
-      <categories>
-        <category>docker</category>
-      </categories>
-      <tags>
-        <tag>docker安装</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[Java基础之Collection]]></title>
     <url>%2Fblog%2F2018%2F03%2F29%2FJava%E5%9F%BA%E7%A1%80%E4%B9%8BCollection%2F</url>
     <content type="text"><![CDATA[java集合之HashMap 环境：jdk8 前言hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。 对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？ hashmap在jdk7和jdk8中实现是不一样的。 jdk7中，hashmap底层的数据结构数组+单链表 jdk8中，hashmap底层的数据结构数组+单链表+红黑树 围绕以上的问题，开始对它进行剖析。 深入HashMapHashmap类图 参考 https://tech.meituan.com/java-hashmap.html Java 8系列之重新认识HashMap]]></content>
@@ -219,6 +230,17 @@
       <tags>
         <tag>java集合</tag>
         <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Docker之安装]]></title>
+    <url>%2Fblog%2F2018%2F03%2F29%2Fdocker%E4%B9%8B%E5%AE%89%E8%A3%85%2F</url>
+    <content type="text"><![CDATA[Docker之安装 环境：Centos6.5，Centos7前言1、EPEL（ Extra Packages for Enterprise Linux，企业版Linux的额外软件包)是yum的一个软件源，里面包含了许多基本源里没有的软件；2、docker要求服务CentOS6以上，kernel 版本必须2.6.32-431或更高；查看系统的版本和内核1234## 查看系统版本$ lsb_release -a## 查看内核版本$ uname -r Centos6.5安装docker要将Docker安装到CentOS上，要使用EPEL软件库，下载epel安装包并安装12$ wget http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm$ rpm -ivh epel-release-6-8.noarch.rpm 检查EPEL源1234567891011121314$yum repolistLoaded plugins: fastestmirrorLoading mirror speeds from cached hostfile * base: mirrors.skyshe.cn * epel: mirrors.opencas.cn * extras: mirrors.skyshe.cn * updates: centos.ustc.edu.cnrepo id repo name statusbase CentOS-6 - Base 6,575epel Extra Packages for Enterprise Linux 6 - x86_64 12,234extras CentOS-6 - Extras 62updates CentOS-6 - Updates 1,580repolist: 20,451EPEL已经在repo列出，并显示提供12234个软件包，EPEL源的配置安装到了/etc/yum.repos.d/epel.repo 安装123$ yum install -y docker-io$ service docker start$ chkconfig docker on 检查docker是否安装成功12345678910111213141516171819202122232425262728$docker infoContainers: 0Images: 0Storage Driver: devicemapper Pool Name: docker-8:3-276002-pool Pool Blocksize: 65.54 kB Backing Filesystem: extfs Data file: /dev/loop0 Metadata file: /dev/loop1 Data Space Used: 305.7 MB Data Space Total: 107.4 GB Data Space Available: 4.873 GB Metadata Space Used: 729.1 kB Metadata Space Total: 2.147 GB Metadata Space Available: 2.147 GB Udev Sync Supported: true Deferred Removal Enabled: false Data loop file: /var/lib/docker/devicemapper/devicemapper/data Metadata loop file: /var/lib/docker/devicemapper/devicemapper/metadata Library Version: 1.02.95-RHEL6 (2015-09-08)Execution Driver: native-0.2Logging Driver: json-fileKernel Version: 2.6.32-431.el6.x86_64Operating System: &lt;unknown&gt;CPUs: 1Total Memory: 996.4 MiBName: winter-01ID: KJ3G:XD6V:SDDV:5SGY:2TRQ:4XXR:XBPV:VLHE:XHHZ:F425:7G2B:G5D5 Centos7安装dockercentos7可以直接使用yum安装，不需要再添加其他软件源信息. 安装1$ yum install -y docker 添加镜像源使用daocloud的镜像加速器，在https://www.daocloud.io上注册账号，选择加速器 正常情况下，直接执行上图的命令即可，但为了安全起见，执行后，查看/etc/docker/daemon.json，是否格式正确。 1234567$ vim /etc/docker/daemon.json&#123; &quot;registry-mirrors&quot;: [ &quot;http://5c00508c.m.daocloud.io&quot; ], &quot;insecure-registries&quot;: []&#125; 验证123456## 启动$ service docker start## 配置开机启动$ chkconfig docker on## 下载镜像测试## docker pull hello-world Q&amp;A：Centos6.5安装好epel后，执行命令yum repolist报错，信息如下：1234$ yum repolistLoaded plugins: product-id, security, subscription-managerUpdating certificate-based repositories.Error: Cannot retrieve metalink for repository: epel. Please verify its path and try again 解决办法：vim /etc/yum.repos.d/epel.repo编辑[epel]下的baseurl前的#号去掉，mirrorlist前添加#号。正确配置如下：12345678[epel]name=Extra Packages for Enterprise Linux 6 - $basearchbaseurl=http://download.fedoraproject.org/pub/epel/6/$basearch#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-6&amp;arch=$basearchfailovermethod=priorityenabled=1gpgcheck=1gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 执行1$yum makecache 参考 https://www.jianshu.com/p/3a4cd73e3272 CentOS7安装Docker https://blog.csdn.net/Mr_OOO/article/details/67016309 Docker国内镜像源设置]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker安装</tag>
       </tags>
   </entry>
   <entry>
