@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[Blackbox_exporter之安装]]></title>
-    <url>%2Fblog%2F2018%2F08%2F15%2FBlackbox-exporter%E4%B9%8B%E5%AE%89%E8%A3%85%2F</url>
-    <content type="text"><![CDATA[环境:centos7, blackbox_exporter 0.12.0 前言这里使用blackbox_exporter的ssh和ping的检测功能. Build with Binary And Config SystemdBuild with Binary Download123$ cd /opt$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz &amp;&amp; mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0 Config blackbox.yml12345678910111213$ vim /opt/blackbox_exporter-0.12.0/blackbox.ymlmodules: ssh_banner: prober: tcp timeout: 15s tcp: query_response: - expect: &quot;^SSH-2.0-&quot; icmp: prober: icmp timeout: 5s icmp: preferred_ip_protocol: &quot;ip4&quot; Config Systemd123456789101112131415161718$ vim /usr/lib/systemd/system/blackbox.service[Unit]Description=blackbox.serviceWants=network-online.targetAfter=network-online.target[Service]Type=simpleExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.ymlRestart=on-failureExecReload=/bin/kill -s HUP $MAINPIDExecStop=/bin/kill -s QUIT $MAINPID[Install]WantedBy=multi-user.target# 启动$ systemctl enable blackbox &amp;&amp; systemctl start blackbox Test blackbox在浏览器中查看:http://10.1.1.26:9115 Build with Docker]]></content>
-      <categories>
-        <category>prometheus</category>
-      </categories>
-      <tags>
-        <tag>blackbox_exporter安装</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[Kubernetes Pods指定镜像仓库]]></title>
     <url>%2Fblog%2F2018%2F08%2F15%2FKubernetes-Pods%E6%8C%87%E5%AE%9A%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%2F</url>
     <content type="text"><![CDATA[Foreward在创建pod时,image是从哪个仓库下载?应该如何指定公司的Regitry?最佳实践是什么?带着这些问题,记录自己的爬坑经历. 镜像建议 对每个镜像都指定明确的版本号(不要使用latest这样的版本号),减少去镜像仓库拉取的消耗.(可以学习kube的api,版本为X.Y.Z. X is the major version, Y is the minor version, and Z is the patch version) 使用镜像私仓 使用私仓时,需要配置认证信息. pod中指定私仓优先级高于node指定私仓. 在node节点中配置(推荐) 与在每个pod中使用ImagePullSecrets相比,少了重复的配置代码. 配置认证信息 docker添加私仓认证信息,可参考这里 一般使用docker时,默认都是从docker hub上拉取镜像.正常拉取是不需要认证信息的,但在上传时需要认证信息. 在每个节点上配置登录认证信息. 123# 默认docker hub的地址是:https://index.docker.io/v1$ echo [密码] | docker login --username [用户名] --password-stdin [私仓服务器地址]# 认证后,会在$HOME/.docker/下生成config.json文件.如果指定退出则会删除该文件. 认证信息优先级 {–root-dir:-/var/lib/kubelet}/config.json 默认config.json不存在 {cwd of kubelet}/config.json 指定kubelet的工作空间路径,这种方式暂不考虑. ${HOME}/.docker/config.json 默认config.json是不存在的 /.docker/config.json 默认该目录不存在 在pod中指定ImagePullSecrets创建secret12# 实际上在pull镜像时创建一个虚拟的.docker/config.json文件.$ kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL pod中使用imagePulSecrets123456789101112apiVersion: apps/v1 # 可以使用kubectl api-versions确定指定的版本kind: Podmetadata: name: foo namespace: awesomeappsspec: containers: - name: foo image: janedoe/awesomeapp:v1 imagePullSecrets: - name: myregistryke 以上两种方式,可以结合使用,建议每台node上都先配置认证信息,有需要再使用第二种方式. ReferenceImages]]></content>
@@ -76,6 +65,17 @@
       </categories>
       <tags>
         <tag>kubeadm安装</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[blackbox_exporter之安装]]></title>
+    <url>%2Fblog%2F2018%2F08%2F06%2FBlackbox-exporter%E4%B9%8B%E5%AE%89%E8%A3%85%2F</url>
+    <content type="text"><![CDATA[环境:centos7, blackbox_exporter 0.12.0 前言这里使用blackbox_exporter的ssh和ping的检测功能. Build with Binary And Config SystemdBuild with Binary Download123$ cd /opt$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz &amp;&amp; mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0 Config blackbox.yml12345678910111213$ vim /opt/blackbox_exporter-0.12.0/blackbox.ymlmodules: ssh_banner: prober: tcp timeout: 15s tcp: query_response: - expect: &quot;^SSH-2.0-&quot; icmp: prober: icmp timeout: 5s icmp: preferred_ip_protocol: &quot;ip4&quot; Config Systemd123456789101112131415161718$ vim /usr/lib/systemd/system/blackbox.service[Unit]Description=blackbox.serviceWants=network-online.targetAfter=network-online.target[Service]Type=simpleExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.ymlRestart=on-failureExecReload=/bin/kill -s HUP $MAINPIDExecStop=/bin/kill -s QUIT $MAINPID[Install]WantedBy=multi-user.target# 启动$ systemctl enable blackbox &amp;&amp; systemctl start blackbox Test blackbox在浏览器中查看:http://10.1.1.26:9115 Build with Docker]]></content>
+      <categories>
+        <category>prometheus</category>
+      </categories>
+      <tags>
+        <tag>blackbox_exporter安装</tag>
       </tags>
   </entry>
   <entry>
