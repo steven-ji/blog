@@ -309,7 +309,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/03/29/Java基础之Collection/">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="溏溏爸爸">
@@ -328,7 +328,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/blog/2018/03/29/Java基础之Collection/" itemprop="url">Java基础之Collection</a></h1>
+                <a class="post-title-link" href="/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/" itemprop="url">Kubernetes Pods指定镜像仓库</a></h1>
         
 
         <div class="post-meta">
@@ -340,8 +340,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T15:17:10+08:00">
-                2018-03-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-15T22:49:52+08:00">
+                2018-08-15
               </time>
             
 
@@ -350,6 +350,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -372,7 +394,403 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  6
+                  522
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>[TOC]</p>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>在创建pod时,image是从哪个仓库下载?应该如何指定公司的Regitry?最佳实践是什么?带着这些问题,记录自己的爬坑经历.</p>
+<h2 id="镜像建议"><a href="#镜像建议" class="headerlink" title="镜像建议"></a>镜像建议</h2><ul>
+<li>对每个镜像都指定明确的版本号(不要使用latest这样的版本号),减少去镜像仓库拉取的消耗.(可以学习kube的api,版本为X.Y.Z. X is the major version, Y is the minor version, and Z is the patch version) </li>
+</ul>
+<h2 id="使用镜像私仓"><a href="#使用镜像私仓" class="headerlink" title="使用镜像私仓"></a>使用镜像私仓</h2><ul>
+<li><p>使用私仓时,需要配置认证信息.</p>
+</li>
+<li><p>pod中指定私仓优先级高于node指定私仓.</p>
+</li>
+</ul>
+<h3 id="在node节点中配置-推荐"><a href="#在node节点中配置-推荐" class="headerlink" title="在node节点中配置(推荐)"></a>在node节点中配置(推荐)</h3><ul>
+<li>与在每个pod中使用ImagePullSecrets相比,少了重复的配置代码.</li>
+</ul>
+<h4 id="配置认证信息"><a href="#配置认证信息" class="headerlink" title="配置认证信息"></a>配置认证信息</h4><ul>
+<li>docker添加私仓认证信息,可参考<a href="https://docs.docker.com/engine/reference/commandline/login/#provide-a-password-using-stdin" target="_blank" rel="noopener">这里</a></li>
+</ul>
+<p>一般使用docker时,默认都是从docker hub上拉取镜像.正常拉取是不需要认证信息的,但在上传时需要认证信息.</p>
+<p>在每个节点上配置登录认证信息.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 默认docker hub的地址是:https://index.docker.io/v1</span><br><span class="line">$ echo [密码] | docker login --username [用户名] --password-stdin [私仓服务器地址]</span><br><span class="line"># 认证后,会在$HOME/.docker/下生成config.json文件.如果指定退出则会删除该文件.</span><br></pre></td></tr></table></figure>
+<h4 id="认证信息优先级"><a href="#认证信息优先级" class="headerlink" title="认证信息优先级"></a>认证信息优先级</h4><ul>
+<li>{–root-dir:-/var/lib/kubelet}/config.json </li>
+</ul>
+<p>默认config.json不存在</p>
+<ul>
+<li>{cwd of kubelet}/config.json </li>
+</ul>
+<p>指定kubelet的工作空间路径,这种方式暂不考虑.</p>
+<ul>
+<li>${HOME}/.docker/config.json </li>
+</ul>
+<p>默认config.json是不存在的</p>
+<ul>
+<li>/.docker/config.json</li>
+</ul>
+<p>默认该目录不存在</p>
+<h3 id="在pod中指定ImagePullSecrets"><a href="#在pod中指定ImagePullSecrets" class="headerlink" title="在pod中指定ImagePullSecrets"></a>在pod中指定ImagePullSecrets</h3><h4 id="创建secret"><a href="#创建secret" class="headerlink" title="创建secret"></a>创建secret</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 实际上在pull镜像时创建一个虚拟的.docker/config.json文件.</span><br><span class="line">$ kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL</span><br></pre></td></tr></table></figure>
+<h4 id="pod中使用imagePulSecrets"><a href="#pod中使用imagePulSecrets" class="headerlink" title="pod中使用imagePulSecrets"></a>pod中使用imagePulSecrets</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apiVersion: apps/v1 # 可以使用kubectl api-versions确定指定的版本</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: foo</span><br><span class="line">  namespace: awesomeapps</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: foo</span><br><span class="line">      image: janedoe/awesomeapp:v1</span><br><span class="line">  imagePullSecrets:</span><br><span class="line">    - name: myregistryke</span><br></pre></td></tr></table></figure>
+<p>以上两种方式,可以结合使用,建议每台node上都先配置认证信息,有需要再使用第二种方式.</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><h3 id="Images"><a href="#Images" class="headerlink" title="Images"></a><a href="https://kubernetes.io/docs/concepts/containers/images/" target="_blank" rel="noopener">Images</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/04/Mysql之常用操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/04/04/Mysql之常用操作/" itemprop="url">Mysql之常用操作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T14:09:47+08:00">
+                2018-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  489
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Mysql之常用操作"><a href="#Mysql之常用操作" class="headerlink" title="Mysql之常用操作"></a>Mysql之常用操作</h2><ul>
+<li>环境：mysql 5.7.14</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这里记录mysql的一些操作用作应用。</p>
+<h2 id="用户相关"><a href="#用户相关" class="headerlink" title="用户相关"></a>用户相关</h2><h3 id="修改用户名密法"><a href="#修改用户名密法" class="headerlink" title="修改用户名密法"></a>修改用户名密法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ /usr/local/mysql/bin/mysqladmin -u root password</span><br></pre></td></tr></table></figure>
+<h3 id="创建用户并授权"><a href="#创建用户并授权" class="headerlink" title="创建用户并授权"></a>创建用户并授权</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ CREATE USER &apos;username&apos;@&apos;%&apos; IDENTIFIED BY &apos;password&apos;;</span><br><span class="line">$ GRANT all privileges ON databasename.* TO &apos;username&apos;@&apos;%&apos; with grant options</span><br></pre></td></tr></table></figure>
+<h3 id="字符设置"><a href="#字符设置" class="headerlink" title="字符设置"></a>字符设置</h3><p>场景一：utf8字符集数据库需要修改为utf8mb4</p>
+<p>首先，先查询当前mysql是否支持utf8mb4，如果支持，修改my.cnf，重启mysql，再修改表或者表字段字符集。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">## 配置my.cnf</span><br><span class="line">[client]</span><br><span class="line">default-character-set=utf8mb4 </span><br><span class="line">[mysql]</span><br><span class="line">default-character-set=utf8mb4</span><br></pre></td></tr></table></figure>
+<h4 id="查询字符集"><a href="#查询字符集" class="headerlink" title="查询字符集"></a>查询字符集</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">## 查看数据库支持字符集</span><br><span class="line">$ show variables like&apos;%char%&apos;;</span><br><span class="line">  character_set_client			utf8mb4 //客户端字符集</span><br><span class="line">  character_set_connection		utf8mb4 //链接字符集</span><br><span class="line">  character_set_database		utf8mb4 //数据库字符集</span><br><span class="line">  character_set_filesystem		binary  </span><br><span class="line">  character_set_results			utf8mb4 //结果字符集</span><br><span class="line">  character_set_server			utf8mb4 //服务器字符集</span><br><span class="line">  character_set_system			utf8mb4 //系统字符集</span><br><span class="line">  character_sets_dir			/usr/local/mysql/share/charsets/</span><br><span class="line">## 查看mysql支持的字符集</span><br><span class="line">$ show charset;</span><br><span class="line">## 查看当前数据库编码：</span><br><span class="line">$ SHOW CREATE DATABASE db_name;</span><br><span class="line">## 查看表编码：</span><br><span class="line">$ SHOW CREATE TABLE tbl_name;</span><br><span class="line">## 查看字段编码：</span><br><span class="line">$ SHOW FULL COLUMNS FROM tbl_name;</span><br></pre></td></tr></table></figure>
+<h4 id="修改字符集"><a href="#修改字符集" class="headerlink" title="修改字符集"></a>修改字符集</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 修改数据库字符</span><br><span class="line">¥ ALTER DATABASE [database_name] CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</span><br><span class="line">## 修改表字符集</span><br><span class="line">$ ALTER TABLE [table_name] CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</span><br><span class="line">## 修改表字段字符集</span><br><span class="line">$ ALTER TABLE [table_name] MODIFY COLUMN [column] varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</span><br></pre></td></tr></table></figure>
+<p>Tip:为了实现客户端utf8连接到MySQL后，使用的也是utf8mb4字符集，就在 mysqld配置中配置了 init_connect=’SET NAMES utf8mb4’ 表示初始化连接都设置为utf8mb4字符集，再配置一个 skip-character-set-client-handshake = true 忽略客户端字符集设置，不论客户端是何种字符集，都按照init_connect中的设置进行使用，这样就满足了应用的需求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">## 配置my.cnf</span><br><span class="line">[client]</span><br><span class="line">default-character-set=utf8mb4 </span><br><span class="line">[mysql]</span><br><span class="line">default-character-set=utf8mb4</span><br><span class="line">[mysqld]</span><br><span class="line">character-set-server = utf8mb4</span><br><span class="line">collation-server = utf8mb4_unicode_ci</span><br><span class="line">init_connect = &apos;SET NAMES utf8mb4&apos;</span><br><span class="line">character-set-client-handshake = true</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/02/Redis之集群创建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/04/02/Redis之集群创建/" itemprop="url">Redis之集群搭建</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T23:17:10+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  212
                 </span>
               
 
@@ -411,7 +829,21 @@
       
         
           
-            <h2 id="java基础之Collection"><a href="#java基础之Collection" class="headerlink" title="java基础之Collection"></a>java基础之Collection</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>
+            <h2 id="Redis之集群搭建"><a href="#Redis之集群搭建" class="headerlink" title="Redis之集群搭建"></a>Redis之集群搭建</h2><ul>
+<li>环境：Centos7，redis3.2</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>### </p>
+<h2 id="Cluster添加密码"><a href="#Cluster添加密码" class="headerlink" title="Cluster添加密码"></a>Cluster添加密码</h2><p><strong>前提：先创建无密码集群</strong></p>
+<h3 id="方式一：手动添加密码到配置文件"><a href="#方式一：手动添加密码到配置文件" class="headerlink" title="方式一：手动添加密码到配置文件"></a>方式一：手动添加密码到配置文件</h3><p>修改所有redis服务器的配置文件添加密码，然后关闭redis-cluster，然后重启redis-cluster</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">requirepass &quot;abc&quot;</span><br><span class="line">masterauth &quot;abc&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="方式二：通过命令添加密码"><a href="#方式二：通过命令添加密码" class="headerlink" title="方式二：通过命令添加密码"></a>方式二：通过命令添加密码</h3><p>通过命令行设置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">## 登录有添加密码</span><br><span class="line">$ redis-cli -h [host] -p [port] -c</span><br><span class="line">$ config set masterauth abc</span><br><span class="line">$ config set requirepass abc</span><br><span class="line">$ config rewrite</span><br><span class="line">$ shutdown</span><br><span class="line">## 每个节点都执行上述操作，然后正常关闭即可。查看每个节点的conf配置文件，会发现都自动添加了</span><br><span class="line">requirepass &quot;abc&quot;</span><br><span class="line">masterauth &quot;abc&quot;</span><br></pre></td></tr></table></figure>
+<p>后续登录都需要添加密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli -h [host] -p [port] -c -a [password]</span><br><span class="line">或者</span><br><span class="line">$ redis-cli -h [host] -p [port] -c</span><br><span class="line">$ auth [password]</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>​</li>
+</ul>
+
           
         
       
@@ -1431,7 +1863,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1442,7 +1874,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1453,7 +1885,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1514,7 +1946,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">4.3k</span>
+    <span title="Site words total count">5.5k</span>
   
 </div>
 
