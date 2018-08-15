@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="java集合,java Collection," />
+  <meta name="keywords" content="java集合,HashMap," />
 
 
 
@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="java基础之Collection前言">
-<meta name="keywords" content="java集合,java Collection">
+<meta name="description" content="java集合之HashMap 环境：jdk8  前言hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。 对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？ hashmap在jdk7和jdk8中实现是不一样的。">
+<meta name="keywords" content="java集合,HashMap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java基础之Collection">
 <meta property="og:url" content="http://steven-ji.github.io/blog/2018/03/29/Java基础之Collection/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="java基础之Collection前言">
+<meta property="og:description" content="java集合之HashMap 环境：jdk8  前言hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。 对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？ hashmap在jdk7和jdk8中实现是不一样的。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-29T10:01:03.430Z">
+<meta property="og:image" content="https://ws2.sinaimg.cn/large/006tKfTcgy1fpxgnrsbl8j30ln0d5752.jpg">
+<meta property="og:updated_time" content="2018-08-15T14:56:31.879Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java基础之Collection">
-<meta name="twitter:description" content="java基础之Collection前言">
+<meta name="twitter:description" content="java集合之HashMap 环境：jdk8  前言hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。 对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？ hashmap在jdk7和jdk8中实现是不一样的。">
+<meta name="twitter:image" content="https://ws2.sinaimg.cn/large/006tKfTcgy1fpxgnrsbl8j30ln0d5752.jpg">
 
 
 
@@ -350,6 +352,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/java集合/" itemprop="url" rel="index">
+                    <span itemprop="name">java集合</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -371,7 +395,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  6
+                  204
                 </span>
               
 
@@ -408,7 +432,22 @@
       
 
       
-        <h2 id="java基础之Collection"><a href="#java基础之Collection" class="headerlink" title="java基础之Collection"></a>java基础之Collection</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>
+        <h2 id="java集合之HashMap"><a href="#java集合之HashMap" class="headerlink" title="java集合之HashMap"></a>java集合之HashMap</h2><ul>
+<li>环境：jdk8</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。</p>
+<p>对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？</p>
+<p>hashmap在jdk7和jdk8中实现是不一样的。</p>
+<ul>
+<li>jdk7中，hashmap底层的数据结构数组+单链表</li>
+<li>jdk8中，hashmap底层的数据结构数组+单链表+红黑树</li>
+</ul>
+<p>围绕以上的问题，开始对它进行剖析。</p>
+<h2 id="深入HashMap"><a href="#深入HashMap" class="headerlink" title="深入HashMap"></a>深入HashMap</h2><h3 id="Hashmap类图"><a href="#Hashmap类图" class="headerlink" title="Hashmap类图"></a>Hashmap类图</h3><p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fpxgnrsbl8j30ln0d5752.jpg" alt="25644DE6-8C03-4A5B-BC25-3481D92E2D76"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://tech.meituan.com/java-hashmap.html" target="_blank" rel="noopener">https://tech.meituan.com/java-hashmap.html</a> Java 8系列之重新认识HashMap</li>
+</ul>
+
       
     </div>
     
@@ -456,7 +495,7 @@
           
             <a href="/blog/tags/java集合/" rel="tag"># java集合</a>
           
-            <a href="/blog/tags/java-Collection/" rel="tag"># java Collection</a>
+            <a href="/blog/tags/HashMap/" rel="tag"># HashMap</a>
           
         </div>
       
@@ -469,8 +508,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2018/03/29/docker之安装/" rel="next" title="Docker之安装">
-                <i class="fa fa-chevron-left"></i> Docker之安装
+              <a href="/blog/2018/03/28/hexo进阶之添加评论/" rel="next" title="hexo进阶之添加评论">
+                <i class="fa fa-chevron-left"></i> hexo进阶之添加评论
               </a>
             
           </div>
@@ -478,6 +517,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/03/29/docker之安装/" rel="prev" title="Docker之安装">
+                Docker之安装 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -563,7 +606,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -574,7 +617,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -585,7 +628,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -628,7 +671,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java基础之Collection"><span class="nav-number">1.</span> <span class="nav-text">java基础之Collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java集合之HashMap"><span class="nav-number">1.</span> <span class="nav-text">java集合之HashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深入HashMap"><span class="nav-number">3.</span> <span class="nav-text">深入HashMap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hashmap类图"><span class="nav-number">3.1.</span> <span class="nav-text">Hashmap类图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
@@ -662,7 +705,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">4.3k</span>
+    <span title="Site words total count">10.8k</span>
   
 </div>
 

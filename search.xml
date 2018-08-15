@@ -24,6 +24,86 @@
     </entry>
     
     <entry>
+      <title>kubernetes常见问题汇总</title>
+      <link href="/blog/2018/08/11/kubernetes%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/"/>
+      <url>/blog/2018/08/11/kubernetes%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/</url>
+      <content type="html"><![CDATA[<h3 id="报错-etc-kubernetes-pki-ca-crt-already-exists"><a href="#报错-etc-kubernetes-pki-ca-crt-already-exists" class="headerlink" title="报错:/etc/kubernetes/pki/ca.crt already exists"></a>报错:/etc/kubernetes/pki/ca.crt already exists</h3><ul><li><p>错误描述<br>在node节点操作kubeadm join时报出的错误.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[preflight] Running pre-flight checks.</span><br><span class="line">        [WARNING FileExisting-crictl]: crictl not found in system path</span><br><span class="line">[preflight] Some fatal errors occurred:</span><br><span class="line">        [ERROR Port-10250]: Port 10250 is in use</span><br><span class="line">        [ERROR DirAvailable--etc-kubernetes-manifests]: /etc/kubernetes/manifests is not empty</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-kubelet.conf]: /etc/kubernetes/kubelet.conf already exists</span><br><span class="line">[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`</span><br></pre></td></tr></table></figure></li><li><p>解决方案:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubeadm reset</span><br><span class="line"># 再次执行kubeadm join</span><br><span class="line">$ kubeadm join &lt;ip&gt;:&lt;port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;*******&gt;</span><br></pre></td></tr></table></figure></li></ul>]]></content>
+      
+      
+        <tags>
+            
+            <tag> kubernetes Q&amp;A </tag>
+            
+            <tag> kubernetes常见问题 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>kubernetes之master搭建.md</title>
+      <link href="/blog/2018/08/09/kubernetes%E4%B9%8Bmaster%E6%90%AD%E5%BB%BA/"/>
+      <url>/blog/2018/08/09/kubernetes%E4%B9%8Bmaster%E6%90%AD%E5%BB%BA/</url>
+      <content type="html"><![CDATA[<ul><li>环境: centos7, kubernetes 1.11.2, docker-ce-17.03.2.ce</li></ul><h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>Kubernetes对于Master机器的配置最低的要求是2G内存和2 Core CPU.<br>使用kubeadm来安装master cluster.</p><h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>1个master,2个node<br>k8s-master-1<br>192.168.1.100<br>k8s-node-1<br>192.168.1.101<br>k8s-node-2<br>192.168.1.102</p><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="端口检查"><a href="#端口检查" class="headerlink" title="端口检查"></a>端口检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># Master node(s)</span><br><span class="line">Protocol Direction Port Range Purpose</span><br><span class="line">TCP Inbound 6443* Kubernetes API server</span><br><span class="line">TCP Inbound 2379-2380 etcd server client API</span><br><span class="line">TCP Inbound 10250 Kubelet API</span><br><span class="line">TCP Inbound 10251 kube-scheduler</span><br><span class="line">TCP Inbound 10252 kube-controller-manager</span><br><span class="line">TCP Inbound 10255 Read-only Kubelet API</span><br><span class="line"># Worker node(s)</span><br><span class="line">Protocol Direction Port Range Purpose</span><br><span class="line">TCP Inbound 10250 Kubelet API</span><br><span class="line">TCP Inbound 10255 Read-only Kubelet API</span><br><span class="line">TCP Inbound 30000-32767 NodePort Services**</span><br></pre></td></tr></table></figure><h4 id="环境调整"><a href="#环境调整" class="headerlink" title="环境调整"></a>环境调整</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 关闭SELinux(临时)</span><br><span class="line">$ setenforce 0</span><br><span class="line"># 永久关闭SELinux</span><br><span class="line">$ vim /etc/selinux/config</span><br><span class="line">SELINUX=disabled</span><br><span class="line"># 关闭swap</span><br><span class="line">$ swapoff -a</span><br><span class="line"># 添加kubernetes的yum仓库,这里使用阿里云的.</span><br><span class="line">$ vim /etc/yum.repos.d/kubernetes.repo</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line">repo_gpgcheck=0</span><br><span class="line">gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg</span><br><span class="line">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br></pre></td></tr></table></figure><h4 id="设置hosts"><a href="#设置hosts" class="headerlink" title="设置hosts"></a>设置hosts</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/hosts</span><br><span class="line">192.1.1.100 k8s-master-1 </span><br><span class="line">192.1.1.100 k8s-node-1 </span><br><span class="line">192.1.1.100 k8s-node-2</span><br></pre></td></tr></table></figure><h3 id="Install-kubeadm-kubectl-kubelet"><a href="#Install-kubeadm-kubectl-kubelet" class="headerlink" title="Install kubeadm kubectl kubelet"></a>Install kubeadm kubectl kubelet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y kubeadm kubectl kubelet</span><br></pre></td></tr></table></figure><h3 id="Install-Docker"><a href="#Install-Docker" class="headerlink" title="Install Docker"></a>Install Docker</h3><p>kubernetes v1.11.2建议是用的docker版本是17.03版本,这里安装过程忽略.</p><h3 id="下载k8s相关镜像"><a href="#下载k8s相关镜像" class="headerlink" title="下载k8s相关镜像"></a>下载k8s相关镜像</h3><p>由于在使用kubeadm init时,下载的镜像从k8s.gcr.io上下载,国内网络被墙了,这边只能曲线救国.</p><p>利用docker hub做中转(因为docker hub是在国外的).</p><p>具体操作是现在github上创建相关的Docekrfile,然后再在docker hub上创建auto build仓库.最后从自己的docker hub仓库下载镜像后,重命名为k8s.gcr.io/kube-scheduler-amd64:v1.11.2等即可.</p><p>这里有个镜像拉取脚本.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">images=(</span><br><span class="line">  kube-proxy-amd64:v1.11.2</span><br><span class="line">  kube-scheduler-amd64:v1.11.2</span><br><span class="line">  kube-controller-manager-amd64:v1.11.2</span><br><span class="line">  kube-apiserver-amd64:v1.11.2</span><br><span class="line">  etcd-amd64:3.2.18</span><br><span class="line">  pause:3.1</span><br><span class="line">  kubernetes-dashboard-amd64:v1.8.3</span><br><span class="line">  k8s-dns-sidecar-amd64:1.14.8</span><br><span class="line">  k8s-dns-kube-dns-amd64:1.14.8</span><br><span class="line">  k8s-dns-dnsmasq-nanny-amd64:1.14.8</span><br><span class="line">  coredns:1.1.3</span><br><span class="line">)</span><br><span class="line">for imageName in $&#123;images[@]&#125; ; do</span><br><span class="line">  docker pull jilingjun1014/$imageName</span><br><span class="line">  docker tag jilingjun1014/$imageName k8s.gcr.io/$imageName</span><br><span class="line">  docker rmi jilingjun1014/$imageName</span><br><span class="line">done</span><br></pre></td></tr></table></figure><h3 id="master初始化"><a href="#master初始化" class="headerlink" title="master初始化"></a>master初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># master初始化</span><br><span class="line">$ kubeadm init --kubernetes-version=v1.11.2 --pod-network-cidr=10.244.0.0/16</span><br><span class="line">Your Kubernetes master has initialized successfully!</span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line">You can now join any number of machines by running the following on each node</span><br><span class="line">as root:</span><br><span class="line">  kubeadm join 116.62.177.233:6443 --token mfv9of.3bo96kuhwiuf2sh5 --discovery-token-ca-cert-hash sha256:d04a7670ef39c41900ca142e807e96a326d6f37300076e94ce2bda4c0934ff52</span><br><span class="line"># 配置kubectl认证(官方推荐用非root用户,这里为了方便起见,使用root用户)</span><br><span class="line">$ mkdir -p ~/.kube</span><br><span class="line">$ cp -i /etc/kubernetes/admin.conf ~/.kube/config</span><br><span class="line"># 非root用户需要配置</span><br><span class="line">$ chown $(id -u):$(id -g) $HOME/.kube/config </span><br><span class="line"># root用户需要配置</span><br><span class="line">$ echo &quot;export KUBECONFIG=/etc/kubernetes/admin.conf&quot; &gt;&gt; /etc/profile $ source /etc/profile</span><br></pre></td></tr></table></figure><h4 id="Pod网络设置-flannel网络设置"><a href="#Pod网络设置-flannel网络设置" class="headerlink" title="Pod网络设置(flannel网络设置)"></a>Pod网络设置(flannel网络设置)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /etc/cni/net.d/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /etc/cni/net.d/10-flannel.conf</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;cbr0&quot;,</span><br><span class="line">  &quot;type&quot;: &quot;flannel&quot;,</span><br><span class="line">  &quot;delegate&quot;: &#123;</span><br><span class="line">    &quot;isDefaultGateway&quot;: true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF </span><br><span class="line">$ mkdir /run/flannel/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /run/flannel/subnet.env</span><br><span class="line">FLANNEL_NETWORK=10.244.0.0/16</span><br><span class="line">FLANNEL_SUBNET=10.244.1.0/24</span><br><span class="line">FLANNEL_MTU=1450</span><br><span class="line">FLANNEL_IPMASQ=true</span><br><span class="line">EOF</span><br><span class="line"># 添加网络类型</span><br><span class="line">$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure><h4 id="检查master是否创建成功"><a href="#检查master是否创建成功" class="headerlink" title="检查master是否创建成功"></a>检查master是否创建成功</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># ready全部为1/1表示成功</span><br><span class="line">$ kubectl get pod --all-namespaces</span><br><span class="line">NAMESPACE    NAME                  READY STATUS RESTARTS AGE</span><br><span class="line">kube-system coredns-78fcdf6894-cvrzg 1/1 Running 0 3h   # 1/1表示正常</span><br><span class="line">kube-system coredns-78fcdf6894-sc2zd 1/1 Running 0 3h  # 1/1表示正常</span><br><span class="line">kube-system etcd-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-apiserver-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-controller-manager-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-flannel-ds-2dzz9 1/1 Running 0 3h   # 1/1表示正常</span><br><span class="line">kube-system kube-proxy-zgbcp 1/1 Running 0 3h</span><br><span class="line">kube-system kube-scheduler-k8s-master-1 1/1 Running 0 3h</span><br></pre></td></tr></table></figure><h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有pod信息,需要使用--all-namespaces,不然默认参数是default</span><br><span class="line">$ kubectl get pod --all-namespaces</span><br><span class="line"># 查看节点信息</span><br><span class="line">$ kubectl get nodes</span><br><span class="line">NAME STATUS ROLES AGE VERSION</span><br><span class="line">k8s-master-1 Ready master 1d v1.11.1</span><br><span class="line">k8s-node-1 Ready &lt;none&gt; 2h v1.11.1</span><br><span class="line">k8s-node-2 Ready &lt;none&gt; 1d v1.11.1</span><br></pre></td></tr></table></figure><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="使用-kubeadm-搭建-kubernetes-1-10-2-集群"><a href="#使用-kubeadm-搭建-kubernetes-1-10-2-集群" class="headerlink" title="使用 kubeadm 搭建 kubernetes 1.10.2 集群"></a><a href="https://maiyang.me/post/2018-05-15-use-kubeadm-install-kubernetes-1.10.2/" target="_blank" rel="noopener">使用 kubeadm 搭建 kubernetes 1.10.2 集群</a></h3><h3 id="利用docker-hub做中转拉取google的k8s镜像"><a href="#利用docker-hub做中转拉取google的k8s镜像" class="headerlink" title="利用docker hub做中转拉取google的k8s镜像"></a><a href="https://www.cnblogs.com/cuishuai/p/8483496.html" target="_blank" rel="noopener">利用docker hub做中转拉取google的k8s镜像</a></h3><h3 id="深入玩转K8S之使用kubeadm安装Kubernetes-v1-10以及常见问题解答"><a href="#深入玩转K8S之使用kubeadm安装Kubernetes-v1-10以及常见问题解答" class="headerlink" title="深入玩转K8S之使用kubeadm安装Kubernetes v1.10以及常见问题解答"></a><a href="http://blog.51cto.com/devingeng/2096495" target="_blank" rel="noopener">深入玩转K8S之使用kubeadm安装Kubernetes v1.10以及常见问题解答</a></h3>]]></content>
+      
+      <categories>
+          
+          <category> kubernetes </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kubernetes集群搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>kubernetes参考资料.md</title>
+      <link href="/blog/2018/08/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99-md/"/>
+      <url>/blog/2018/08/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99-md/</url>
+      <content type="html"><![CDATA[<h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><a href="https://kubernetes.io/docs/home/" target="_blank" rel="noopener">官方文档</a></h3><p>选择 Browse Docs</p><h3 id="Kubernetes中文社区"><a href="#Kubernetes中文社区" class="headerlink" title="Kubernetes中文社区"></a><a href="https://www.kubernetes.org.cn/" target="_blank" rel="noopener">Kubernetes中文社区</a></h3><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="什么是pause容器"><a href="#什么是pause容器" class="headerlink" title="什么是pause容器?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">什么是pause容器?</a></h4>]]></content>
+      
+      <categories>
+          
+          <category> kubernetes </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kubernetes参考资料 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Kubernetes之kubeadm安装.md</title>
+      <link href="/blog/2018/08/08/Kubernetes%E4%B9%8Bkubeadm%E5%AE%89%E8%A3%85-md/"/>
+      <url>/blog/2018/08/08/Kubernetes%E4%B9%8Bkubeadm%E5%AE%89%E8%A3%85-md/</url>
+      <content type="html"><![CDATA[<ul><li>环境: Centos7, Kubernetes 1.11.2, docker-ce 17.03</li></ul><h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>Kubernetes安装文档.</p><p>这里是一些安装软件的</p><ul><li><p>kubeadm: the command to bootstrap the cluster.</p></li><li><p>kubelet: the component that runs on all of the machines in your cluster and does things like starting pods and containers.</p></li><li><p>kubectl: the command line util to talk to your cluster.</p></li></ul><h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="添加yum仓库配置文件"><a href="#添加yum仓库配置文件" class="headerlink" title="添加yum仓库配置文件"></a>添加yum仓库配置文件</h4><p>官方推荐的使用的packages.cloud.google.com地址不通,这里使用阿里云的yum仓库.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</span><br><span class="line"></span><br><span class="line">[kubernetes]</span><br><span class="line"></span><br><span class="line">name=Kubernetes</span><br><span class="line"></span><br><span class="line">baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line"></span><br><span class="line">enabled=1</span><br><span class="line"></span><br><span class="line">gpgcheck=0</span><br><span class="line"></span><br><span class="line">repo_gpgcheck=0</span><br><span class="line"></span><br><span class="line">gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg</span><br><span class="line"></span><br><span class="line">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line"></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure><h4 id="关闭SELinux"><a href="#关闭SELinux" class="headerlink" title="关闭SELinux"></a>关闭SELinux</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 临时关闭</span><br><span class="line"></span><br><span class="line">$ setenforce 0</span><br><span class="line"></span><br><span class="line"># 保证下次机器重启时生效.</span><br><span class="line"></span><br><span class="line">$ vim /etc/selinux/config</span><br><span class="line"></span><br><span class="line">SELINUX=disabled</span><br></pre></td></tr></table></figure><h4 id="网络设置"><a href="#网络设置" class="headerlink" title="网络设置"></a>网络设置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ vim cat &lt;&lt;EOF &gt; /etc/sysctl.d/k8s.conf</span><br><span class="line"></span><br><span class="line">net.bridge.bridge-nf-call-ip6tables = 1</span><br><span class="line"></span><br><span class="line">net.bridge.bridge-nf-call-iptables = 1</span><br><span class="line"></span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">$ sysctl --system</span><br></pre></td></tr></table></figure><h4 id="关闭系统swap"><a href="#关闭系统swap" class="headerlink" title="关闭系统swap"></a>关闭系统swap</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ swapoff -a &amp;&amp; sysctl -w vm.swappiness=0</span><br></pre></td></tr></table></figure><h4 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h4><p>此处忽略,查看docker官方安装教程即可.</p><h3 id="Install-Master"><a href="#Install-Master" class="headerlink" title="Install Master"></a>Install Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes</span><br><span class="line"></span><br><span class="line">$ systemctl enable kubelet &amp;&amp; systemctl start kubelet</span><br></pre></td></tr></table></figure>]]></content>
+      
+      <categories>
+          
+          <category> kubernetes </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kubeadm安装 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>自动化运维工具之OpsManage安装</title>
       <link href="/blog/2018/05/24/%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7%E4%B9%8BOpsManage%E5%AE%89%E8%A3%85/"/>
       <url>/blog/2018/05/24/%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7%E4%B9%8BOpsManage%E5%AE%89%E8%A3%85/</url>
@@ -39,6 +119,27 @@
         <tags>
             
             <tag> 自动化运维工具之OpsManage </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>架构之定义</title>
+      <link href="/blog/2018/05/02/%E6%9E%B6%E6%9E%84%E4%B9%8B%E5%AE%9A%E4%B9%89/"/>
+      <url>/blog/2018/05/02/%E6%9E%B6%E6%9E%84%E4%B9%8B%E5%AE%9A%E4%B9%89/</url>
+      <content type="html"><![CDATA[<h2 id="架构之定义"><a href="#架构之定义" class="headerlink" title="架构之定义"></a>架构之定义</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前嘴里常说架构师,但并没有去细究它的具体含义.偶然间看到别人分享了极客时间的《从0开始学架构》专栏.读了架构到底是什么这篇文章后,发现自己从来都没有思考过.(人最怕的就是<strong><em>不知道自己不知道</em></strong>)赶紧学习充电.</p><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p><strong>架构:软件系统的顶层结构.</strong>(引用文章的结论).没有知识体系,理解这些概念真的很难.没办法,只能尝试去理解,强行记忆了.</p><p>想要理解,需要几个概念进行比较理解.</p><ul><li><p>系统与子系统</p><p>一些独立的“个体”,互相关联和协作.(个体可以是组件、子系统、模块)</p></li></ul><ul><li><p>模块与组件</p><p>模块是从逻辑角度理解,进行职责上的划分.</p><p>组件是从物理角度理解,便于复用.</p></li><li><p>框架</p><p>1、组件规范;</p><p>2、提供基础功能产品;</p></li></ul><p>架构需要明确系统包含哪些“个体”,并且需要明确个体运作和协作的规则.</p><p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fqwsgmsqhoj31cg0rkgoo.jpg" alt="66091B87-6F9C-4FAD-934A-C3472C2FB399"></p>]]></content>
+      
+      <categories>
+          
+          <category> 架构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 架构定义 </tag>
             
         </tags>
       
@@ -175,6 +276,21 @@
     </entry>
     
     <entry>
+      <title>阿里开源之Jarslink初体验</title>
+      <link href="/blog/2018/03/31/%E9%98%BF%E9%87%8C%E5%BC%80%E6%BA%90%E4%B9%8BJarslink%E5%88%9D%E4%BD%93%E9%AA%8C/"/>
+      <url>/blog/2018/03/31/%E9%98%BF%E9%87%8C%E5%BC%80%E6%BA%90%E4%B9%8BJarslink%E5%88%9D%E4%BD%93%E9%AA%8C/</url>
+      <content type="html"><![CDATA[<h2 id="Jarslink初体验"><a href="#Jarslink初体验" class="headerlink" title="Jarslink初体验"></a>Jarslink初体验</h2><ul><li>环境：spring-boot 1.5.3，<a href="https://github.com/alibaba/jarslink" target="_blank" rel="noopener">Jarslink</a> 1.5.0.20171107，jdk8</li></ul><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于一个新东西，通常用哲学的问题进行初步了解。它是什么？它从哪里来？能够解决什么问题（要到哪里去）？</p><ul><li><p>它是什么？它从那里来？</p><p>阿里开源的，名为Jarslink并基于Java的模块化开发框架。它提供在运行时动态加载模块（jar包）、卸载、模块间调用的API。</p></li><li><p>能够解决什么问题？</p></li></ul><h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="新建一个Hello-World工程模块"><a href="#新建一个Hello-World工程模块" class="headerlink" title="新建一个Hello World工程模块"></a>新建一个Hello World工程模块</h3>]]></content>
+      
+      
+        <tags>
+            
+            <tag> Jarslink </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>Docker之安装</title>
       <link href="/blog/2018/03/29/docker%E4%B9%8B%E5%AE%89%E8%A3%85/"/>
       <url>/blog/2018/03/29/docker%E4%B9%8B%E5%AE%89%E8%A3%85/</url>
@@ -190,6 +306,29 @@
         <tags>
             
             <tag> docker安装 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Java基础之Collection</title>
+      <link href="/blog/2018/03/29/Java%E5%9F%BA%E7%A1%80%E4%B9%8BCollection/"/>
+      <url>/blog/2018/03/29/Java%E5%9F%BA%E7%A1%80%E4%B9%8BCollection/</url>
+      <content type="html"><![CDATA[<h2 id="java集合之HashMap"><a href="#java集合之HashMap" class="headerlink" title="java集合之HashMap"></a>java集合之HashMap</h2><ul><li>环境：jdk8</li></ul><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>hashmap是非常常用的，深入了解还是很有好处的。对于hashmap或其他东西，了解一些关键和核心就能抓住要点，深入太多的其他细节，反而分散注意力，性价比反而不高。</p><p>对于HashMap，其关键点有这些：底层的数据结构是是什么？存储值的如何取值的？hash碰撞了怎么办？线程不安全会引发的问题？</p><p>hashmap在jdk7和jdk8中实现是不一样的。</p><ul><li>jdk7中，hashmap底层的数据结构数组+单链表</li><li>jdk8中，hashmap底层的数据结构数组+单链表+红黑树</li></ul><p>围绕以上的问题，开始对它进行剖析。</p><h2 id="深入HashMap"><a href="#深入HashMap" class="headerlink" title="深入HashMap"></a>深入HashMap</h2><h3 id="Hashmap类图"><a href="#Hashmap类图" class="headerlink" title="Hashmap类图"></a>Hashmap类图</h3><p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fpxgnrsbl8j30ln0d5752.jpg" alt="25644DE6-8C03-4A5B-BC25-3481D92E2D76"></p><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul><li><a href="https://tech.meituan.com/java-hashmap.html" target="_blank" rel="noopener">https://tech.meituan.com/java-hashmap.html</a> Java 8系列之重新认识HashMap</li></ul>]]></content>
+      
+      <categories>
+          
+          <category> java集合 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java集合 </tag>
+            
+            <tag> HashMap </tag>
             
         </tags>
       
