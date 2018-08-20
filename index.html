@@ -309,6 +309,211 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster安装/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/20/Gluster安装/" itemprop="url">Gluster安装</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T09:17:43+08:00">
+                2018-08-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  575
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>Centos 7</li>
+<li>Gluster 4.1</li>
+</ul>
+<p>使用三台机器配置.</p>
+<p>192.168.1.100 server1</p>
+<p>192.168.1.101 server2</p>
+<p>192.168.1.102 server3</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录.</p>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Add-Yum-Repository"><a href="#Add-Yum-Repository" class="headerlink" title="Add Yum Repository"></a>Add Yum Repository</h3><p>添加gluster下载仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install centos-release-gluster</span><br></pre></td></tr></table></figure>
+<h3 id="Use-XFS"><a href="#Use-XFS" class="headerlink" title="Use XFS"></a>Use XFS</h3><p>推荐使用XFS文件系统,这里我还是使用exts4,没有重新格式化文件系统.</p>
+<h3 id="Install-Gluster-And-Start"><a href="#Install-Gluster-And-Start" class="headerlink" title="Install Gluster And Start"></a>Install Gluster And Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ yum install glusterfs-server</span><br><span class="line">$ systemctl enable glusterd &amp;&amp; systemctl start glusterd</span><br></pre></td></tr></table></figure>
+<h3 id="Set-Firewalld"><a href="#Set-Firewalld" class="headerlink" title="Set Firewalld"></a>Set Firewalld</h3><p>防火墙配置ip级别允许规则,默认是24007端口,但是每增加bricks都会新增监听端口,所以需要配置ip级别的许可.</p>
+<p>centos7已经使用firewalld.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 允许指定ip.我使用三台机器做测试,每台机器要配置另外两台服务器的ip.</span><br><span class="line">$ firewall-cmd --permanent --add-rich-rule=&quot;rule family=&apos;ipv4&apos; source address=&apos;192.168.1.101&apos; accept&quot;</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+<h3 id="Set-Trusted-Pool"><a href="#Set-Trusted-Pool" class="headerlink" title="Set Trusted Pool"></a>Set Trusted Pool</h3><p>这里使用的三台机器,在server1将server2和server3添加到Trust Pool.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># /etc/hosts需要配置映射.</span><br><span class="line">$ gluster peer probe server2</span><br><span class="line">$ gluster peer probe server3</span><br></pre></td></tr></table></figure>
+<h3 id="Create-a-Volume"><a href="#Create-a-Volume" class="headerlink" title="Create a Volume"></a>Create a Volume</h3><p>在三台服务器上分别创建/bricks/brick1/gv0目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
+<p>挂载目录到gluster上.(任意节点执行命令)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 这里选择的replicas模式,保证数据丢失,其他模式不在这里讨论.</span><br><span class="line">$ gluster volume create gv0 replica 3 server1:/bricks/brick1/gv0 server2:/bricks/brick1/gv0 server3:/bricks/brick1/gv0</span><br><span class="line">$ gluster volume start gv0</span><br></pre></td></tr></table></figure>
+<p>查看volume信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Replicate</span><br><span class="line">Volume ID: 5835a014-b598-467d-ba34-3301d6730d6f</span><br><span class="line">Status: Started</span><br><span class="line">Snapshot Count: 0</span><br><span class="line">Number of Bricks: 1 x 3 = 3</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/bricks/brick1/gv0</span><br><span class="line">Brick2: server2:/bricks/brick1/gv0</span><br><span class="line">Brick3: server3:/bricks/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">transport.address-family: inet</span><br><span class="line">nfs.disable: on</span><br><span class="line">performance.client-io-threads: off</span><br></pre></td></tr></table></figure>
+<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 将server1:/gv0 挂在到/mnt目录</span><br><span class="line">$ mount -t glusterfs server1:/gv0 /mnt</span><br><span class="line"># 生成100个copy-test的文件</span><br><span class="line">$ for i in `seq -w 1 100`; do cp -rp /var/log/messages /mnt/copy-test-$i; done</span><br><span class="line"># 在三台机器上查看是否都有100个文件.</span><br><span class="line">$ ls -lA /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>推荐部署机器为奇数,不然会出现脑裂现象.(猜测使用了poxis算法)</li>
+<li>gluster推荐使用<a href="https://zh.wikipedia.org/wiki/XFS" target="_blank" rel="noopener">xfs文件系统</a>,centos/Red Hat Enterprise Linux 7默认使用,创建系统时可能可能没有指定.</li>
+</ul>
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><ul>
+<li><a href="http://xiaqunfeng.cc/2017/07/06/XFS-vs-EXT4/" target="_blank" rel="noopener">XFS vs EXT4</a></li>
+<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-xfs" target="_blank" rel="noopener">THE XFS FILE SYSTEM</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="gluster-Quickstart"><a href="#gluster-Quickstart" class="headerlink" title="gluster-Quickstart"></a><a href="https://wiki.centos.org/SpecialInterestGroup/Storage/gluster-Quickstart" target="_blank" rel="noopener">gluster-Quickstart</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1975,188 +2180,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/03/prometheus配置zookeeper服务发现机制/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/03/prometheus配置zookeeper服务发现机制/" itemprop="url">prometheus配置zookeeper服务发现机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-03T21:39:13+08:00">
-                2018-08-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  409
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境:zookeeper 3.4.12, prometheus 2.3.1, centos7.3,node_exporter 0.16.0</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>prometheus监听时,一般时配置到prometheus.yml中.机器数量少还好,如果机器数量大,每次改动再重启,简直就是个噩梦.还好它支持服务发现.<br>如何文件、consul、zookeeper等.具体可以查看<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cazure_sd_config%3E" target="_blank" rel="noopener">官网配置</a>说明.</p>
-<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="服务器及软件安装"><a href="#服务器及软件安装" class="headerlink" title="服务器及软件安装"></a>服务器及软件安装</h4><p>服务器    安装软件<br>10.1.1.25    prometheus,zookeeper<br>10.1.1.21<br>10.1.1.22<br>10.1.1.23    node_exporter<br>安装过程不在累述,自行百度即可.</p>
-<h3 id="Config-Prometheus-yml"><a href="#Config-Prometheus-yml" class="headerlink" title="Config Prometheus.yml"></a>Config Prometheus.yml</h3><p>现在我需要监听118.10.2.34服务器中的3台虚拟机10.1.1.21:9100,10.1.1.22:9100,10.1.1.23:9100<br>zookeeper中的路径设置如下:<br>/proxy/118.10.2.34:22/10.1.1.21:9100<br>/proxy/118.10.2.34:22/10.1.1.22:9100<br>/proxy/118.10.2.34:22/10.1.1.23:9100</p>
-<h4 id="promethues-yml"><a href="#promethues-yml" class="headerlink" title="promethues.yml"></a>promethues.yml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;proxy&apos;</span><br><span class="line">    honor_labels: true</span><br><span class="line">    serverset_sd_configs:</span><br><span class="line">    - servers:</span><br><span class="line">      - &apos;10.1.1.25:2181&apos; </span><br><span class="line">      paths:</span><br><span class="line">      - &apos;/proxy&apos;</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [&apos;__meta_serverset_path&apos;]    # 待抓取的服务器集合路径</span><br><span class="line">      regex: &apos;^/proxy/([^/]+)/([^/]+)&apos;                       # 路径匹配规则</span><br><span class="line">      target_label: &apos;meta_ip&apos;</span><br><span class="line">      replacement: &apos;$&#123;1&#125;&amp;$&#123;2&#125;&apos;</span><br><span class="line">    - source_labels: [&apos;meta_ip&apos;]</span><br><span class="line">      regex: &apos;(\d+.\d+.\d+.\d+):(\d+)&amp;(\d+.\d+.\d+.\d+):(\d+)&apos;  # 解析出ip</span><br><span class="line">      target_label: &apos;__address__&apos;</span><br><span class="line">      replacement: &apos;$&#123;1&#125;:$&#123;2&#125;&apos;   # 设置监听的服务器ip</span><br><span class="line">    - source_labels: [&apos;meta_ip&apos;]</span><br><span class="line">      regex: &apos;(\d+.\d+.\d+.\d+):(\d+)&amp;(\d+.\d+.\d+.\d+):(\d+)&apos;</span><br><span class="line">      target_label: &apos;machine&apos;    # 设置所属服务器,用于标识作用,便于以后分组</span><br><span class="line">      replacement: &apos;$&#123;3&#125;:$&#123;4&#125;&apos;</span><br></pre></td></tr></table></figure>
-<h4 id="特别注意"><a href="#特别注意" class="headerlink" title="特别注意"></a>特别注意</h4><p>zookeeper中的节点,如10.1.1.26:9100其值必须设置为json格式,可以简单设置为{},否则prometheus不能解析到该节点.</p>
-<h3 id="效果检查"><a href="#效果检查" class="headerlink" title="效果检查"></a>效果检查</h3><p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/0545bc9a-a416-4c66-8245-963a34bbdde4/index_files/55493948.png" alt="img"></p>
-<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/0545bc9a-a416-4c66-8245-963a34bbdde4/index_files/55801785.png" alt="img"></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Prometheus-Configuration"><a href="#Prometheus-Configuration" class="headerlink" title="Prometheus Configuration"></a><a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cserverset_sd_config%3E" target="_blank" rel="noopener">Prometheus Configuration</a></h3><h3 id="ZooKeeper-serverset-discovery-Issues"><a href="#ZooKeeper-serverset-discovery-Issues" class="headerlink" title="ZooKeeper serverset discovery Issues"></a><a href="https://github.com/prometheus/prometheus/issues/2758" target="_blank" rel="noopener">ZooKeeper serverset discovery Issues</a></h3><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h3><h4 id="Prometheus-Node-exporter"><a href="#Prometheus-Node-exporter" class="headerlink" title="Prometheus/Node_exporter"></a><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Prometheus/Node_exporter</a></h4><h4 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a><a href="http://zookeeper.apache.org/releases.html#download" target="_blank" rel="noopener">Zookeeper</a></h4>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2211,7 +2234,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2233,7 +2256,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2294,7 +2317,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">13.4k</span>
+    <span title="Site words total count">14.0k</span>
   
 </div>
 

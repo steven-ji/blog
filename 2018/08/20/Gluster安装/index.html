@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Gluster Install," />
 
 
 
@@ -79,16 +79,18 @@
 
 
 
-<meta name="description" content="向终身学习者致敬">
-<meta property="og:type" content="website">
-<meta property="og:title" content="ttbb玩代码">
-<meta property="og:url" content="http://steven-ji.github.io/blog/categories/自动化运维工具/index.html">
+<meta name="description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
+<meta name="keywords" content="Gluster Install">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gluster安装">
+<meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/20/Gluster安装/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="向终身学习者致敬">
+<meta property="og:description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-20T02:43:48.852Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ttbb玩代码">
-<meta name="twitter:description" content="向终身学习者致敬">
+<meta name="twitter:title" content="Gluster安装">
+<meta name="twitter:description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
 
 
 
@@ -118,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://steven-ji.github.io/blog/categories/自动化运维工具/"/>
+  <link rel="canonical" href="http://steven-ji.github.io/blog/2018/08/20/Gluster安装/"/>
 
 
 
 
 
-  <title>分类: 自动化运维工具 | ttbb玩代码</title>
+  <title>Gluster安装 | ttbb玩代码</title>
   
 
 
@@ -154,7 +156,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -294,55 +296,261 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block category">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>自动化运维工具<small>分类</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster安装/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/blog/2018/05/24/自动化运维工具之OpsManage安装/" itemprop="url">
-              
-                <span itemprop="name">自动化运维工具之OpsManage安装</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Gluster安装</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-05-24T17:23:02+08:00"
-              content="2018-05-24" >
-          05-24
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T09:17:43+08:00">
+                2018-08-20
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  575
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    </div>
+      
 
+      
+        <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>Centos 7</li>
+<li>Gluster 4.1</li>
+</ul>
+<p>使用三台机器配置.</p>
+<p>192.168.1.100 server1</p>
+<p>192.168.1.101 server2</p>
+<p>192.168.1.102 server3</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录.</p>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Add-Yum-Repository"><a href="#Add-Yum-Repository" class="headerlink" title="Add Yum Repository"></a>Add Yum Repository</h3><p>添加gluster下载仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install centos-release-gluster</span><br></pre></td></tr></table></figure>
+<h3 id="Use-XFS"><a href="#Use-XFS" class="headerlink" title="Use XFS"></a>Use XFS</h3><p>推荐使用XFS文件系统,这里我还是使用exts4,没有重新格式化文件系统.</p>
+<h3 id="Install-Gluster-And-Start"><a href="#Install-Gluster-And-Start" class="headerlink" title="Install Gluster And Start"></a>Install Gluster And Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ yum install glusterfs-server</span><br><span class="line">$ systemctl enable glusterd &amp;&amp; systemctl start glusterd</span><br></pre></td></tr></table></figure>
+<h3 id="Set-Firewalld"><a href="#Set-Firewalld" class="headerlink" title="Set Firewalld"></a>Set Firewalld</h3><p>防火墙配置ip级别允许规则,默认是24007端口,但是每增加bricks都会新增监听端口,所以需要配置ip级别的许可.</p>
+<p>centos7已经使用firewalld.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 允许指定ip.我使用三台机器做测试,每台机器要配置另外两台服务器的ip.</span><br><span class="line">$ firewall-cmd --permanent --add-rich-rule=&quot;rule family=&apos;ipv4&apos; source address=&apos;192.168.1.101&apos; accept&quot;</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+<h3 id="Set-Trusted-Pool"><a href="#Set-Trusted-Pool" class="headerlink" title="Set Trusted Pool"></a>Set Trusted Pool</h3><p>这里使用的三台机器,在server1将server2和server3添加到Trust Pool.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># /etc/hosts需要配置映射.</span><br><span class="line">$ gluster peer probe server2</span><br><span class="line">$ gluster peer probe server3</span><br></pre></td></tr></table></figure>
+<h3 id="Create-a-Volume"><a href="#Create-a-Volume" class="headerlink" title="Create a Volume"></a>Create a Volume</h3><p>在三台服务器上分别创建/bricks/brick1/gv0目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
+<p>挂载目录到gluster上.(任意节点执行命令)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 这里选择的replicas模式,保证数据丢失,其他模式不在这里讨论.</span><br><span class="line">$ gluster volume create gv0 replica 3 server1:/bricks/brick1/gv0 server2:/bricks/brick1/gv0 server3:/bricks/brick1/gv0</span><br><span class="line">$ gluster volume start gv0</span><br></pre></td></tr></table></figure>
+<p>查看volume信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Replicate</span><br><span class="line">Volume ID: 5835a014-b598-467d-ba34-3301d6730d6f</span><br><span class="line">Status: Started</span><br><span class="line">Snapshot Count: 0</span><br><span class="line">Number of Bricks: 1 x 3 = 3</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/bricks/brick1/gv0</span><br><span class="line">Brick2: server2:/bricks/brick1/gv0</span><br><span class="line">Brick3: server3:/bricks/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">transport.address-family: inet</span><br><span class="line">nfs.disable: on</span><br><span class="line">performance.client-io-threads: off</span><br></pre></td></tr></table></figure>
+<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 将server1:/gv0 挂在到/mnt目录</span><br><span class="line">$ mount -t glusterfs server1:/gv0 /mnt</span><br><span class="line"># 生成100个copy-test的文件</span><br><span class="line">$ for i in `seq -w 1 100`; do cp -rp /var/log/messages /mnt/copy-test-$i; done</span><br><span class="line"># 在三台机器上查看是否都有100个文件.</span><br><span class="line">$ ls -lA /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>推荐部署机器为奇数,不然会出现脑裂现象.(猜测使用了poxis算法)</li>
+<li>gluster推荐使用<a href="https://zh.wikipedia.org/wiki/XFS" target="_blank" rel="noopener">xfs文件系统</a>,centos/Red Hat Enterprise Linux 7默认使用,创建系统时可能可能没有指定.</li>
+</ul>
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><ul>
+<li><a href="http://xiaqunfeng.cc/2017/07/06/XFS-vs-EXT4/" target="_blank" rel="noopener">XFS vs EXT4</a></li>
+<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-xfs" target="_blank" rel="noopener">THE XFS FILE SYSTEM</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="gluster-Quickstart"><a href="#gluster-Quickstart" class="headerlink" title="gluster-Quickstart"></a><a href="https://wiki.centos.org/SpecialInterestGroup/Storage/gluster-Quickstart" target="_blank" rel="noopener">gluster-Quickstart</a></h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/blog/uploads/wechatpay.png" alt="溏溏爸爸 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/blog/uploads/alipay.png" alt="溏溏爸爸 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/Gluster-Install/" rel="tag"># Gluster Install</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/" rel="next" title="Kubernetes Pods指定镜像仓库">
+                <i class="fa fa-chevron-left"></i> Kubernetes Pods指定镜像仓库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -350,6 +558,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTI2Mi8xMTc5OA=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -370,8 +587,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -445,6 +671,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Install"><span class="nav-number">3.</span> <span class="nav-text">Install</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Add-Yum-Repository"><span class="nav-number">3.1.</span> <span class="nav-text">Add Yum Repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-XFS"><span class="nav-number">3.2.</span> <span class="nav-text">Use XFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Install-Gluster-And-Start"><span class="nav-number">3.3.</span> <span class="nav-text">Install Gluster And Start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Firewalld"><span class="nav-number">3.4.</span> <span class="nav-text">Set Firewalld</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Trusted-Pool"><span class="nav-number">3.5.</span> <span class="nav-text">Set Trusted Pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-Volume"><span class="nav-number">3.6.</span> <span class="nav-text">Create a Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Testing"><span class="nav-number">3.7.</span> <span class="nav-text">Testing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓展"><span class="nav-number">5.</span> <span class="nav-text">拓展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gluster-Quickstart"><span class="nav-number">6.1.</span> <span class="nav-text">gluster-Quickstart</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -594,6 +836,10 @@
 
 
   
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -622,6 +868,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
