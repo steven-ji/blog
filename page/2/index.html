@@ -309,6 +309,377 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/05/altermanager之初体验/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/05/altermanager之初体验/" itemprop="url">altermanager之初体验</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T23:54:16+08:00">
+                2018-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
+                    <span itemprop="name">prometheus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  335
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>环境:centos7, alertmanager 0.15.1</li>
+<li><a href="https://github.com/prometheus/alertmanager" target="_blank" rel="noopener">github</a></li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚入门alertmanager,权当记录.</p>
+<h2 id="Execute-Alertmanager"><a href="#Execute-Alertmanager" class="headerlink" title="Execute Alertmanager"></a>Execute Alertmanager</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><ul>
+<li><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Download</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 安装在/opt下.下载地址prometheus官网有提供.</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/alertmanager/releases/download/v0.15.1/alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv alertmanager-0.15.1.linux-amd64 alertmanager-0.15.1</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/alertmanager.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/alertmanager-0.15.1/alertmanager --config.file=/opt/alertmanager-0.15.1/alertmanager.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable alertmanager &amp;&amp; systemctl start alertmanager</span><br></pre></td></tr></table></figure>
+<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
+<li><a href="https://prometheus.io/docs/alerting/configuration/" target="_blank" rel="noopener">alertmanager.yml example</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># </span><br><span class="line">$ vim /opt/alertmanager-0.15.1/alertmanager.yml</span><br><span class="line">global:</span><br><span class="line">  resolve_timeout: 5m</span><br><span class="line">  smtp_smarthost: &apos;smtp.mxhichina.com:25&apos;</span><br><span class="line">  smtp_from: &apos;xiaoxiangyoupin@basestonedata.com&apos;</span><br><span class="line">  smtp_auth_username: &apos;xiaoxiangyoupin@basestonedata.com&apos;</span><br><span class="line">  smtp_auth_password: &apos;Xiaoxiangyoupin1&apos;</span><br><span class="line">templates:</span><br><span class="line">  - &apos;/tmp/alert_test.txt&apos; # 发送消息模版.</span><br><span class="line">route:</span><br><span class="line">  group_by: [&apos;proxy&apos;]</span><br><span class="line">  group_wait: 10s</span><br><span class="line">  group_interval: 20s</span><br><span class="line">  repeat_interval: 5m # 警告发送成功后,等待该配置时间后才再次发送.</span><br><span class="line">  receiver: &apos;proxy-team&apos;</span><br><span class="line"># 以上配置会被routes标签继承或覆盖.</span><br><span class="line">#  routes: </span><br><span class="line">receivers: # 接收方集合</span><br><span class="line">- name: &apos;proxy-team&apos;</span><br><span class="line">  email_configs:</span><br><span class="line">  - to: &apos;363054731@qq.com,jiangwe@basestonedata.com&apos;</span><br><span class="line">    text: &apos;报警&apos;</span><br><span class="line"># 防止过度报警.</span><br><span class="line">#inhibit_rules:</span><br><span class="line">#  - source_match:</span><br><span class="line">#      severity: &apos;critical&apos;</span><br><span class="line">#    target_match:</span><br><span class="line">#      severity: &apos;warning&apos;</span><br><span class="line">#    equal: [&apos;alertname&apos;, &apos;dev&apos;, &apos;instance&apos;]</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/04/prometheus之监测服务器心跳/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/04/prometheus之监测服务器心跳/" itemprop="url">prometheus之监测服务器心跳</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:42:33+08:00">
+                2018-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
+                    <span itemprop="name">prometheus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  509
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>环境:centos7, prometheus 2.3.1, blackbox_export 0.12.0</li>
+<li>其他<a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener">exporter</a></li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>blackbox能支持什么协议:HTTP, HTTPS (via the http prober), DNS, TCP socket and ICMP.<br>对于机器可用性的监测,最简单的莫过于使用ping或者ssh的方式.这里使用blackbox_exporter,基于使用node_exporter的经验,可能会认为需要将blackbox_exporter部署到每个节点下,而实际上通过一个部署了blackbox_exporter的节点去检测其他机器.</p>
+<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/df0296f8-6c9a-4642-991a-8b3679667974/index_files/82906877.png" alt="img"></p>
+<h2 id="Execute-blackbox-exporter"><a href="#Execute-blackbox-exporter" class="headerlink" title="Execute blackbox_exporter"></a>Execute blackbox_exporter</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0</span><br></pre></td></tr></table></figure>
+<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/blackbox.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=blackbox.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable blackbox &amp;&amp; systemctl start blackbox</span><br></pre></td></tr></table></figure>
+<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># pwd指定宿主机配置文件路径,我一般都放在/data/blackbox_exporter/config目录下</span><br><span class="line">$ docker build -t blackbox_exporter .</span><br><span class="line">$ docker run -d -p 9115:9115 --name blackbox_exporter -v `pwd`:/config blackbox_exporter --config.file=/config/blackbox.yml</span><br></pre></td></tr></table></figure>
+<h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
+<li><a href="https://github.com/prometheus/blackbox_exporter/blob/master/example.yml" target="_blank" rel="noopener">blackbox_exporter example.yml</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 这里暂时只使用ping和ssh验证主机有效性的方式,其他配置可参看github上的example.yml</span><br><span class="line">$ vim blackbox.yml</span><br><span class="line"># probe探测频率由prometheus中的scripe_timeout决定.</span><br><span class="line">modules:</span><br><span class="line">  ssh_banner:</span><br><span class="line">    prober: tcp</span><br><span class="line">    timeout: 10s # 每次探测的网络超时时间,默认为10秒</span><br><span class="line">    tcp:</span><br><span class="line">      query_response:</span><br><span class="line">      - expect: &quot;^SSH-2.0-&quot;</span><br><span class="line">  icmp:</span><br><span class="line">    prober: icmp</span><br><span class="line">    timeout: 10s</span><br><span class="line">    icmp:</span><br><span class="line">      preferred_ip_protocol: &quot;ip4&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Test-Blackbox-Exporter"><a href="#Test-Blackbox-Exporter" class="headerlink" title="Test Blackbox Exporter"></a>Test Blackbox Exporter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 测试目标10.1.1.21的ping信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=icmp\&amp;target\=10.1.1.25</span><br><span class="line">......</span><br><span class="line">probe_success 0  # 目标主机ping失败</span><br><span class="line"># 测试目标10.1.1.21 22的ssh信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=ssh_banner\&amp;target\=10.1.1.21:22</span><br><span class="line">......</span><br><span class="line">probe_success 1  # 目标主机ssh通过</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="blackbox-exporter-github"><a href="#blackbox-exporter-github" class="headerlink" title="blackbox_exporter github"></a><a href="https://github.com/prometheus/blackbox_exporter" target="_blank" rel="noopener">blackbox_exporter github</a></h3><h3 id="用Prometheus进行网络质量ping"><a href="#用Prometheus进行网络质量ping" class="headerlink" title="用Prometheus进行网络质量ping"></a><a href="https://www.iamle.com/archives/2130.html" target="_blank" rel="noopener">用Prometheus进行网络质量ping</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/03/prometheus配置zookeeper服务发现机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1841,385 +2212,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/03/swagger2问题汇总/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/04/03/swagger2问题汇总/" itemprop="url">swagger2问题汇总</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-03T13:44:15+08:00">
-                2018-04-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/swagger/" itemprop="url" rel="index">
-                    <span itemprop="name">swagger</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,118
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  7
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="swagger2问题汇总"><a href="#swagger2问题汇总" class="headerlink" title="swagger2问题汇总"></a>swagger2问题汇总</h2><ul>
-<li>环境：swagger 2.7.0，spring-boot 1.5.9</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这里是对在使用swagger时碰到的相关问题汇总。</p>
-<h2 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h2><h4 id="Failed-to-start-bean-‘documentationPluginsBootstrapper’-nested-exception-is-java-lang-NullPointerException"><a href="#Failed-to-start-bean-‘documentationPluginsBootstrapper’-nested-exception-is-java-lang-NullPointerException" class="headerlink" title="Failed to start bean ‘documentationPluginsBootstrapper’; nested exception is java.lang.NullPointerException"></a>Failed to start bean ‘documentationPluginsBootstrapper’; nested exception is java.lang.NullPointerException</h4><p>swagger的配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">@EnableSwagger2</span><br><span class="line">public class Swagger2 &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    public Docket createRestApi() &#123;</span><br><span class="line">        return new Docket(DocumentationType.SWAGGER_2)</span><br><span class="line">                .apiInfo(new ApiInfoBuilder()</span><br><span class="line">                        .title(&quot;测试&quot;)</span><br><span class="line">                        .description(&quot;测试&quot;)</span><br><span class="line">                        .termsOfServiceUrl(&quot;&quot;)</span><br><span class="line">                        .contact(&quot;jilingjun&quot;)</span><br><span class="line">                        .version(&quot;1.0&quot;)</span><br><span class="line">                        .build())</span><br><span class="line">                .select()</span><br><span class="line">                .apis(RequestHandlerSelectors.basePackage(&quot;com.bsd.recommend.controller&quot;))</span><br><span class="line">                .paths(PathSelectors.any())</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>详细错误如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">org.springframework.context.ApplicationContextException: Failed to start bean &apos;documentationPluginsBootstrapper&apos;; nested exception is java.lang.NullPointerException</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:176) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor.access$200(DefaultLifecycleProcessor.java:51) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:346) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:149) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:112) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:879) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.finishRefresh(EmbeddedWebApplicationContext.java:144) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:545) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.refresh(EmbeddedWebApplicationContext.java:122) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:737) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:370) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:314) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1162) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1151) ~[spring-boot-1.5.1.RELEASE.jar:1.5.1.RELEASE]</span><br><span class="line">	at com.bsd.recommend.RecommendApplication.main(RecommendApplication.java:23) ~[classes/:na]</span><br><span class="line">Caused by: java.lang.NullPointerException: null</span><br><span class="line">	at springfox.documentation.builders.RequestHandlerSelectors$4.apply(RequestHandlerSelectors.java:97) ~[springfox-core-2.7.0.jar:2.7.0]</span><br><span class="line">	at springfox.documentation.builders.RequestHandlerSelectors$4.apply(RequestHandlerSelectors.java:94) ~[springfox-core-2.7.0.jar:2.7.0]</span><br><span class="line">	at com.google.common.base.Present.transform(Present.java:79) ~[guava-19.0.jar:na]</span><br><span class="line">	at springfox.documentation.builders.RequestHandlerSelectors$5.apply(RequestHandlerSelectors.java:113) ~[springfox-core-2.7.0.jar:2.7.0]</span><br><span class="line">	at springfox.documentation.builders.RequestHandlerSelectors$5.apply(RequestHandlerSelectors.java:110) ~[springfox-core-2.7.0.jar:2.7.0]</span><br><span class="line">	at com.google.common.base.Predicates$AndPredicate.apply(Predicates.java:374) ~[guava-19.0.jar:na]</span><br><span class="line">	at com.google.common.base.Predicates$AndPredicate.apply(Predicates.java:374) ~[guava-19.0.jar:na]</span><br><span class="line">	at com.google.common.collect.Iterators$7.computeNext(Iterators.java:675) ~[guava-19.0.jar:na]</span><br><span class="line">	at com.google.common.collect.AbstractIterator.tryToComputeNext(AbstractIterator.java:143) ~[guava-19.0.jar:na]</span><br><span class="line">	at com.google.common.collect.AbstractIterator.hasNext(AbstractIterator.java:138) ~[guava-19.0.jar:na]</span><br><span class="line">	at springfox.documentation.spring.web.scanners.ApiListingReferenceScanner.scan(ApiListingReferenceScanner.java:48) ~[springfox-spring-web-2.7.0.jar:2.7.0]</span><br><span class="line">	at springfox.documentation.spring.web.scanners.ApiDocumentationScanner.scan(ApiDocumentationScanner.java:67) ~[springfox-spring-web-2.7.0.jar:2.7.0]</span><br><span class="line">	at springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper.scanDocumentation(DocumentationPluginsBootstrapper.java:95) ~[springfox-spring-web-2.7.0.jar:2.7.0]</span><br><span class="line">	at springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper.start(DocumentationPluginsBootstrapper.java:154) ~[springfox-spring-web-2.7.0.jar:2.7.0]</span><br><span class="line">	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:173) ~[spring-context-4.3.6.RELEASE.jar:4.3.6.RELEASE]</span><br><span class="line">	... 14 common frames omitted</span><br></pre></td></tr></table></figure>
-<p>初步诊断，swagger在做scan操作抛出了空指针异常。现在只能google了，发现这事一个bug，并且在2.8.0之后进行了修复（2.8.0修复的问题在这里：<a href="https://github.com/springfox/springfox/issues/2186）。" target="_blank" rel="noopener">https://github.com/springfox/springfox/issues/2186）。</a></p>
-<p>（可参考：<a href="https://github.com/springfox/springfox/issues/1876）" target="_blank" rel="noopener">https://github.com/springfox/springfox/issues/1876）</a></p>
-<p>这个问题是发生在对controller做了切面后才会出现，If I use AOP advice on my method within @RestController I face this issue too because Spring creates proxy class to wrap controller’s method call。</p>
-<h5 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h5><ul>
-<li>swagger 2.7.0，spring-boot 1.5.1</li>
-</ul>
-<p>既然是个bug，就应该有临时解决方案吧。这还真让我找到了，具体解决的源url就找不到了，就直接帖代码了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">@EnableSwagger2</span><br><span class="line">public class Swagger2 extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addViewControllers(ViewControllerRegistry registry) &#123;</span><br><span class="line">        registry.addRedirectViewController(&quot;/documentation/v2/api-docs&quot;, &quot;/v2/api-docs?group=restful-api&quot;);</span><br><span class="line">        registry.addRedirectViewController(&quot;/documentation/swagger-resources/configuration/ui&quot;, &quot;/swagger-resources/configuration/ui&quot;);</span><br><span class="line">        registry.addRedirectViewController(&quot;/documentation/swagger-resources/configuration/security&quot;, &quot;/swagger-resources/configuration/security&quot;);</span><br><span class="line">        registry.addRedirectViewController(&quot;/documentation/swagger-resources&quot;, &quot;/swagger-resources&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addResourceHandlers(ResourceHandlerRegistry registry) &#123;</span><br><span class="line">        registry.</span><br><span class="line">                addResourceHandler(&quot;/documentation/swagger-ui.html**&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/swagger-ui.html&quot;);</span><br><span class="line">        registry.</span><br><span class="line">                addResourceHandler(&quot;/documentation/webjars/**&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/webjars/&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public Docket createRestApi() &#123;</span><br><span class="line">        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()</span><br><span class="line">                .apis(RequestHandlerSelectors.any()).paths(PathSelectors.any())</span><br><span class="line">                .build().forCodeGeneration(true);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private ApiInfo apiInfo() &#123;</span><br><span class="line">        return new ApiInfoBuilder().title(&quot;测试&quot;)</span><br><span class="line">                .description(&quot;测试&quot;)</span><br><span class="line">                .termsOfServiceUrl(&quot;&quot;).contact(&quot;联系我&quot;).version(&quot;1.0&quot;).build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://github.com/springfox/springfox/issues/1876" target="_blank" rel="noopener">https://github.com/springfox/springfox/issues/1876</a> NullPointerException with Spring Data Rest integration</li>
-<li><a href="https://github.com/springfox/springfox/issues/1860" target="_blank" rel="noopener">https://github.com/springfox/springfox/issues/1860</a> [spring boot]@EnableAspectJAutoProxy cause endpoint scanning failed</li>
-</ul>
-<hr>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/04/02/Redis之集群创建/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/04/02/Redis之集群创建/" itemprop="url">Redis之集群搭建</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T23:17:10+08:00">
-                2018-04-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  212
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Redis之集群搭建"><a href="#Redis之集群搭建" class="headerlink" title="Redis之集群搭建"></a>Redis之集群搭建</h2><ul>
-<li>环境：Centos7，redis3.2</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>### </p>
-<h2 id="Cluster添加密码"><a href="#Cluster添加密码" class="headerlink" title="Cluster添加密码"></a>Cluster添加密码</h2><p><strong>前提：先创建无密码集群</strong></p>
-<h3 id="方式一：手动添加密码到配置文件"><a href="#方式一：手动添加密码到配置文件" class="headerlink" title="方式一：手动添加密码到配置文件"></a>方式一：手动添加密码到配置文件</h3><p>修改所有redis服务器的配置文件添加密码，然后关闭redis-cluster，然后重启redis-cluster</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">requirepass &quot;abc&quot;</span><br><span class="line">masterauth &quot;abc&quot;</span><br></pre></td></tr></table></figure>
-<h3 id="方式二：通过命令添加密码"><a href="#方式二：通过命令添加密码" class="headerlink" title="方式二：通过命令添加密码"></a>方式二：通过命令添加密码</h3><p>通过命令行设置密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">## 登录有添加密码</span><br><span class="line">$ redis-cli -h [host] -p [port] -c</span><br><span class="line">$ config set masterauth abc</span><br><span class="line">$ config set requirepass abc</span><br><span class="line">$ config rewrite</span><br><span class="line">$ shutdown</span><br><span class="line">## 每个节点都执行上述操作，然后正常关闭即可。查看每个节点的conf配置文件，会发现都自动添加了</span><br><span class="line">requirepass &quot;abc&quot;</span><br><span class="line">masterauth &quot;abc&quot;</span><br></pre></td></tr></table></figure>
-<p>后续登录都需要添加密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli -h [host] -p [port] -c -a [password]</span><br><span class="line">或者</span><br><span class="line">$ redis-cli -h [host] -p [port] -c</span><br><span class="line">$ auth [password]</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li>​</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2274,7 +2266,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2285,7 +2277,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2296,7 +2288,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2357,7 +2349,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">14.0k</span>
+    <span title="Site words total count">16.2k</span>
   
 </div>
 

@@ -309,6 +309,418 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/21/kubernetes常用命令/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/21/kubernetes常用命令/" itemprop="url">kubernetes常用命令</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T14:19:18+08:00">
+                2018-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,808
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><h3 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># nginx-deployment.yaml</span><br><span class="line">$ vim nginx-deployment.yaml</span><br><span class="line">apiVersion: apps/v1 # 1.11版本之后</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-deployment</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3 # 3个副本</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx # 与template.metadata.labels一致</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br></pre></td></tr></table></figure>
+<h4 id="创建Deployments"><a href="#创建Deployments" class="headerlink" title="创建Deployments"></a>创建Deployments</h4><ul>
+<li>record参数设置为true,在Deployment revision时方便命令记录,以及在describe时能够看到Annotations中指令记录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f nginx-deployment.yaml --record</span><br><span class="line">deployment &quot;nginx-deployment&quot; created</span><br></pre></td></tr></table></figure>
+<h4 id="查看发布历史记录"><a href="#查看发布历史记录" class="headerlink" title="查看发布历史记录"></a>查看发布历史记录</h4><ul>
+<li>rollout 字面是上线意思,我理解为发布.</li>
+</ul>
+<p>替换metadata.name,即上面文件中的nginx-deployment名称.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout history deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment</span><br><span class="line"># 如果在创建Deployments时没有使用--record,没有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         &lt;none&gt;</span><br><span class="line"># 如果在创建时指定--record,会有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>查看版本的具体信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl rollout history deployment/nginx-deployment --revision=1</span><br><span class="line">deployments &quot;nginx-deployment&quot; with revision #1</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:	app=nginx</span><br><span class="line">	pod-template-hash=2777190766</span><br><span class="line">  Annotations:	kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:	nginx</span><br><span class="line">    Port:	80/TCP</span><br><span class="line">    Host Port:	0/TCP</span><br><span class="line">    Environment:	&lt;none&gt;</span><br><span class="line">    Mounts:	&lt;none&gt;</span><br><span class="line">  Volumes:	&lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="查看Deployments"><a href="#查看Deployments" class="headerlink" title="查看Deployments"></a>查看Deployments</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get deployment [metadata.name](可选)</span><br><span class="line"># 不指定deployment的名字将查询全部的deployments.如下:</span><br><span class="line">NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">hello-node-deployment   1         1         1            1           17m</span><br><span class="line">nginx-deployment        1         1         1            1           4m</span><br></pre></td></tr></table></figure>
+<h4 id="查看RS-ReplicaSet"><a href="#查看RS-ReplicaSet" class="headerlink" title="查看RS(ReplicaSet)"></a>查看RS(ReplicaSet)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get rs</span><br><span class="line">NAME                              DESIRED   CURRENT   READY     AGE</span><br><span class="line">nginx-deployment-966857787        1         1         1         5m</span><br></pre></td></tr></table></figure>
+<h4 id="更新Deployments-自动rollout"><a href="#更新Deployments-自动rollout" class="headerlink" title="更新Deployments(自动rollout)"></a>更新Deployments(自动rollout)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 方式一,修改文件中的spec.template.spec.containers[0].image值</span><br><span class="line">kubectl edit deployment/[metadata.name]</span><br><span class="line">$ kubectl edit deployment/nginx-deployment</span><br><span class="line"># 方式二 </span><br><span class="line">kubectl set image deployment [metadata.name] [spec.spec.containers.name]=镜像名称</span><br><span class="line">$ kubectl set image deployment nginx-deployment nginx=nginx:1.7.9</span><br></pre></td></tr></table></figure>
+<h4 id="查看发布状态"><a href="#查看发布状态" class="headerlink" title="查看发布状态"></a>查看发布状态</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout status deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
+<h4 id="查看deployment详细信息"><a href="#查看deployment详细信息" class="headerlink" title="查看deployment详细信息"></a>查看deployment详细信息</h4><ul>
+<li>关注Events,记录了发布的过程.实际是创建了一个新的ReplicaSet-&gt;nginx-deployment-6ccc5f4cbb,然后逐渐下原来的ReplicaSet-&gt;nginx-deployment-966857787的Pod.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe deployment/[metadata.name]</span><br><span class="line">$ kubectl describe deployment/nginx-deployment</span><br><span class="line">Name:                   nginx-deployment</span><br><span class="line">Namespace:              default</span><br><span class="line">CreationTimestamp:      Tue, 21 Aug 2018 15:18:18 +0800</span><br><span class="line">Labels:                 app=nginx</span><br><span class="line">Annotations:            deployment.kubernetes.io/revision=2</span><br><span class="line">                        kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">Selector:               app=nginx</span><br><span class="line">Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable</span><br><span class="line">StrategyType:           RollingUpdate</span><br><span class="line">MinReadySeconds:        0</span><br><span class="line">RollingUpdateStrategy:  25% max unavailable, 25% max surge</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:  app=nginx</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:        nginx:1.7.9</span><br><span class="line">    Port:         80/TCP</span><br><span class="line">    Host Port:    0/TCP</span><br><span class="line">    Environment:  &lt;none&gt;</span><br><span class="line">    Mounts:       &lt;none&gt;</span><br><span class="line">  Volumes:        &lt;none&gt;</span><br><span class="line">Conditions:</span><br><span class="line">  Type           Status  Reason</span><br><span class="line">  ----           ------  ------</span><br><span class="line">  Available      True    MinimumReplicasAvailable</span><br><span class="line">  Progressing    True    NewReplicaSetAvailable</span><br><span class="line">OldReplicaSets:  &lt;none&gt;</span><br><span class="line">NewReplicaSet:   nginx-deployment-6ccc5f4cbb (3/3 replicas created)</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason             Age   From                   Message</span><br><span class="line">  ----    ------             ----  ----                   -------</span><br><span class="line">  Normal  ScalingReplicaSet  4m    deployment-controller  Scaled up replica set nginx-deployment-966857787 to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 0</span><br></pre></td></tr></table></figure>
+<h4 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h4><ul>
+<li><p>回滚之后,revision对应记录就会消失</p>
+</li>
+<li><p>undo是回滚到上一个版本的操作.</p>
+<p>假设有三个版本:nginx:1.4.7, nginx:1.7.9, nginx:1.9.7, nginx:1.10.3,当前版本为nginx:1.10.3.</p>
+<p>1、假如指定to-revision回滚到1.7.9版本,再执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
+<p>2、第一次执行undo(不指定to-revision),回滚到1.9.7版本,再次执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
+<p>3、第一次指定to-revision回滚到1.7.9,第二次指定to-revision回滚到1.9.7,第三次指定to-revision回滚到1.4.7,第四次指定undo(不指定to-revison),则是回滚到1.9.7.</p>
+</li>
+</ul>
+<p>假设有三个版本:nginx:1.7.9,nginx:1.9.7,nginx:1.10.3,当前版本为nginx:1.10.3.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 查看发布历史记录</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment </span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">3         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>第一次执行undo回退到前一个版本,即nginx:1.9.7.如果第二次再执行,又会回滚到原版本,即nginx:1.10.3.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout undo deployment/[metatdata.name]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里查看下发布历史记录,发现revision为3的记录消失了.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">4         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>指定to-revision回退到指定历史</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout undo deployment/[metadata.name] --to-revision=[number]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment --to-revision=2</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里如果执行undo但不指定--to-revision,则恢复导原来版本.</span><br></pre></td></tr></table></figure>
+<h4 id="Deployment扩容"><a href="#Deployment扩容" class="headerlink" title="Deployment扩容"></a>Deployment扩容</h4><p>指定 扩容/缩容 副本数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">kubectl scale deployment/[metadata.name] --replicas=[number]</span><br><span class="line">$ kubectl scale deployment/nginx-deployment --replicas=6</span><br><span class="line">deployment.extensions/nginx-deployment scaled</span><br><span class="line"># 查看扩容状态</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 3 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 4 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 5 of 6 updated replicas are available...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
+<p>当集群启用horizontal pod autoscaling后,可以根据CPU利用率,在范围内扩容或缩容.(todo还不知道怎么做)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ $ kubectl autoscale deployment nginx-deployment --min=10 --max=15 --cpu-percent=80</span><br><span class="line">deployment &quot;nginx-deployment&quot; autoscaled</span><br></pre></td></tr></table></figure>
+<h4 id="设置Deployments发布历史记录"><a href="#设置Deployments发布历史记录" class="headerlink" title="设置Deployments发布历史记录"></a>设置Deployments发布历史记录</h4><p>在nginx-deployment.yaml中设置spec.revisionHistoryLimits属性,默认是保留全部历史记录.可以不用去理会.</p>
+<h4 id="设置Deployments发布策略"><a href="#设置Deployments发布策略" class="headerlink" title="设置Deployments发布策略"></a>设置Deployments发布策略</h4><p><code>spec.strategy</code> 指定新的Pod替换旧的Pod的策略。 <code>spec.strategy.type</code> 可以是<code>Recreate</code>或者是 <code>RollingUpdate</code>。<code>RollingUpdate</code>是默认值。</p>
+<ul>
+<li>Recreate 指在创建出新的Pod之前会杀掉已经存在的Pod.(强烈建议不使用)</li>
+<li>RollingUpdate 指滚动升级.逐步一个一个交替升级.可以指定<code>maxUnavailable</code> 和 <code>maxSurge</code> 来控制 rolling update 进程。<ul>
+<li>maxUnavaiables <code>.spec.strategy.rollingUpdate.maxUnavailable</code>指定在升级的过程中不可用的Pod数量.默认为1,也可以设置为百分比.如设置为30%,则原来的ReplicaSet会立刻缩容到70%.</li>
+<li>maxSurge <code>.spec.strategy.rollingUpdate.maxSurge</code>指定在升级过程中,新老Pod的总数的最大值.如设置为30%,启动rolling update后新的ReplicatSet将会立即扩容,新老Pod的总数不能超过期望的Pod数量的130%。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Pause设置"><a href="#Pause设置" class="headerlink" title="Pause设置"></a>Pause设置</h4><p><code>.spec.paused</code>是可以可选配置项，boolean值。默认为false.</p>
+<p>如果设置paused后,对Deployment中的PodTemplateSpec的修改都不会触发新的rollout。</p>
+<h2 id="后续需要学习"><a href="#后续需要学习" class="headerlink" title="后续需要学习"></a>后续需要学习</h2><h3 id="如何在集群中启用了horizontal-pod-autoscaling"><a href="#如何在集群中启用了horizontal-pod-autoscaling" class="headerlink" title="如何在集群中启用了horizontal pod autoscaling"></a>如何在集群中启用了horizontal pod autoscaling</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Kubernetes-apis"><a href="#Kubernetes-apis" class="headerlink" title="Kubernetes apis"></a><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11" target="_blank" rel="noopener">Kubernetes apis</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/20/Gluster入门/" itemprop="url">Gluster入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T14:20:27+08:00">
+                2018-08-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  476
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><p>First, it is important to understand that GlusterFS isn’t really a filesystem in and of itself. It concatenates existing filesystems into one (or more) big chunks so that data being written into or read out of Gluster gets distributed across multiple hosts simultaneously. This means that you can use space from any host that you have available. Typically, XFS is recommended but it can be used with other filesystems as well. Most commonly EXT4 is used when XFS isn’t, but you can (and many, many people do) use another filesystem that suits you. Now that we understand that, we can define a few of the common terms used in Gluster.</p>
+<ul>
+<li>A <strong>trusted pool</strong> refers collectively to the hosts in a given Gluster Cluster.</li>
+<li>A <strong>node</strong> or “server” refers to any server that is part of a trusted pool. In general, this assumes all nodes are in the same trusted pool.</li>
+<li>A <strong>brick</strong> is used to refer to any device (really this means filesystem) that is being used for Gluster storage.</li>
+<li>An <strong>export</strong> refers to the mount path of the brick(s) on a given server, for example, /export/brick1</li>
+<li>The term <strong>Global Namespace</strong> is a fancy way of saying a Gluster volume</li>
+<li>A <strong>Gluster volume</strong> is a collection of one or more bricks (of course, typically this is two or more). This is analogous to /etc/exports entries for NFS.</li>
+<li><strong>GNFS</strong> and <strong>kNFS</strong>. GNFS is how we refer to our inline NFS server. kNFS stands for kernel NFS, or, as most people would say, just plain NFS. Most often, you will want kNFS services disabled on the Gluster nodes. Gluster NFS doesn’t take any additional configuration and works just like you would expect with NFSv3. It is possible to configure Gluster and NFS to live in harmony if you want to.</li>
+</ul>
+<p>Other notes:</p>
+<ul>
+<li>For this test, if you do not have DNS set up, you can get away with using /etc/hosts entries for the two nodes. However, when you move from this basic setup to using Gluster in production, correct DNS entries (forward and reverse) and NTP are essential.</li>
+<li>When you install the Operating System, do not format the Gluster storage disks! We will use specific settings with the mkfs command later on when we set up Gluster. If you are testing with a single disk (not recommended), make sure to carve out a free partition or two to be used by Gluster later, so that you can format or reformat at will during your testing.</li>
+<li>Firewalls are great, except when they aren’t. For storage servers, being able to operate in a trusted environment without firewalls can mean huge gains in performance, and is recommended. In case you absolutely need to set up a firewall, have a look at <a href="https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/" target="_blank" rel="noopener">Setting up clients</a>for information on the ports used.</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster安装/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1809,377 +2221,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/05/altermanager之初体验/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/05/altermanager之初体验/" itemprop="url">altermanager之初体验</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T23:54:16+08:00">
-                2018-08-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  335
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境:centos7, alertmanager 0.15.1</li>
-<li><a href="https://github.com/prometheus/alertmanager" target="_blank" rel="noopener">github</a></li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚入门alertmanager,权当记录.</p>
-<h2 id="Execute-Alertmanager"><a href="#Execute-Alertmanager" class="headerlink" title="Execute Alertmanager"></a>Execute Alertmanager</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><ul>
-<li><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Download</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 安装在/opt下.下载地址prometheus官网有提供.</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/alertmanager/releases/download/v0.15.1/alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv alertmanager-0.15.1.linux-amd64 alertmanager-0.15.1</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/alertmanager.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/alertmanager-0.15.1/alertmanager --config.file=/opt/alertmanager-0.15.1/alertmanager.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable alertmanager &amp;&amp; systemctl start alertmanager</span><br></pre></td></tr></table></figure>
-<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
-<li><a href="https://prometheus.io/docs/alerting/configuration/" target="_blank" rel="noopener">alertmanager.yml example</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># </span><br><span class="line">$ vim /opt/alertmanager-0.15.1/alertmanager.yml</span><br><span class="line">global:</span><br><span class="line">  resolve_timeout: 5m</span><br><span class="line">  smtp_smarthost: &apos;smtp.mxhichina.com:25&apos;</span><br><span class="line">  smtp_from: &apos;xiaoxiangyoupin@basestonedata.com&apos;</span><br><span class="line">  smtp_auth_username: &apos;xiaoxiangyoupin@basestonedata.com&apos;</span><br><span class="line">  smtp_auth_password: &apos;Xiaoxiangyoupin1&apos;</span><br><span class="line">templates:</span><br><span class="line">  - &apos;/tmp/alert_test.txt&apos; # 发送消息模版.</span><br><span class="line">route:</span><br><span class="line">  group_by: [&apos;proxy&apos;]</span><br><span class="line">  group_wait: 10s</span><br><span class="line">  group_interval: 20s</span><br><span class="line">  repeat_interval: 5m # 警告发送成功后,等待该配置时间后才再次发送.</span><br><span class="line">  receiver: &apos;proxy-team&apos;</span><br><span class="line"># 以上配置会被routes标签继承或覆盖.</span><br><span class="line">#  routes: </span><br><span class="line">receivers: # 接收方集合</span><br><span class="line">- name: &apos;proxy-team&apos;</span><br><span class="line">  email_configs:</span><br><span class="line">  - to: &apos;363054731@qq.com,jiangwe@basestonedata.com&apos;</span><br><span class="line">    text: &apos;报警&apos;</span><br><span class="line"># 防止过度报警.</span><br><span class="line">#inhibit_rules:</span><br><span class="line">#  - source_match:</span><br><span class="line">#      severity: &apos;critical&apos;</span><br><span class="line">#    target_match:</span><br><span class="line">#      severity: &apos;warning&apos;</span><br><span class="line">#    equal: [&apos;alertname&apos;, &apos;dev&apos;, &apos;instance&apos;]</span><br></pre></td></tr></table></figure></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/04/prometheus之监测服务器心跳/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/04/prometheus之监测服务器心跳/" itemprop="url">prometheus之监测服务器心跳</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:42:33+08:00">
-                2018-08-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  509
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境:centos7, prometheus 2.3.1, blackbox_export 0.12.0</li>
-<li>其他<a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener">exporter</a></li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>blackbox能支持什么协议:HTTP, HTTPS (via the http prober), DNS, TCP socket and ICMP.<br>对于机器可用性的监测,最简单的莫过于使用ping或者ssh的方式.这里使用blackbox_exporter,基于使用node_exporter的经验,可能会认为需要将blackbox_exporter部署到每个节点下,而实际上通过一个部署了blackbox_exporter的节点去检测其他机器.</p>
-<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/df0296f8-6c9a-4642-991a-8b3679667974/index_files/82906877.png" alt="img"></p>
-<h2 id="Execute-blackbox-exporter"><a href="#Execute-blackbox-exporter" class="headerlink" title="Execute blackbox_exporter"></a>Execute blackbox_exporter</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0</span><br></pre></td></tr></table></figure>
-<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/blackbox.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=blackbox.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable blackbox &amp;&amp; systemctl start blackbox</span><br></pre></td></tr></table></figure>
-<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># pwd指定宿主机配置文件路径,我一般都放在/data/blackbox_exporter/config目录下</span><br><span class="line">$ docker build -t blackbox_exporter .</span><br><span class="line">$ docker run -d -p 9115:9115 --name blackbox_exporter -v `pwd`:/config blackbox_exporter --config.file=/config/blackbox.yml</span><br></pre></td></tr></table></figure>
-<h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
-<li><a href="https://github.com/prometheus/blackbox_exporter/blob/master/example.yml" target="_blank" rel="noopener">blackbox_exporter example.yml</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 这里暂时只使用ping和ssh验证主机有效性的方式,其他配置可参看github上的example.yml</span><br><span class="line">$ vim blackbox.yml</span><br><span class="line"># probe探测频率由prometheus中的scripe_timeout决定.</span><br><span class="line">modules:</span><br><span class="line">  ssh_banner:</span><br><span class="line">    prober: tcp</span><br><span class="line">    timeout: 10s # 每次探测的网络超时时间,默认为10秒</span><br><span class="line">    tcp:</span><br><span class="line">      query_response:</span><br><span class="line">      - expect: &quot;^SSH-2.0-&quot;</span><br><span class="line">  icmp:</span><br><span class="line">    prober: icmp</span><br><span class="line">    timeout: 10s</span><br><span class="line">    icmp:</span><br><span class="line">      preferred_ip_protocol: &quot;ip4&quot;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="Test-Blackbox-Exporter"><a href="#Test-Blackbox-Exporter" class="headerlink" title="Test Blackbox Exporter"></a>Test Blackbox Exporter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 测试目标10.1.1.21的ping信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=icmp\&amp;target\=10.1.1.25</span><br><span class="line">......</span><br><span class="line">probe_success 0  # 目标主机ping失败</span><br><span class="line"># 测试目标10.1.1.21 22的ssh信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=ssh_banner\&amp;target\=10.1.1.21:22</span><br><span class="line">......</span><br><span class="line">probe_success 1  # 目标主机ssh通过</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="blackbox-exporter-github"><a href="#blackbox-exporter-github" class="headerlink" title="blackbox_exporter github"></a><a href="https://github.com/prometheus/blackbox_exporter" target="_blank" rel="noopener">blackbox_exporter github</a></h3><h3 id="用Prometheus进行网络质量ping"><a href="#用Prometheus进行网络质量ping" class="headerlink" title="用Prometheus进行网络质量ping"></a><a href="https://www.iamle.com/archives/2130.html" target="_blank" rel="noopener">用Prometheus进行网络质量ping</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2234,7 +2275,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2245,7 +2286,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2256,7 +2297,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2317,7 +2358,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">14.0k</span>
+    <span title="Site words total count">16.2k</span>
   
 </div>
 

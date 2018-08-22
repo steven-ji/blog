@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="kubernetes的pause容器," />
+  <meta name="keywords" content="kubernetes常用命令," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Foreward之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?docker容器实际是利用Linux的namespace和cgroup达到容器化的目的. Two feature of Linux kernellinux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行">
-<meta name="keywords" content="kubernetes的pause容器">
+<meta name="description" content="控制器Deployment123456789101112131415161718192021# nginx-deployment.yaml$ vim nginx-deployment.yamlapiVersion: apps/v1 # 1.11版本之后kind: Deploymentmetadata:  name: nginx-deploymentspec:  replicas: 3 # 3个副本">
+<meta name="keywords" content="kubernetes常用命令">
 <meta property="og:type" content="article">
-<meta property="og:title" content="kubernetes之pause容器">
-<meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/12/kubernetes之pause容器/index.html">
+<meta property="og:title" content="kubernetes常用命令">
+<meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/21/kubernetes常用命令/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="Foreward之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?docker容器实际是利用Linux的namespace和cgroup达到容器化的目的. Two feature of Linux kernellinux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行">
+<meta property="og:description" content="控制器Deployment123456789101112131415161718192021# nginx-deployment.yaml$ vim nginx-deployment.yamlapiVersion: apps/v1 # 1.11版本之后kind: Deploymentmetadata:  name: nginx-deploymentspec:  replicas: 3 # 3个副本">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-15T15:33:37.910Z">
+<meta property="og:updated_time" content="2018-08-21T13:53:45.225Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="kubernetes之pause容器">
-<meta name="twitter:description" content="Foreward之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?docker容器实际是利用Linux的namespace和cgroup达到容器化的目的. Two feature of Linux kernellinux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行">
+<meta name="twitter:title" content="kubernetes常用命令">
+<meta name="twitter:description" content="控制器Deployment123456789101112131415161718192021# nginx-deployment.yaml$ vim nginx-deployment.yamlapiVersion: apps/v1 # 1.11版本之后kind: Deploymentmetadata:  name: nginx-deploymentspec:  replicas: 3 # 3个副本">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://steven-ji.github.io/blog/2018/08/12/kubernetes之pause容器/"/>
+  <link rel="canonical" href="http://steven-ji.github.io/blog/2018/08/21/kubernetes常用命令/"/>
 
 
 
 
 
-  <title>kubernetes之pause容器 | ttbb玩代码</title>
+  <title>kubernetes常用命令 | ttbb玩代码</title>
   
 
 
@@ -310,7 +310,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/12/kubernetes之pause容器/">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/21/kubernetes常用命令/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="溏溏爸爸">
@@ -327,7 +327,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">kubernetes之pause容器</h1>
+          <h1 class="post-title" itemprop="name headline">kubernetes常用命令</h1>
         
 
         <div class="post-meta">
@@ -339,8 +339,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T22:29:12+08:00">
-                2018-08-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T14:19:18+08:00">
+                2018-08-21
               </time>
             
 
@@ -393,7 +393,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  408
+                  1,808
                 </span>
               
 
@@ -409,7 +409,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  9
                 </span>
               
             </div>
@@ -430,16 +430,59 @@
       
 
       
-        <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?<br>docker容器实际是利用Linux的namespace和cgroup达到容器化的目的.</p>
-<h2 id="Two-feature-of-Linux-kernel"><a href="#Two-feature-of-Linux-kernel" class="headerlink" title="Two feature of Linux kernel"></a>Two feature of Linux kernel</h2><p>linux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行隔离.<br>打个比方,就像你去买商品房,每套都是用混泥土墙隔开,保证别人不会闯到你家.这个可以类比为cgroup,而cgroup就是linux对机器的物理资源(cpu,内存,磁盘io)的隔离.买完了房子,那产权当然是属于你,而不是别人(可能有小三),另外,住进去后你要用水、用电、用网络,对其他人也一样,但是每户各自结算,这就像linux环境中的user namespace、network namespace等,属于环境的隔离.<br>由于能力有限,只能先这么去理解.这里罗列左耳朵耗子的文章.</p>
-<ul>
-<li><a href="https://coolshell.cn/articles/17010.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（上）</a></li>
-<li><a href="https://coolshell.cn/articles/17029.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（下）</a></li>
-<li><a href="https://coolshell.cn/articles/17049.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX CGROUP</a></li>
+        <h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><h3 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># nginx-deployment.yaml</span><br><span class="line">$ vim nginx-deployment.yaml</span><br><span class="line">apiVersion: apps/v1 # 1.11版本之后</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-deployment</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3 # 3个副本</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx # 与template.metadata.labels一致</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br></pre></td></tr></table></figure>
+<h4 id="创建Deployments"><a href="#创建Deployments" class="headerlink" title="创建Deployments"></a>创建Deployments</h4><ul>
+<li>record参数设置为true,在Deployment revision时方便命令记录,以及在describe时能够看到Annotations中指令记录</li>
 </ul>
-<h2 id="AUFS-、DEVICEMAPPER"><a href="#AUFS-、DEVICEMAPPER" class="headerlink" title="AUFS 、DEVICEMAPPER"></a>AUFS 、DEVICEMAPPER</h2><p>对于这两个的理解,AUFS是文件管理系统,用于对文件进行分层.<br>具体可以看耗子叔的这两篇文章.<br><a href="https://coolshell.cn/articles/17061.html" target="_blank" rel="noopener">DOCKER基础技术：AUFS</a><br><a href="https://coolshell.cn/articles/17200.html" target="_blank" rel="noopener">DOCKER基础技术：DEVICEMAPPER</a></p>
-<h2 id="Pause"><a href="#Pause" class="headerlink" title="Pause"></a>Pause</h2><p>In Kubernetes, the pause container serves as the “parent container” for all of the containers in your pod. The pause container has two core responsibilities. First, it serves as the basis of Linux namespace sharing in the pod. And second, with PID (process ID) namespace sharing enabled, it serves as PID 1 for each pod and reaps zombie processes.<br>对于pause的理解</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="What-are-Kubernetes-Pods-Anyway"><a href="#What-are-Kubernetes-Pods-Anyway" class="headerlink" title="What are Kubernetes Pods Anyway?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">What are Kubernetes Pods Anyway?</a></h3><h3 id="The-Almighty-Pause-Container"><a href="#The-Almighty-Pause-Container" class="headerlink" title="The Almighty Pause Container"></a><a href="https://www.ianlewis.org/en/almighty-pause-container" target="_blank" rel="noopener">The Almighty Pause Container</a></h3>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f nginx-deployment.yaml --record</span><br><span class="line">deployment &quot;nginx-deployment&quot; created</span><br></pre></td></tr></table></figure>
+<h4 id="查看发布历史记录"><a href="#查看发布历史记录" class="headerlink" title="查看发布历史记录"></a>查看发布历史记录</h4><ul>
+<li>rollout 字面是上线意思,我理解为发布.</li>
+</ul>
+<p>替换metadata.name,即上面文件中的nginx-deployment名称.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout history deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment</span><br><span class="line"># 如果在创建Deployments时没有使用--record,没有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         &lt;none&gt;</span><br><span class="line"># 如果在创建时指定--record,会有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>查看版本的具体信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl rollout history deployment/nginx-deployment --revision=1</span><br><span class="line">deployments &quot;nginx-deployment&quot; with revision #1</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:	app=nginx</span><br><span class="line">	pod-template-hash=2777190766</span><br><span class="line">  Annotations:	kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:	nginx</span><br><span class="line">    Port:	80/TCP</span><br><span class="line">    Host Port:	0/TCP</span><br><span class="line">    Environment:	&lt;none&gt;</span><br><span class="line">    Mounts:	&lt;none&gt;</span><br><span class="line">  Volumes:	&lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="查看Deployments"><a href="#查看Deployments" class="headerlink" title="查看Deployments"></a>查看Deployments</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get deployment [metadata.name](可选)</span><br><span class="line"># 不指定deployment的名字将查询全部的deployments.如下:</span><br><span class="line">NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">hello-node-deployment   1         1         1            1           17m</span><br><span class="line">nginx-deployment        1         1         1            1           4m</span><br></pre></td></tr></table></figure>
+<h4 id="查看RS-ReplicaSet"><a href="#查看RS-ReplicaSet" class="headerlink" title="查看RS(ReplicaSet)"></a>查看RS(ReplicaSet)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get rs</span><br><span class="line">NAME                              DESIRED   CURRENT   READY     AGE</span><br><span class="line">nginx-deployment-966857787        1         1         1         5m</span><br></pre></td></tr></table></figure>
+<h4 id="更新Deployments-自动rollout"><a href="#更新Deployments-自动rollout" class="headerlink" title="更新Deployments(自动rollout)"></a>更新Deployments(自动rollout)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 方式一,修改文件中的spec.template.spec.containers[0].image值</span><br><span class="line">kubectl edit deployment/[metadata.name]</span><br><span class="line">$ kubectl edit deployment/nginx-deployment</span><br><span class="line"># 方式二 </span><br><span class="line">kubectl set image deployment [metadata.name] [spec.spec.containers.name]=镜像名称</span><br><span class="line">$ kubectl set image deployment nginx-deployment nginx=nginx:1.7.9</span><br></pre></td></tr></table></figure>
+<h4 id="查看发布状态"><a href="#查看发布状态" class="headerlink" title="查看发布状态"></a>查看发布状态</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout status deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
+<h4 id="查看deployment详细信息"><a href="#查看deployment详细信息" class="headerlink" title="查看deployment详细信息"></a>查看deployment详细信息</h4><ul>
+<li>关注Events,记录了发布的过程.实际是创建了一个新的ReplicaSet-&gt;nginx-deployment-6ccc5f4cbb,然后逐渐下原来的ReplicaSet-&gt;nginx-deployment-966857787的Pod.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe deployment/[metadata.name]</span><br><span class="line">$ kubectl describe deployment/nginx-deployment</span><br><span class="line">Name:                   nginx-deployment</span><br><span class="line">Namespace:              default</span><br><span class="line">CreationTimestamp:      Tue, 21 Aug 2018 15:18:18 +0800</span><br><span class="line">Labels:                 app=nginx</span><br><span class="line">Annotations:            deployment.kubernetes.io/revision=2</span><br><span class="line">                        kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">Selector:               app=nginx</span><br><span class="line">Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable</span><br><span class="line">StrategyType:           RollingUpdate</span><br><span class="line">MinReadySeconds:        0</span><br><span class="line">RollingUpdateStrategy:  25% max unavailable, 25% max surge</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:  app=nginx</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:        nginx:1.7.9</span><br><span class="line">    Port:         80/TCP</span><br><span class="line">    Host Port:    0/TCP</span><br><span class="line">    Environment:  &lt;none&gt;</span><br><span class="line">    Mounts:       &lt;none&gt;</span><br><span class="line">  Volumes:        &lt;none&gt;</span><br><span class="line">Conditions:</span><br><span class="line">  Type           Status  Reason</span><br><span class="line">  ----           ------  ------</span><br><span class="line">  Available      True    MinimumReplicasAvailable</span><br><span class="line">  Progressing    True    NewReplicaSetAvailable</span><br><span class="line">OldReplicaSets:  &lt;none&gt;</span><br><span class="line">NewReplicaSet:   nginx-deployment-6ccc5f4cbb (3/3 replicas created)</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason             Age   From                   Message</span><br><span class="line">  ----    ------             ----  ----                   -------</span><br><span class="line">  Normal  ScalingReplicaSet  4m    deployment-controller  Scaled up replica set nginx-deployment-966857787 to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 0</span><br></pre></td></tr></table></figure>
+<h4 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h4><ul>
+<li><p>回滚之后,revision对应记录就会消失</p>
+</li>
+<li><p>undo是回滚到上一个版本的操作.</p>
+<p>假设有三个版本:nginx:1.4.7, nginx:1.7.9, nginx:1.9.7, nginx:1.10.3,当前版本为nginx:1.10.3.</p>
+<p>1、假如指定to-revision回滚到1.7.9版本,再执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
+<p>2、第一次执行undo(不指定to-revision),回滚到1.9.7版本,再次执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
+<p>3、第一次指定to-revision回滚到1.7.9,第二次指定to-revision回滚到1.9.7,第三次指定to-revision回滚到1.4.7,第四次指定undo(不指定to-revison),则是回滚到1.9.7.</p>
+</li>
+</ul>
+<p>假设有三个版本:nginx:1.7.9,nginx:1.9.7,nginx:1.10.3,当前版本为nginx:1.10.3.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 查看发布历史记录</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment </span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">3         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>第一次执行undo回退到前一个版本,即nginx:1.9.7.如果第二次再执行,又会回滚到原版本,即nginx:1.10.3.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout undo deployment/[metatdata.name]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里查看下发布历史记录,发现revision为3的记录消失了.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">4         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
+<p>指定to-revision回退到指定历史</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl rollout undo deployment/[metadata.name] --to-revision=[number]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment --to-revision=2</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里如果执行undo但不指定--to-revision,则恢复导原来版本.</span><br></pre></td></tr></table></figure>
+<h4 id="Deployment扩容"><a href="#Deployment扩容" class="headerlink" title="Deployment扩容"></a>Deployment扩容</h4><p>指定 扩容/缩容 副本数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">kubectl scale deployment/[metadata.name] --replicas=[number]</span><br><span class="line">$ kubectl scale deployment/nginx-deployment --replicas=6</span><br><span class="line">deployment.extensions/nginx-deployment scaled</span><br><span class="line"># 查看扩容状态</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 3 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 4 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 5 of 6 updated replicas are available...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
+<p>当集群启用horizontal pod autoscaling后,可以根据CPU利用率,在范围内扩容或缩容.(todo还不知道怎么做)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ $ kubectl autoscale deployment nginx-deployment --min=10 --max=15 --cpu-percent=80</span><br><span class="line">deployment &quot;nginx-deployment&quot; autoscaled</span><br></pre></td></tr></table></figure>
+<h4 id="设置Deployments发布历史记录"><a href="#设置Deployments发布历史记录" class="headerlink" title="设置Deployments发布历史记录"></a>设置Deployments发布历史记录</h4><p>在nginx-deployment.yaml中设置spec.revisionHistoryLimits属性,默认是保留全部历史记录.可以不用去理会.</p>
+<h4 id="设置Deployments发布策略"><a href="#设置Deployments发布策略" class="headerlink" title="设置Deployments发布策略"></a>设置Deployments发布策略</h4><p><code>spec.strategy</code> 指定新的Pod替换旧的Pod的策略。 <code>spec.strategy.type</code> 可以是<code>Recreate</code>或者是 <code>RollingUpdate</code>。<code>RollingUpdate</code>是默认值。</p>
+<ul>
+<li>Recreate 指在创建出新的Pod之前会杀掉已经存在的Pod.(强烈建议不使用)</li>
+<li>RollingUpdate 指滚动升级.逐步一个一个交替升级.可以指定<code>maxUnavailable</code> 和 <code>maxSurge</code> 来控制 rolling update 进程。<ul>
+<li>maxUnavaiables <code>.spec.strategy.rollingUpdate.maxUnavailable</code>指定在升级的过程中不可用的Pod数量.默认为1,也可以设置为百分比.如设置为30%,则原来的ReplicaSet会立刻缩容到70%.</li>
+<li>maxSurge <code>.spec.strategy.rollingUpdate.maxSurge</code>指定在升级过程中,新老Pod的总数的最大值.如设置为30%,启动rolling update后新的ReplicatSet将会立即扩容,新老Pod的总数不能超过期望的Pod数量的130%。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Pause设置"><a href="#Pause设置" class="headerlink" title="Pause设置"></a>Pause设置</h4><p><code>.spec.paused</code>是可以可选配置项，boolean值。默认为false.</p>
+<p>如果设置paused后,对Deployment中的PodTemplateSpec的修改都不会触发新的rollout。</p>
+<h2 id="后续需要学习"><a href="#后续需要学习" class="headerlink" title="后续需要学习"></a>后续需要学习</h2><h3 id="如何在集群中启用了horizontal-pod-autoscaling"><a href="#如何在集群中启用了horizontal-pod-autoscaling" class="headerlink" title="如何在集群中启用了horizontal pod autoscaling"></a>如何在集群中启用了horizontal pod autoscaling</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Kubernetes-apis"><a href="#Kubernetes-apis" class="headerlink" title="Kubernetes apis"></a><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11" target="_blank" rel="noopener">Kubernetes apis</a></h3>
       
     </div>
     
@@ -485,7 +528,7 @@
       
         <div class="post-tags">
           
-            <a href="/blog/tags/kubernetes的pause容器/" rel="tag"># kubernetes的pause容器</a>
+            <a href="/blog/tags/kubernetes常用命令/" rel="tag"># kubernetes常用命令</a>
           
         </div>
       
@@ -498,8 +541,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2018/08/11/kubernetes常见问题汇总/" rel="next" title="kubernetes常见问题汇总">
-                <i class="fa fa-chevron-left"></i> kubernetes常见问题汇总
+              <a href="/blog/2018/08/20/Gluster入门/" rel="next" title="Gluster入门">
+                <i class="fa fa-chevron-left"></i> Gluster入门
               </a>
             
           </div>
@@ -507,10 +550,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/" rel="prev" title="Kubernetes Pods指定镜像仓库">
-                Kubernetes Pods指定镜像仓库 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -661,7 +700,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Foreward"><span class="nav-number">1.</span> <span class="nav-text">Foreward</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Two-feature-of-Linux-kernel"><span class="nav-number">2.</span> <span class="nav-text">Two feature of Linux kernel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUFS-、DEVICEMAPPER"><span class="nav-number">3.</span> <span class="nav-text">AUFS 、DEVICEMAPPER</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pause"><span class="nav-number">4.</span> <span class="nav-text">Pause</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#What-are-Kubernetes-Pods-Anyway"><span class="nav-number">5.1.</span> <span class="nav-text">What are Kubernetes Pods Anyway?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#The-Almighty-Pause-Container"><span class="nav-number">5.2.</span> <span class="nav-text">The Almighty Pause Container</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#控制器"><span class="nav-number">1.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Deployment"><span class="nav-number">1.1.</span> <span class="nav-text">Deployment</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建Deployments"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建Deployments</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看发布历史记录"><span class="nav-number">1.1.2.</span> <span class="nav-text">查看发布历史记录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看Deployments"><span class="nav-number">1.1.3.</span> <span class="nav-text">查看Deployments</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看RS-ReplicaSet"><span class="nav-number">1.1.4.</span> <span class="nav-text">查看RS(ReplicaSet)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新Deployments-自动rollout"><span class="nav-number">1.1.5.</span> <span class="nav-text">更新Deployments(自动rollout)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看发布状态"><span class="nav-number">1.1.6.</span> <span class="nav-text">查看发布状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看deployment详细信息"><span class="nav-number">1.1.7.</span> <span class="nav-text">查看deployment详细信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#版本回退"><span class="nav-number">1.1.8.</span> <span class="nav-text">版本回退</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Deployment扩容"><span class="nav-number">1.1.9.</span> <span class="nav-text">Deployment扩容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置Deployments发布历史记录"><span class="nav-number">1.1.10.</span> <span class="nav-text">设置Deployments发布历史记录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置Deployments发布策略"><span class="nav-number">1.1.11.</span> <span class="nav-text">设置Deployments发布策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pause设置"><span class="nav-number">1.1.12.</span> <span class="nav-text">Pause设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续需要学习"><span class="nav-number">2.</span> <span class="nav-text">后续需要学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何在集群中启用了horizontal-pod-autoscaling"><span class="nav-number">2.1.</span> <span class="nav-text">如何在集群中启用了horizontal pod autoscaling</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubernetes-apis"><span class="nav-number">3.1.</span> <span class="nav-text">Kubernetes apis</span></a></li></ol></li></ol></div>
             
 
           </div>
