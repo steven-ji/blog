@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/blog/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring boot 监控,Spring boot Actuator," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Environment Spring boot 2.0.4 Jdk1.8  Preface今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸) 通过梳理,识别出以下几个问题:  代码中的日志没有行至有效的规范.debug和info没有明确的规范. 有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.  针对日志规范问题,每个人的见解不一样">
+<meta name="keywords" content="Spring boot 监控,Spring boot Actuator">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring boot之Actuator理解">
+<meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/27/Spring-boot之Actuator理解/index.html">
+<meta property="og:site_name" content="ttbb玩代码">
+<meta property="og:description" content="Environment Spring boot 2.0.4 Jdk1.8  Preface今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸) 通过梳理,识别出以下几个问题:  代码中的日志没有行至有效的规范.debug和info没有明确的规范. 有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.  针对日志规范问题,每个人的见解不一样">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-27T11:14:01.237Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring boot之Actuator理解">
+<meta name="twitter:description" content="Environment Spring boot 2.0.4 Jdk1.8  Preface今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸) 通过梳理,识别出以下几个问题:  代码中的日志没有行至有效的规范.debug和info没有明确的规范. 有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.  针对日志规范问题,每个人的见解不一样">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://steven-ji.github.io/blog/2018/08/27/Spring-boot之Actuator理解/"/>
+
+
+
+
+
+  <title>Spring boot之Actuator理解 | ttbb玩代码</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?3052eff79e5b319c50246c1e59822cc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ttbb玩代码</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/blog/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/blog/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <input type="text" id="local-search-input" placeholder="search my blog...">
+  <div id="local-search-result"></div>
+  <span class="popup-btn-close">close</span>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/27/Spring-boot之Actuator理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring boot之Actuator理解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-27T11:26:44+08:00">
+                2018-08-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,841
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
+<li>Spring boot 2.0.4</li>
+<li>Jdk1.8</li>
+</ul>
+<h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸)</p>
+<p>通过梳理,识别出以下几个问题:</p>
+<ul>
+<li>代码中的日志没有行至有效的规范.debug和info没有明确的规范.</li>
+<li>有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.</li>
+</ul>
+<p>针对日志规范问题,每个人的见解不一样,我自己的梳理在《Java日志规范看法》中.</p>
+<p>根据第二个问题,发现spring boot actuator提供了这个能力,这就促使我去研究一番.</p>
+<h2 id="Spring-Boot-Actuator"><a href="#Spring-Boot-Actuator" class="headerlink" title="Spring Boot Actuator"></a>Spring Boot Actuator</h2><p>○ Spring Boot includes a number of additional features to help you monitor and manage your application when you push it to production. You can choose to manage and monitor your application by using HTTP endpoints or with JMX. Auditing, health, and metrics gathering can also be automatically applied to your application.</p>
+<p>☆ Spring boot 提供了以HTTP或JMX管理和监控应用程序.适用于应用程序的审计、健康情况、度量收集.</p>
+<h3 id="依赖包"><a href="#依赖包" class="headerlink" title="依赖包"></a>依赖包</h3><p>maven项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</span><br><span class="line">	&lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="提供的端点"><a href="#提供的端点" class="headerlink" title="提供的端点"></a>提供的端点</h3><ul>
+<li>详细用法参考<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</li>
+</ul>
+<p>下表提供了16个请求端点,HTTP和JMX都可以使用.</p>
+<ul>
+<li>请求前缀为/actuators</li>
+</ul>
+<p>例如:以http方式,监测应用程序健康情况:/actuators/health</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:[port]/actuator/health</span><br><span class="line">&#123;&quot;status&quot;:&quot;UP&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>列表:</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Enabled by default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auditevents</code></td>
+<td>Exposes audit events information for the current application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>beans</code></td>
+<td>Displays a complete list of all the Spring beans in your application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>conditions</code></td>
+<td>Shows the conditions that were evaluated on configuration and auto-configuration classes and the reasons why they did or did not match.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>configprops</code></td>
+<td>Displays a collated list of all <code>@ConfigurationProperties</code>.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>Exposes properties from Spring’s <code>ConfigurableEnvironment</code>.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>flyway</code></td>
+<td>Shows any Flyway database migrations that have been applied.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>health</code></td>
+<td>Shows application health information.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>httptrace</code></td>
+<td>Displays HTTP trace information (by default, the last 100 HTTP request-response exchanges).</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>Displays arbitrary application info.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>loggers</code></td>
+<td>Shows and modifies the configuration of loggers in the application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>liquibase</code></td>
+<td>Shows any Liquibase database migrations that have been applied.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>metrics</code></td>
+<td>Shows ‘metrics’ information for the current application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>mappings</code></td>
+<td>Displays a collated list of all <code>@RequestMapping</code> paths.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>scheduledtasks</code></td>
+<td>Displays the scheduled tasks in your application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>sessions</code></td>
+<td>Allows retrieval and deletion of user sessions from a Spring Session-backed session store. Not available when using Spring Session’s support for reactive web applications.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>shutdown</code></td>
+<td>Lets the application be gracefully shutdown.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>threaddump</code></td>
+<td>Performs a thread dump.</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>○ If your application is a web application (Spring MVC, Spring WebFlux, or Jersey),you can use the following additional endpoints.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Enabled by default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>heapdump</code></td>
+<td>Returns a GZip compressed <code>hprof</code> heap dump file.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>jolokia</code></td>
+<td>Exposes JMX beans over HTTP (when Jolokia is on the classpath, not available for WebFlux).</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>logfile</code></td>
+<td>Returns the contents of the logfile (if <code>logging.file</code> or <code>logging.path</code> properties have been set). Supports the use of the HTTP <code>Range</code> header to retrieve part of the log file’s content.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>prometheus</code></td>
+<td>Exposes metrics in a format that can be scraped by a Prometheus server.</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h4 id="开启端点"><a href="#开启端点" class="headerlink" title="开启端点"></a>开启端点</h4><ul>
+<li>actuator中提供的20个端点,默认级别开关级别如下:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>JMX</th>
+<th>Web</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auditevents</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>beans</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>conditions</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>configprops</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>flyway</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>health</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>heapdump</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>httptrace</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>jolokia</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>logfile</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>loggers</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>liquibase</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>metrics</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>mappings</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>prometheus</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>scheduledtasks</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>sessions</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>shutdown</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>threaddump</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>JMX</p>
+<p>除prometheus、logfile、jolokia、heapdump没有提供外,其余端点默认开启.</p>
+</li>
+<li><p>Web</p>
+<p>默认只开启health、info端点.</p>
+</li>
+</ul>
+<p>正确打开姿势:</p>
+<ul>
+<li><p>JMX</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.jmx.exposure.include</span><br><span class="line"># 关闭 management.endpoints.jmx.exposure.exclude</span><br><span class="line"># 如关闭mappings、shutdown端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=mappings,shutdown</span><br><span class="line"># 如关闭所有端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Web</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.web.exposure.include</span><br><span class="line"># 关闭 management.endpoints.web.exposure.exclude</span><br><span class="line"># 如打开env、mappings端点</span><br><span class="line">management.endpoints.web.exposure.include=env,mappings</span><br><span class="line"># 如打开所有端点</span><br><span class="line">management.endpoints.web.exposure.include=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="端点详细用法"><a href="#端点详细用法" class="headerlink" title="端点详细用法"></a>端点详细用法</h4><p>请求前缀为/actuators.具体用法参考文档<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</p>
+<h4 id="配置端点缓存"><a href="#配置端点缓存" class="headerlink" title="配置端点缓存"></a>配置端点缓存</h4><p>○ Endpoints automatically cache responses to read operations that do not take any parameters. </p>
+<p>☆ 官方说是默认缓存读取操作的无参端点返回值.至于具体时间只能看源码了.</p>
+<p>对应的源码类为:EndpointAutoConfiguration、EndpointIdTimeToLivePropertyFunction</p>
+<p>正确配置姿势如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># The prefix management.endpoint.&lt;name&gt; is used to uniquely identify the endpoint that is being configured.</span><br><span class="line"># 如配置bean端点返回值缓存时间为10秒</span><br><span class="line">management.endpoint.beans.cache.time-to-live=10s</span><br></pre></td></tr></table></figure>
+<h4 id="自定义端点路径"><a href="#自定义端点路径" class="headerlink" title="自定义端点路径"></a>自定义端点路径</h4><ul>
+<li><p>base-path</p>
+<p>默认值是:/actuator</p>
+</li>
+<li><p>path-mapping</p>
+<p>端点映射路径,默认是官方提供的20个端点名称.</p>
+</li>
+</ul>
+<p>完整请求路径为:[base-path]+[path-mapping]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 原health端点为:/actuator/health,现在改为:/manager/healthcheck</span><br><span class="line">management.endpoints.web.base-path=/manager</span><br><span class="line">management.endpoints.web.path-mapping.health=healthcheck</span><br></pre></td></tr></table></figure>
+<h4 id="自定义端点"><a href="#自定义端点" class="headerlink" title="自定义端点"></a>自定义端点</h4><p>○ If you add a <code>@Bean</code> annotated with <code>@Endpoint</code>, any methods annotated with <code>@ReadOperation</code>, <code>@WriteOperation</code>, or <code>@DeleteOperation</code> are automatically exposed over JMX and, in a web application, over HTTP as well. Endpoints can be exposed over HTTP using Jersey, Spring MVC, or Spring WebFlux.</p>
+<p>○ You can also write technology-specific endpoints by using <code>@JmxEndpoint</code> or <code>@WebEndpoint</code>. These endpoints are restricted to their respective technologies. For example, <code>@WebEndpoint</code> is exposed only over HTTP and not over JMX.</p>
+<p>○ You can write technology-specific extensions by using <code>@EndpointWebExtension</code> and <code>@EndpointJmxExtension</code>. These annotations let you provide technology-specific operations to augment an existing endpoint.</p>
+<p>○ Finally, if you need access to web-framework-specific functionality, you can implement Servlet or Spring <code>@Controller</code> and <code>@RestController</code> endpoints at the cost of them not being available over JMX or when using a different web framework.</p>
+<p>☆ actuator可以提供JMX和HTTP两种方式,所以也提供对应实现的方式.</p>
+<ul>
+<li><p><code>@Endpoint</code>针对JMX和HTTP.</p>
+</li>
+<li><p><code>@JmxEndpoint</code>或<code>@EndpointJmxExtension</code>只针对JMX.</p>
+</li>
+<li><p><code>@WebEndpoint</code>或<code>@EndpointWebExtension</code>只针对HTTP.</p>
+</li>
+<li><p><code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> 这三个用于指定请求方式.</p>
+<p>| Operation          | HTTP method |<br>| —————— | ———– |<br>| <code>@ReadOperation</code>   | <code>GET</code>       |<br>| <code>@WriteOperation</code>  | <code>POST</code>      |<br>| <code>@DeleteOperation</code> | <code>DELETE</code>    |</p>
+</li>
+</ul>
+<h5 id="☆-使用actuator的自定义端点有特别的意义吗"><a href="#☆-使用actuator的自定义端点有特别的意义吗" class="headerlink" title="☆ 使用actuator的自定义端点有特别的意义吗?"></a>☆ 使用actuator的自定义端点有特别的意义吗?</h5><p>目前看,针对HTTP的方式,与平常我自己暴露端点也没区别.但针对JMX监控的话,这就是它优势之处了.</p>
+<p>另外,个人认为没有特殊要求,使用<code>@Endpoint</code>更好,既提供了JMX监控端点,也同时提供了HTTP监控端点.</p>
+<h5 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h5><h6 id="新增端点"><a href="#新增端点" class="headerlink" title="新增端点"></a>新增端点</h6><ul>
+<li>使用<code>@Endpoint</code>、<code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> </li>
+</ul>
+<p>○ To allow the input to be mapped to the operation method’s parameters, Java code implementing an endpoint should be compiled with <code>-parameters</code>, and Kotlin code implementing an endpoint should be compiled with <code>-java-parameters</code>. This will happen automatically if you are using Spring Boot’s Gradle plugin or if you are using Maven and <code>spring-boot-starter-parent</code>.</p>
+<p>☆ 在使用<code>@ReadOperation</code>等时,如果需要匹配参数个数,则需要在spring boot时添加<code>-parameters</code>.</p>
+<p>例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">@Endpoint(id = &quot;custom-health&quot;)</span><br><span class="line">public class CustomHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health2(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter: &quot; + name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health3(@Selector String name, @Selector String name2) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter1: &quot; + name +&quot;,parameter2: &quot; + name2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @WriteOperation</span><br><span class="line">    public String writeOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point post&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @DeleteOperation</span><br><span class="line">    public String deleteOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point delete&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动时,使用-parameters参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>启动时,不使用-parameters参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 调用health无参方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health</span><br><span class="line">health</span><br><span class="line"></span><br><span class="line"># 调用health2方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/name</span><br><span class="line">&#123;&quot;timestamp&quot;:&quot;2018-08-27T11:04:06.709+0000&quot;,&quot;status&quot;:400,&quot;error&quot;:&quot;Bad Request&quot;,&quot;message&quot;:&quot;Missing parameters: name&quot;,&quot;path&quot;:&quot;/actuator/custom-health/p1&quot;&#125;</span><br><span class="line"></span><br><span class="line">只能通过以下方式才能请求到health2方法,参数名必须相同.&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;?name=hello</span><br><span class="line">custom-end-point get parameter: hello</span><br><span class="line"></span><br><span class="line"># 调用health3方法,参数名必须相同,&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;/&#123;anystring&#125;?name=hello&amp;name=world</span><br><span class="line">custom-end-point get parameter1: hello,parameter2: world</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用<code>WebEndpointExtension</code>或<code>@EndpointJmxExtension</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">@Endpoint(id = &quot;myhealth&quot;)</span><br><span class="line">public class MyHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@EndpointWebExtension(endpoint = MyHealthEndpoint.class)</span><br><span class="line">public class MyHealthWebEndpointExtension &#123;</span><br><span class="line"></span><br><span class="line">    private final MyHealthEndpoint delegate;</span><br><span class="line"></span><br><span class="line">    public MyHealthWebEndpointExtension(MyHealthEndpoint delegate) &#123;</span><br><span class="line">        this.delegate = delegate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public WebEndpointResponse&lt;String&gt; getHealth() &#123;</span><br><span class="line">        return new WebEndpointResponse&lt;&gt;(&quot;health&quot;, 200);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class ActuatorConfiguration &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    public MyHealthEndpoint myHealthEndpoint() &#123;</span><br><span class="line">        return new MyHealthEndpoint();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    @ConditionalOnBean(&#123;MyHealthEndpoint.class&#125;)</span><br><span class="line">    public MyHealthWebEndpointExtension myHealthWebEndpointExtension(</span><br><span class="line">            MyHealthEndpoint delegate) &#123;</span><br><span class="line">        return new MyHealthWebEndpointExtension(delegate);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="覆盖原端点"><a href="#覆盖原端点" class="headerlink" title="覆盖原端点"></a>覆盖原端点</h6><h2 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h2><h3 id="端点默认缓存的默认时间是多少"><a href="#端点默认缓存的默认时间是多少" class="headerlink" title="端点默认缓存的默认时间是多少?"></a>端点默认缓存的默认时间是多少?</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="spring-boot-2-0-4-doc"><a href="#spring-boot-2-0-4-doc" class="headerlink" title="spring-boot-2.0.4-doc"></a><a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">spring-boot-2.0.4-doc</a></h3><h3 id="Custom-Endpoint-in-Spring-Boot-Actuator"><a href="#Custom-Endpoint-in-Spring-Boot-Actuator" class="headerlink" title="Custom Endpoint in Spring Boot Actuator"></a><a href="https://www.javadevjournal.com/spring-boot/spring-boot-actuator-custom-endpoint/" target="_blank" rel="noopener">Custom Endpoint in Spring Boot Actuator</a></h3><h3 id="How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0"><a href="#How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0" class="headerlink" title="How to make the @Endpoint(id = “health”) working in Spring Boot 2.0?"></a><a href="https://stackoverflow.com/questions/46796899/how-to-make-the-endpointid-health-working-in-spring-boot-2-0" target="_blank" rel="noopener">How to make the <code>@Endpoint(id = “health”)</code> working in Spring Boot 2.0?</a></h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/blog/uploads/wechatpay.png" alt="溏溏爸爸 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/blog/uploads/alipay.png" alt="溏溏爸爸 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/Spring-boot-监控/" rel="tag"># Spring boot 监控</a>
+          
+            <a href="/blog/tags/Spring-boot-Actuator/" rel="tag"># Spring boot Actuator</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/08/23/kubernetes的DNS理解/" rel="next" title="kubernetes的DNS理解">
+                <i class="fa fa-chevron-left"></i> kubernetes的DNS理解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTI2Mi8xMTc5OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/blog/uploads/avatar.png"
+                alt="溏溏爸爸" />
+            
+              <p class="site-author-name" itemprop="name">溏溏爸爸</p>
+              <p class="site-description motion-element" itemprop="description">向终身学习者致敬</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/blog/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/blog/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/blog/tags/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/steven-ji" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment"><span class="nav-number">1.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Preface"><span class="nav-number">2.</span> <span class="nav-text">Preface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Boot-Actuator"><span class="nav-number">3.</span> <span class="nav-text">Spring Boot Actuator</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖包"><span class="nav-number">3.1.</span> <span class="nav-text">依赖包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提供的端点"><span class="nav-number">3.2.</span> <span class="nav-text">提供的端点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开启端点"><span class="nav-number">3.2.1.</span> <span class="nav-text">开启端点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#端点详细用法"><span class="nav-number">3.2.2.</span> <span class="nav-text">端点详细用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置端点缓存"><span class="nav-number">3.2.3.</span> <span class="nav-text">配置端点缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义端点路径"><span class="nav-number">3.2.4.</span> <span class="nav-text">自定义端点路径</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义端点"><span class="nav-number">3.2.5.</span> <span class="nav-text">自定义端点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#☆-使用actuator的自定义端点有特别的意义吗"><span class="nav-number">3.2.5.1.</span> <span class="nav-text">☆ 使用actuator的自定义端点有特别的意义吗?</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#如何使用"><span class="nav-number">3.2.5.2.</span> <span class="nav-text">如何使用</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#新增端点"><span class="nav-number">3.2.5.2.1.</span> <span class="nav-text">新增端点</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#覆盖原端点"><span class="nav-number">3.2.5.2.2.</span> <span class="nav-text">覆盖原端点</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遗留问题"><span class="nav-number">4.</span> <span class="nav-text">遗留问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#端点默认缓存的默认时间是多少"><span class="nav-number">4.1.</span> <span class="nav-text">端点默认缓存的默认时间是多少?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#spring-boot-2-0-4-doc"><span class="nav-number">5.1.</span> <span class="nav-text">spring-boot-2.0.4-doc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Custom-Endpoint-in-Spring-Boot-Actuator"><span class="nav-number">5.2.</span> <span class="nav-text">Custom Endpoint in Spring Boot Actuator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0"><span class="nav-number">5.3.</span> <span class="nav-text">How to make the @Endpoint(id = “health”) working in Spring Boot 2.0?</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">溏溏爸爸</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">20.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/blog/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/blog/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1s');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+  <a href="https://github.com/steven-ji"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+</body>
+</html>

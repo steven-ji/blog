@@ -309,6 +309,978 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/27/Spring-boot之Actuator理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/27/Spring-boot之Actuator理解/" itemprop="url">Spring boot之Actuator理解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-27T11:26:44+08:00">
+                2018-08-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,841
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
+<li>Spring boot 2.0.4</li>
+<li>Jdk1.8</li>
+</ul>
+<h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸)</p>
+<p>通过梳理,识别出以下几个问题:</p>
+<ul>
+<li>代码中的日志没有行至有效的规范.debug和info没有明确的规范.</li>
+<li>有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.</li>
+</ul>
+<p>针对日志规范问题,每个人的见解不一样,我自己的梳理在《Java日志规范看法》中.</p>
+<p>根据第二个问题,发现spring boot actuator提供了这个能力,这就促使我去研究一番.</p>
+<h2 id="Spring-Boot-Actuator"><a href="#Spring-Boot-Actuator" class="headerlink" title="Spring Boot Actuator"></a>Spring Boot Actuator</h2><p>○ Spring Boot includes a number of additional features to help you monitor and manage your application when you push it to production. You can choose to manage and monitor your application by using HTTP endpoints or with JMX. Auditing, health, and metrics gathering can also be automatically applied to your application.</p>
+<p>☆ Spring boot 提供了以HTTP或JMX管理和监控应用程序.适用于应用程序的审计、健康情况、度量收集.</p>
+<h3 id="依赖包"><a href="#依赖包" class="headerlink" title="依赖包"></a>依赖包</h3><p>maven项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</span><br><span class="line">	&lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="提供的端点"><a href="#提供的端点" class="headerlink" title="提供的端点"></a>提供的端点</h3><ul>
+<li>详细用法参考<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</li>
+</ul>
+<p>下表提供了16个请求端点,HTTP和JMX都可以使用.</p>
+<ul>
+<li>请求前缀为/actuators</li>
+</ul>
+<p>例如:以http方式,监测应用程序健康情况:/actuators/health</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:[port]/actuator/health</span><br><span class="line">&#123;&quot;status&quot;:&quot;UP&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>列表:</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Enabled by default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auditevents</code></td>
+<td>Exposes audit events information for the current application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>beans</code></td>
+<td>Displays a complete list of all the Spring beans in your application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>conditions</code></td>
+<td>Shows the conditions that were evaluated on configuration and auto-configuration classes and the reasons why they did or did not match.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>configprops</code></td>
+<td>Displays a collated list of all <code>@ConfigurationProperties</code>.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>Exposes properties from Spring’s <code>ConfigurableEnvironment</code>.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>flyway</code></td>
+<td>Shows any Flyway database migrations that have been applied.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>health</code></td>
+<td>Shows application health information.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>httptrace</code></td>
+<td>Displays HTTP trace information (by default, the last 100 HTTP request-response exchanges).</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>Displays arbitrary application info.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>loggers</code></td>
+<td>Shows and modifies the configuration of loggers in the application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>liquibase</code></td>
+<td>Shows any Liquibase database migrations that have been applied.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>metrics</code></td>
+<td>Shows ‘metrics’ information for the current application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>mappings</code></td>
+<td>Displays a collated list of all <code>@RequestMapping</code> paths.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>scheduledtasks</code></td>
+<td>Displays the scheduled tasks in your application.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>sessions</code></td>
+<td>Allows retrieval and deletion of user sessions from a Spring Session-backed session store. Not available when using Spring Session’s support for reactive web applications.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>shutdown</code></td>
+<td>Lets the application be gracefully shutdown.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>threaddump</code></td>
+<td>Performs a thread dump.</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>○ If your application is a web application (Spring MVC, Spring WebFlux, or Jersey),you can use the following additional endpoints.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Enabled by default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>heapdump</code></td>
+<td>Returns a GZip compressed <code>hprof</code> heap dump file.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>jolokia</code></td>
+<td>Exposes JMX beans over HTTP (when Jolokia is on the classpath, not available for WebFlux).</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>logfile</code></td>
+<td>Returns the contents of the logfile (if <code>logging.file</code> or <code>logging.path</code> properties have been set). Supports the use of the HTTP <code>Range</code> header to retrieve part of the log file’s content.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>prometheus</code></td>
+<td>Exposes metrics in a format that can be scraped by a Prometheus server.</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h4 id="开启端点"><a href="#开启端点" class="headerlink" title="开启端点"></a>开启端点</h4><ul>
+<li>actuator中提供的20个端点,默认级别开关级别如下:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>JMX</th>
+<th>Web</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auditevents</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>beans</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>conditions</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>configprops</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>flyway</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>health</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>heapdump</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>httptrace</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>jolokia</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>logfile</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>loggers</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>liquibase</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>metrics</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>mappings</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>prometheus</code></td>
+<td>N/A</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>scheduledtasks</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>sessions</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>shutdown</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>threaddump</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>JMX</p>
+<p>除prometheus、logfile、jolokia、heapdump没有提供外,其余端点默认开启.</p>
+</li>
+<li><p>Web</p>
+<p>默认只开启health、info端点.</p>
+</li>
+</ul>
+<p>正确打开姿势:</p>
+<ul>
+<li><p>JMX</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.jmx.exposure.include</span><br><span class="line"># 关闭 management.endpoints.jmx.exposure.exclude</span><br><span class="line"># 如关闭mappings、shutdown端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=mappings,shutdown</span><br><span class="line"># 如关闭所有端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Web</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.web.exposure.include</span><br><span class="line"># 关闭 management.endpoints.web.exposure.exclude</span><br><span class="line"># 如打开env、mappings端点</span><br><span class="line">management.endpoints.web.exposure.include=env,mappings</span><br><span class="line"># 如打开所有端点</span><br><span class="line">management.endpoints.web.exposure.include=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="端点详细用法"><a href="#端点详细用法" class="headerlink" title="端点详细用法"></a>端点详细用法</h4><p>请求前缀为/actuators.具体用法参考文档<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</p>
+<h4 id="配置端点缓存"><a href="#配置端点缓存" class="headerlink" title="配置端点缓存"></a>配置端点缓存</h4><p>○ Endpoints automatically cache responses to read operations that do not take any parameters. </p>
+<p>☆ 官方说是默认缓存读取操作的无参端点返回值.至于具体时间只能看源码了.</p>
+<p>对应的源码类为:EndpointAutoConfiguration、EndpointIdTimeToLivePropertyFunction</p>
+<p>正确配置姿势如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># The prefix management.endpoint.&lt;name&gt; is used to uniquely identify the endpoint that is being configured.</span><br><span class="line"># 如配置bean端点返回值缓存时间为10秒</span><br><span class="line">management.endpoint.beans.cache.time-to-live=10s</span><br></pre></td></tr></table></figure>
+<h4 id="自定义端点路径"><a href="#自定义端点路径" class="headerlink" title="自定义端点路径"></a>自定义端点路径</h4><ul>
+<li><p>base-path</p>
+<p>默认值是:/actuator</p>
+</li>
+<li><p>path-mapping</p>
+<p>端点映射路径,默认是官方提供的20个端点名称.</p>
+</li>
+</ul>
+<p>完整请求路径为:[base-path]+[path-mapping]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 原health端点为:/actuator/health,现在改为:/manager/healthcheck</span><br><span class="line">management.endpoints.web.base-path=/manager</span><br><span class="line">management.endpoints.web.path-mapping.health=healthcheck</span><br></pre></td></tr></table></figure>
+<h4 id="自定义端点"><a href="#自定义端点" class="headerlink" title="自定义端点"></a>自定义端点</h4><p>○ If you add a <code>@Bean</code> annotated with <code>@Endpoint</code>, any methods annotated with <code>@ReadOperation</code>, <code>@WriteOperation</code>, or <code>@DeleteOperation</code> are automatically exposed over JMX and, in a web application, over HTTP as well. Endpoints can be exposed over HTTP using Jersey, Spring MVC, or Spring WebFlux.</p>
+<p>○ You can also write technology-specific endpoints by using <code>@JmxEndpoint</code> or <code>@WebEndpoint</code>. These endpoints are restricted to their respective technologies. For example, <code>@WebEndpoint</code> is exposed only over HTTP and not over JMX.</p>
+<p>○ You can write technology-specific extensions by using <code>@EndpointWebExtension</code> and <code>@EndpointJmxExtension</code>. These annotations let you provide technology-specific operations to augment an existing endpoint.</p>
+<p>○ Finally, if you need access to web-framework-specific functionality, you can implement Servlet or Spring <code>@Controller</code> and <code>@RestController</code> endpoints at the cost of them not being available over JMX or when using a different web framework.</p>
+<p>☆ actuator可以提供JMX和HTTP两种方式,所以也提供对应实现的方式.</p>
+<ul>
+<li><p><code>@Endpoint</code>针对JMX和HTTP.</p>
+</li>
+<li><p><code>@JmxEndpoint</code>或<code>@EndpointJmxExtension</code>只针对JMX.</p>
+</li>
+<li><p><code>@WebEndpoint</code>或<code>@EndpointWebExtension</code>只针对HTTP.</p>
+</li>
+<li><p><code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> 这三个用于指定请求方式.</p>
+<p>| Operation          | HTTP method |<br>| —————— | ———– |<br>| <code>@ReadOperation</code>   | <code>GET</code>       |<br>| <code>@WriteOperation</code>  | <code>POST</code>      |<br>| <code>@DeleteOperation</code> | <code>DELETE</code>    |</p>
+</li>
+</ul>
+<h5 id="☆-使用actuator的自定义端点有特别的意义吗"><a href="#☆-使用actuator的自定义端点有特别的意义吗" class="headerlink" title="☆ 使用actuator的自定义端点有特别的意义吗?"></a>☆ 使用actuator的自定义端点有特别的意义吗?</h5><p>目前看,针对HTTP的方式,与平常我自己暴露端点也没区别.但针对JMX监控的话,这就是它优势之处了.</p>
+<p>另外,个人认为没有特殊要求,使用<code>@Endpoint</code>更好,既提供了JMX监控端点,也同时提供了HTTP监控端点.</p>
+<h5 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h5><h6 id="新增端点"><a href="#新增端点" class="headerlink" title="新增端点"></a>新增端点</h6><ul>
+<li>使用<code>@Endpoint</code>、<code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> </li>
+</ul>
+<p>○ To allow the input to be mapped to the operation method’s parameters, Java code implementing an endpoint should be compiled with <code>-parameters</code>, and Kotlin code implementing an endpoint should be compiled with <code>-java-parameters</code>. This will happen automatically if you are using Spring Boot’s Gradle plugin or if you are using Maven and <code>spring-boot-starter-parent</code>.</p>
+<p>☆ 在使用<code>@ReadOperation</code>等时,如果需要匹配参数个数,则需要在spring boot时添加<code>-parameters</code>.</p>
+<p>例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">@Endpoint(id = &quot;custom-health&quot;)</span><br><span class="line">public class CustomHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health2(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter: &quot; + name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health3(@Selector String name, @Selector String name2) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter1: &quot; + name +&quot;,parameter2: &quot; + name2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @WriteOperation</span><br><span class="line">    public String writeOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point post&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @DeleteOperation</span><br><span class="line">    public String deleteOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point delete&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动时,使用-parameters参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>启动时,不使用-parameters参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 调用health无参方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health</span><br><span class="line">health</span><br><span class="line"></span><br><span class="line"># 调用health2方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/name</span><br><span class="line">&#123;&quot;timestamp&quot;:&quot;2018-08-27T11:04:06.709+0000&quot;,&quot;status&quot;:400,&quot;error&quot;:&quot;Bad Request&quot;,&quot;message&quot;:&quot;Missing parameters: name&quot;,&quot;path&quot;:&quot;/actuator/custom-health/p1&quot;&#125;</span><br><span class="line"></span><br><span class="line">只能通过以下方式才能请求到health2方法,参数名必须相同.&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;?name=hello</span><br><span class="line">custom-end-point get parameter: hello</span><br><span class="line"></span><br><span class="line"># 调用health3方法,参数名必须相同,&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;/&#123;anystring&#125;?name=hello&amp;name=world</span><br><span class="line">custom-end-point get parameter1: hello,parameter2: world</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用<code>WebEndpointExtension</code>或<code>@EndpointJmxExtension</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">@Endpoint(id = &quot;myhealth&quot;)</span><br><span class="line">public class MyHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@EndpointWebExtension(endpoint = MyHealthEndpoint.class)</span><br><span class="line">public class MyHealthWebEndpointExtension &#123;</span><br><span class="line"></span><br><span class="line">    private final MyHealthEndpoint delegate;</span><br><span class="line"></span><br><span class="line">    public MyHealthWebEndpointExtension(MyHealthEndpoint delegate) &#123;</span><br><span class="line">        this.delegate = delegate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public WebEndpointResponse&lt;String&gt; getHealth() &#123;</span><br><span class="line">        return new WebEndpointResponse&lt;&gt;(&quot;health&quot;, 200);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class ActuatorConfiguration &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    public MyHealthEndpoint myHealthEndpoint() &#123;</span><br><span class="line">        return new MyHealthEndpoint();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    @ConditionalOnBean(&#123;MyHealthEndpoint.class&#125;)</span><br><span class="line">    public MyHealthWebEndpointExtension myHealthWebEndpointExtension(</span><br><span class="line">            MyHealthEndpoint delegate) &#123;</span><br><span class="line">        return new MyHealthWebEndpointExtension(delegate);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="覆盖原端点"><a href="#覆盖原端点" class="headerlink" title="覆盖原端点"></a>覆盖原端点</h6><h2 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h2><h3 id="端点默认缓存的默认时间是多少"><a href="#端点默认缓存的默认时间是多少" class="headerlink" title="端点默认缓存的默认时间是多少?"></a>端点默认缓存的默认时间是多少?</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="spring-boot-2-0-4-doc"><a href="#spring-boot-2-0-4-doc" class="headerlink" title="spring-boot-2.0.4-doc"></a><a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">spring-boot-2.0.4-doc</a></h3><h3 id="Custom-Endpoint-in-Spring-Boot-Actuator"><a href="#Custom-Endpoint-in-Spring-Boot-Actuator" class="headerlink" title="Custom Endpoint in Spring Boot Actuator"></a><a href="https://www.javadevjournal.com/spring-boot/spring-boot-actuator-custom-endpoint/" target="_blank" rel="noopener">Custom Endpoint in Spring Boot Actuator</a></h3><h3 id="How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0"><a href="#How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0" class="headerlink" title="How to make the @Endpoint(id = “health”) working in Spring Boot 2.0?"></a><a href="https://stackoverflow.com/questions/46796899/how-to-make-the-endpointid-health-working-in-spring-boot-2-0" target="_blank" rel="noopener">How to make the <code>@Endpoint(id = “health”)</code> working in Spring Boot 2.0?</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/23/kubernetes的DNS理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/23/kubernetes的DNS理解/" itemprop="url">kubernetes的DNS理解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-23T11:24:32+08:00">
+                2018-08-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,335
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>对于k8s的DNS理解还是有些模糊,这里梳理阅读相关文章后的理解.</p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/coredns/" target="_blank" rel="noopener">Using CoreDNS for Service Discovery</a></li>
+<li><a href="https://kubernetes.io/cn/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank" rel="noopener">在 Kubernetes 中配置私有 DNS 和上游域名服务器</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank" rel="noopener">DNS for Services and Pods</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank" rel="noopener">Customizing DNS Service</a></li>
+</ul>
+<h2 id="Kubernetes提供的DNS服务"><a href="#Kubernetes提供的DNS服务" class="headerlink" title="Kubernetes提供的DNS服务"></a>Kubernetes提供的DNS服务</h2><p>DNS是kubernetes内置的Pod服务.包含三个容器:</p>
+<ul>
+<li><p>kubedns</p>
+<p>监测kubernetes的master节点对Services和Endpoints的变化,并且保留在内存中,服务DNS查询.</p>
+</li>
+<li><p>dnsmasq</p>
+<p>缓存DNS,提高查询效率.</p>
+</li>
+<li><p>sidecars</p>
+<p>为dnsmasq和kubedns提供健康检查的端点.</p>
+</li>
+</ul>
+<h3 id="Kube-DNS和CoreDNS"><a href="#Kube-DNS和CoreDNS" class="headerlink" title="Kube-DNS和CoreDNS"></a>Kube-DNS和CoreDNS</h3><p>kubernetes提供了两种DNS服务</p>
+<ul>
+<li>kube-dns</li>
+<li>CoreDNS</li>
+</ul>
+<p>从v1.11版本开始,CoreDNS已经是GA版本了,且已经作为Kubernetes的DNS服务.(<a href="https://coredns.io/" target="_blank" rel="noopener">CoreDNS</a>已经作为CNCF的独立项目)</p>
+<p>kube-dns是在1.9版本前使用.</p>
+<p>在v1.11版本之后,(不建议)如果还想继续使用kube-dns,则在初始化集群是配置以下参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubeadm init --feature-gates=CoreDNS=false</span><br></pre></td></tr></table></figure>
+<h3 id="配置kube-dns的存根域和上游DNS服务器"><a href="#配置kube-dns的存根域和上游DNS服务器" class="headerlink" title="配置kube-dns的存根域和上游DNS服务器"></a>配置kube-dns的存根域和上游DNS服务器</h3><p>这里有两个概念:stub domains 和upstream nameservers.这里我翻译为存根域和上游DNS服务器.</p>
+<ul>
+<li>upstreamNameservers,会覆盖node节点上的/etc/resolv.conf文件,且最多配置三个upstream nameservers.</li>
+</ul>
+<p>例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: kube-dns</span><br><span class="line">  namespace: kube-system</span><br><span class="line">data:</span><br><span class="line">  stubDomains: |</span><br><span class="line">    &#123;&quot;acme.local&quot;: [&quot;1.2.3.4&quot;]&#125;</span><br><span class="line">  upstreamNameservers: |</span><br><span class="line">    [&quot;8.8.8.8&quot;, &quot;8.8.4.4&quot;]</span><br></pre></td></tr></table></figure>
+<p>DNS请求如果后缀有<code>acme.local</code>,则返回DNS Server的地址1.2.3.4.</p>
+<table>
+<thead>
+<tr>
+<th>Domain name</th>
+<th>Server answering the query</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>kubernetes.default.svc.cluster.local</td>
+<td>kube-dns</td>
+</tr>
+<tr>
+<td>foo.acme.local</td>
+<td>custom DNS (1.2.3.4)</td>
+</tr>
+<tr>
+<td>widget.com</td>
+<td>upstream DNS (one of 8.8.8.8, 8.8.4.4)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="Pod设置dnsPolicy对DNS查询的影响"><a href="#Pod设置dnsPolicy对DNS查询的影响" class="headerlink" title="Pod设置dnsPolicy对DNS查询的影响"></a>Pod设置dnsPolicy对DNS查询的影响</h4><p>当在pod中设置的dnsPolicy为<code>default</code> 和<code>None</code>,则自定义的stub domain和upstream nameservers不会生效.</p>
+<p>当dnsPolicy为<code>ClusterFirst</code>后</p>
+<ul>
+<li><p>未配置了存根域和upstream</p>
+<p>如果咩有匹配的domain后缀,如<code>www.kubernetes.io</code>则去查找upstream nameserver.</p>
+</li>
+<li><p>配置自定义存根域和upstream</p>
+<p>首先查找kube-dns的DNS cache.</p>
+<p>再查找自定义的stub domain,即图中的custom DNS.</p>
+<p>最后查找upstream DNS.</p>
+<p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180824174249533.png" alt="image-20180824174249533"></p>
+</li>
+</ul>
+<h3 id="配置CoreDNS的存根域和上游DNS服务器"><a href="#配置CoreDNS的存根域和上游DNS服务器" class="headerlink" title="配置CoreDNS的存根域和上游DNS服务器"></a>配置CoreDNS的存根域和上游DNS服务器</h3><p>CoreDNS提供链条插件式扩展,非常灵活.CoreDNS安装后默认包含了30个插件.CoreDNS的功能可以由一个或多个插件组成.只要会go语言,以及指导DNS工作原理就可以开发插件.</p>
+<p>CoreDNS的配置文件Corefile.且语法规则如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">coredns.io &#123;</span><br><span class="line">    file coredns.io.signed &#123;</span><br><span class="line">        transfer to * 185.49.140.62</span><br><span class="line">    &#125;</span><br><span class="line">    prometheus</span><br><span class="line">    errors</span><br><span class="line">    log</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>详细信息可浏览官网<a href="https://coredns.io/manual/toc/" target="_blank" rel="noopener">CoreDNS</a>.</p>
+<p>在v1.10版本后,kubeadm支持自动转换ConfigMap为Corefile.</p>
+<p>Example:</p>
+<p>kubedns使用以下配置.stubDomain存根域及upstream上游域.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  federations: |</span><br><span class="line">    &#123;&quot;foo&quot; : &quot;foo.feddomain.com&quot;&#125;</span><br><span class="line">  stubDomains: |</span><br><span class="line">    &#123;&quot;abc.com&quot; : [&quot;1.2.3.4&quot;], &quot;my.cluster.local&quot; : [&quot;2.3.4.5&quot;]&#125;</span><br><span class="line">  upstreamNameservers: |</span><br><span class="line">    [&quot;8.8.8.8&quot;, &quot;8.8.4.4&quot;]</span><br><span class="line">kind: ConfigMap</span><br></pre></td></tr></table></figure>
+<p>等价的Corefile配置文件为:</p>
+<ul>
+<li>For federations:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">federation cluster.local &#123;</span><br><span class="line">       foo foo.feddomain.com</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>For stubDomains:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">abc.com:53 &#123;</span><br><span class="line">    errors</span><br><span class="line">    cache 30</span><br><span class="line">    proxy . 1.2.3.4</span><br><span class="line">&#125;</span><br><span class="line">my.cluster.local:53 &#123;</span><br><span class="line">    errors</span><br><span class="line">    cache 30</span><br><span class="line">    proxy . 2.3.4.5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完整配置如下:DNS使用UDP协议,且端口为53</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">.:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        health</span><br><span class="line">        kubernetes cluster.local  in-addr.arpa ip6.arpa &#123;</span><br><span class="line">           upstream  8.8.8.8 8.8.4.4</span><br><span class="line">           pods insecure</span><br><span class="line">           fallthrough in-addr.arpa ip6.arpa</span><br><span class="line">        &#125;</span><br><span class="line">        federation cluster.local &#123;</span><br><span class="line">           foo foo.feddomain.com</span><br><span class="line">        &#125;</span><br><span class="line">        prometheus :9153</span><br><span class="line">        proxy .  8.8.8.8 8.8.4.4</span><br><span class="line">        cache 30</span><br><span class="line">    &#125;</span><br><span class="line">    abc.com:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        cache 30</span><br><span class="line">        proxy . 1.2.3.4</span><br><span class="line">    &#125;</span><br><span class="line">    my.cluster.local:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        cache 30</span><br><span class="line">        proxy . 2.3.4.5</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="DNS中的记录生成规则"><a href="#DNS中的记录生成规则" class="headerlink" title="DNS中的记录生成规则"></a>DNS中的记录生成规则</h3><p>DNS包含A记录和SRV记录.A记录就是ip和域名的映射,SRV记录是端口映射.</p>
+<h4 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h4><p>Service分为Headless和非Headless.(Headless Service:<code>.spec.clusterIP</code>设置为None)</p>
+<p>Service创建之后,默认会生成一条DNS映射的A记录,格式为:<code>[.metadata.name].[namespace].svc.cluster.local</code>.</p>
+<p>还会生成一条DNS映射的SRV(端口)记录,格式为:<code>_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster.local</code>.</p>
+<p>对非Headless的Service,端口的DNS映射就是:<code>[.metadata.name].[namespace].svc.cluster.local</code>.</p>
+<p>对于Headless的Service,目前还不是特别明白.暂且先将原文描述贴下来.For a headless service, this resolves to multiple answers, one for each pod that is backing the service, and contains the port number and the domain name of the pod of the form <code>auto-generated-name.my-svc.my-namespace.svc.cluster.local</code>.</p>
+<h4 id="Pod"><a href="#Pod" class="headerlink" title="Pod"></a>Pod</h4><p>创建Pod会生成一条DNS的A记录:<code>pod-ip-address.my-namespace.pod.cluster.local</code>.</p>
+<p>在集群中查找Pod,可以通过这种格式<code>[.metadata.name].[.spec.subdomain].[namespace].svc.cluster.local</code>查找.</p>
+<h3 id="Pod的DNS规则"><a href="#Pod的DNS规则" class="headerlink" title="Pod的DNS规则"></a>Pod的DNS规则</h3><p> 设置字段:<code>.spec.dsnPolicy</code>.有四种规则:</p>
+<ul>
+<li><p>Default</p>
+<p>虽然名字是Default,但是不是默认规则.</p>
+<p>The Pod inherits the name resolution configuration from the node that the pods run on</p>
+</li>
+<li><p>ClusterFirst</p>
+<p>集群规则优先,如果没有查询到,则去上游域名服务器查询.集群DNS服务和上游DNS服务都可以配置.</p>
+</li>
+<li><p>ClusterFirstWithHostNet</p>
+<p>For Pods running with hostNetwork, you should explicitly set its DNS policy</p>
+</li>
+<li><p>None</p>
+<p>忽略在kubernetes环境DNS配置,并使用自定义的DNS配置.<code>.spec.dsnConfig</code></p>
+</li>
+</ul>
+<h4 id="如何手动设置Pod中的DNS解析配置"><a href="#如何手动设置Pod中的DNS解析配置" class="headerlink" title="如何手动设置Pod中的DNS解析配置"></a>如何手动设置Pod中的DNS解析配置</h4><p>需要在集群中开启功能支持,<code>--feature-gates=CustomPodDNS=true</code>.</p>
+<p>例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  namespace: default</span><br><span class="line">  name: dns-example</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test</span><br><span class="line">      image: nginx</span><br><span class="line">  dnsPolicy: &quot;None&quot;</span><br><span class="line">  dnsConfig:</span><br><span class="line">    nameservers:</span><br><span class="line">      - 1.2.3.4</span><br><span class="line">    searches:</span><br><span class="line">      - ns1.svc.cluster.local</span><br><span class="line">      - my.dns.search.suffix</span><br><span class="line">    options:</span><br><span class="line">      - name: ndots</span><br><span class="line">        value: &quot;2&quot;</span><br><span class="line">      - name: edns0</span><br></pre></td></tr></table></figure>
+<p>运行后,会在Pod中的/etc/resolv.conf文件中生成以下内容:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nameserver 1.2.3.4</span><br><span class="line">search ns1.svc.cluster.local my.dns.search.suffix</span><br><span class="line">options ndots:2 edns0</span><br></pre></td></tr></table></figure>
+<h3 id="自定义DNS服务"><a href="#自定义DNS服务" class="headerlink" title="自定义DNS服务"></a>自定义DNS服务</h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/22/DNS-for-Services-and-Pods翻译/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/22/DNS-for-Services-and-Pods翻译/" itemprop="url">DNS for Services and Pods翻译</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-22T15:40:34+08:00">
+                2018-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  748
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank" rel="noopener">原文链接</a></h2><h2 id="DNS-for-Services-and-Pods"><a href="#DNS-for-Services-and-Pods" class="headerlink" title="DNS for Services and Pods"></a>DNS for Services and Pods</h2><p>这篇文章是kubernetes关于DNS的概述.</p>
+<ul>
+<li>Introduction</li>
+<li>Services</li>
+<li>Pods</li>
+</ul>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>Kubernetes DNS 在集群中调度一个DNS Pod和Service,并配置kubelets去告诉独立的容器使用DNS Service’s IP去解析DNS名称.</p>
+<h4 id="What-things-get-DNS-names"><a href="#What-things-get-DNS-names" class="headerlink" title="What things get DNS names?"></a>What things get DNS names?</h4><p>在集群中的每个service都会被分配一个DNS名称.默认情况下,客户端发起的Pod的DNS搜索包括Pod的namespace和集群默认的域名.这里有个例子说明:</p>
+<p>假设一个Service名称为foo,在kubernetes中的namespace为bar.一个运行在namespace为bar的pod,通过简便的DNS查询到名称为foo的Service.一个运行在namespace为quux的pod,可以在DNS中通过搜索名称为foo.bar,并查到这个容器.</p>
+<p>下面的章节详细的说明了支持的record类型以及支持的布局设计.</p>
+<h3 id="Services"><a href="#Services" class="headerlink" title="Services"></a>Services</h3><h4 id="A-Record"><a href="#A-Record" class="headerlink" title="A Record"></a>A Record</h4><p>正常(not headless)Services会被分配一个这种格式的DNS A 记录<code>my-svc.my-namespace.svc.cluster.local</code>.这个解析集群的Service Ip.</p>
+<p>Headless(没有cluster ip)Services会被分配一个这种格式的DNS A记录<code>my-svc.my-namespace.svc.cluster.local</code>.和正常的Services不同的是,通过解析Pod中的一组Ip.</p>
+<h4 id="SRV-Record"><a href="#SRV-Record" class="headerlink" title="SRV Record"></a>SRV Record</h4><p>SRV记录是在正常或Headless Service创建时指定端口.每个指定的端口,SRV记录的格式是: <code>_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster.local</code>.对于headless serviec来说,这个解析会得到多个结果,pod中的容器端口号和子域名格式为:<code>auto-generated-name.my-svc.my-namespace.svc.cluster.local</code>.</p>
+<h3 id="Pods"><a href="#Pods" class="headerlink" title="Pods"></a>Pods</h3><h4 id="A-Record-1"><a href="#A-Record-1" class="headerlink" title="A Record"></a>A Record</h4><p>Pods会被分配这种格式的一条DNS A记录:<code>pod-ip-address.my-namespace.pod.cluster.local</code></p>
+<p>例如:一个pod的ip是1.2.3.4,namespace为default,DNS为cluster.local的DNS记录为:1-2-3-4.default.pod.cluster.local</p>
+<h4 id="Pod’s-hostname-and-subdomain-fields"><a href="#Pod’s-hostname-and-subdomain-fields" class="headerlink" title="Pod’s hostname and subdomain fields"></a>Pod’s hostname and subdomain fields</h4><p>创建pod时,它的hostname默认为Pod中的metadata.name的值.</p>
+<p>Pod的spec有个hostname字段选项,用来指定pod的hostname.而<code>.spec.hostname</code>优先级高于<code>.metadata.name</code>.例如:给一个pod的hostname设置为”my-host”,那么这个pod的名称就是”my-host”.</p>
+<p>Pod的spec有个subdomain字段选项,用来指定pod的子域名.例如:一个pod的hostname设置为”foo”,subdomain设置为”bar”,namespace为”my-namespace”,则它的查询名称就为:<code>foo.bar.my-namespace.svc.cluster.local</code></p>
+<p>例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: default-subdomain</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    name: busybox</span><br><span class="line">  clusterIP: None</span><br><span class="line">  ports:</span><br><span class="line">  - name: foo # Actually, no port is needed.</span><br><span class="line">    port: 1234</span><br><span class="line">    targetPort: 1234</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: busybox1</span><br><span class="line">  labels:</span><br><span class="line">    name: busybox</span><br><span class="line">spec:</span><br><span class="line">  hostname: busybox-1</span><br><span class="line">  subdomain: default-subdomain</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    command:</span><br><span class="line">      - sleep</span><br><span class="line">      - &quot;3600&quot;</span><br><span class="line">    name: busybox</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: busybox2</span><br><span class="line">  labels:</span><br><span class="line">    name: busybox</span><br><span class="line">spec:</span><br><span class="line">  hostname: busybox-2</span><br><span class="line">  subdomain: default-subdomain</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    command:</span><br><span class="line">      - sleep</span><br><span class="line">      - &quot;3600&quot;</span><br><span class="line">    name: busybox</span><br></pre></td></tr></table></figure>
+<p>如果存在一个headless service和一个pod在同一个namespace中,并且headless service的名称和pod中的subdomain名称相同,kubernetes的DNS服务一样查询到这个Service.例如:上面配置中,一个Pod的hostname是”busybox-1”,subdomain是default-subdomain,而headless service命名为”default-subdomain”.那么这个DNS为<code>busybox-1.default-subdomain.my-namespace.svc.cluster.local</code></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/21/kubernetes常用命令/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1581,7 +2553,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,157
+                  1,194
                 </span>
               
 
@@ -1632,8 +2604,9 @@
 <h3 id="Install-Docker"><a href="#Install-Docker" class="headerlink" title="Install Docker"></a>Install Docker</h3><p>kubernetes v1.11.2建议是用的docker版本是17.03版本,这里安装过程忽略.</p>
 <h3 id="下载k8s相关镜像"><a href="#下载k8s相关镜像" class="headerlink" title="下载k8s相关镜像"></a>下载k8s相关镜像</h3><p>由于在使用kubeadm init时,下载的镜像从k8s.gcr.io上下载,国内网络被墙了,这边只能曲线救国.</p>
 <p>利用docker hub做中转(因为docker hub是在国外的).</p>
-<p>具体操作是现在github上创建相关的Docekrfile,然后再在docker hub上创建auto build仓库.最后从自己的docker hub仓库下载镜像后,重命名为k8s.gcr.io/kube-scheduler-amd64:v1.11.2等即可.</p>
+<p>具体操作是先在github上创建相关的Docekrfile,然后再在docker hub上创建auto build仓库.最后从自己的docker hub仓库下载镜像后,重命名为k8s.gcr.io/kube-scheduler-amd64:v1.11.2等即可.</p>
 <p>这里有个镜像拉取脚本.</p>
+<p>(注意:v1.11版本以后,DNS服务使用coredns:1.1.3,不再使用k8s-dns相关容器,即k8s-dns-sidecar,k8s-dns-kube-dns,k8s-dns-dnsmasq)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">images=(</span><br><span class="line">  kube-proxy-amd64:v1.11.2</span><br><span class="line">  kube-scheduler-amd64:v1.11.2</span><br><span class="line">  kube-controller-manager-amd64:v1.11.2</span><br><span class="line">  kube-apiserver-amd64:v1.11.2</span><br><span class="line">  etcd-amd64:3.2.18</span><br><span class="line">  pause:3.1</span><br><span class="line">  kubernetes-dashboard-amd64:v1.8.3</span><br><span class="line">  k8s-dns-sidecar-amd64:1.14.8</span><br><span class="line">  k8s-dns-kube-dns-amd64:1.14.8</span><br><span class="line">  k8s-dns-dnsmasq-nanny-amd64:1.14.8</span><br><span class="line">  coredns:1.1.3</span><br><span class="line">)</span><br><span class="line">for imageName in $&#123;images[@]&#125; ; do</span><br><span class="line">  docker pull jilingjun1014/$imageName</span><br><span class="line">  docker tag jilingjun1014/$imageName k8s.gcr.io/$imageName</span><br><span class="line">  docker rmi jilingjun1014/$imageName</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
 <h3 id="master初始化"><a href="#master初始化" class="headerlink" title="master初始化"></a>master初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># master初始化</span><br><span class="line">$ kubeadm init --kubernetes-version=v1.11.2 --pod-network-cidr=10.244.0.0/16</span><br><span class="line">Your Kubernetes master has initialized successfully!</span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line">You can now join any number of machines by running the following on each node</span><br><span class="line">as root:</span><br><span class="line">  kubeadm join 116.62.177.233:6443 --token mfv9of.3bo96kuhwiuf2sh5 --discovery-token-ca-cert-hash sha256:d04a7670ef39c41900ca142e807e96a326d6f37300076e94ce2bda4c0934ff52</span><br><span class="line"># 配置kubectl认证(官方推荐用非root用户,这里为了方便起见,使用root用户)</span><br><span class="line">$ mkdir -p ~/.kube</span><br><span class="line">$ cp -i /etc/kubernetes/admin.conf ~/.kube/config</span><br><span class="line"># 非root用户需要配置</span><br><span class="line">$ chown $(id -u):$(id -g) $HOME/.kube/config </span><br><span class="line"># root用户需要配置</span><br><span class="line">$ echo &quot;export KUBECONFIG=/etc/kubernetes/admin.conf&quot; &gt;&gt; /etc/profile $ source /etc/profile</span><br></pre></td></tr></table></figure>
 <h4 id="Pod网络设置-flannel网络设置"><a href="#Pod网络设置-flannel网络设置" class="headerlink" title="Pod网络设置(flannel网络设置)"></a>Pod网络设置(flannel网络设置)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /etc/cni/net.d/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /etc/cni/net.d/10-flannel.conf</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;cbr0&quot;,</span><br><span class="line">  &quot;type&quot;: &quot;flannel&quot;,</span><br><span class="line">  &quot;delegate&quot;: &#123;</span><br><span class="line">    &quot;isDefaultGateway&quot;: true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF </span><br><span class="line">$ mkdir /run/flannel/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /run/flannel/subnet.env</span><br><span class="line">FLANNEL_NETWORK=10.244.0.0/16</span><br><span class="line">FLANNEL_SUBNET=10.244.1.0/24</span><br><span class="line">FLANNEL_MTU=1450</span><br><span class="line">FLANNEL_IPMASQ=true</span><br><span class="line">EOF</span><br><span class="line"># 添加网络类型</span><br><span class="line">$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
@@ -1674,558 +2647,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/08/kubernetes学习资料/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/08/kubernetes学习资料/" itemprop="url">kubernetes参考资料.md</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-08T21:16:34+08:00">
-                2018-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  31
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><a href="https://kubernetes.io/docs/home/" target="_blank" rel="noopener">官方文档</a></h3><p>选择 Browse Docs</p>
-<h3 id="Kubernetes中文社区"><a href="#Kubernetes中文社区" class="headerlink" title="Kubernetes中文社区"></a><a href="https://www.kubernetes.org.cn/" target="_blank" rel="noopener">Kubernetes中文社区</a></h3><h3 id="Api-Example"><a href="#Api-Example" class="headerlink" title="Api Example"></a><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11" target="_blank" rel="noopener">Api Example</a></h3><h3 id="Basic-Commond"><a href="#Basic-Commond" class="headerlink" title="Basic Commond"></a><a href="https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-strong-getting-started-strong-" target="_blank" rel="noopener">Basic Commond</a></h3><h3 id="Kubernetes中文指南"><a href="#Kubernetes中文指南" class="headerlink" title="Kubernetes中文指南"></a><a href="https://jimmysong.io/kubernetes-handbook/" target="_blank" rel="noopener">Kubernetes中文指南</a></h3><h3 id="Istio"><a href="#Istio" class="headerlink" title="Istio"></a><a href="http://www.servicemesher.com/blog/securing-ingress-services-in-istio-with-lets-encrypt-on-kubernetes/" target="_blank" rel="noopener">Istio</a></h3><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="什么是pause容器"><a href="#什么是pause容器" class="headerlink" title="什么是pause容器?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">什么是pause容器?</a></h4>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/08/Kubernetes之kubeadm安装-md/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/08/Kubernetes之kubeadm安装-md/" itemprop="url">Kubernetes之kubeadm安装.md</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-08T20:14:00+08:00">
-                2018-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  301
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境: Centos7, Kubernetes 1.11.2, docker-ce 17.03</li>
-</ul>
-<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>Kubernetes安装文档.</p>
-<p>这里是一些安装软件的</p>
-<ul>
-<li><p>kubeadm: the command to bootstrap the cluster.</p>
-</li>
-<li><p>kubelet: the component that runs on all of the machines in your cluster and does things like starting pods and containers.</p>
-</li>
-<li><p>kubectl: the command line util to talk to your cluster.</p>
-</li>
-</ul>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="添加yum仓库配置文件"><a href="#添加yum仓库配置文件" class="headerlink" title="添加yum仓库配置文件"></a>添加yum仓库配置文件</h4><p>官方推荐的使用的packages.cloud.google.com地址不通,这里使用阿里云的yum仓库.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</span><br><span class="line"></span><br><span class="line">[kubernetes]</span><br><span class="line"></span><br><span class="line">name=Kubernetes</span><br><span class="line"></span><br><span class="line">baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line"></span><br><span class="line">enabled=1</span><br><span class="line"></span><br><span class="line">gpgcheck=0</span><br><span class="line"></span><br><span class="line">repo_gpgcheck=0</span><br><span class="line"></span><br><span class="line">gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg</span><br><span class="line"></span><br><span class="line">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line"></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-<h4 id="关闭SELinux"><a href="#关闭SELinux" class="headerlink" title="关闭SELinux"></a>关闭SELinux</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 临时关闭</span><br><span class="line"></span><br><span class="line">$ setenforce 0</span><br><span class="line"></span><br><span class="line"># 保证下次机器重启时生效.</span><br><span class="line"></span><br><span class="line">$ vim /etc/selinux/config</span><br><span class="line"></span><br><span class="line">SELINUX=disabled</span><br></pre></td></tr></table></figure>
-<h4 id="网络设置"><a href="#网络设置" class="headerlink" title="网络设置"></a>网络设置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ vim cat &lt;&lt;EOF &gt; /etc/sysctl.d/k8s.conf</span><br><span class="line"></span><br><span class="line">net.bridge.bridge-nf-call-ip6tables = 1</span><br><span class="line"></span><br><span class="line">net.bridge.bridge-nf-call-iptables = 1</span><br><span class="line"></span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">$ sysctl --system</span><br></pre></td></tr></table></figure>
-<h4 id="关闭系统swap"><a href="#关闭系统swap" class="headerlink" title="关闭系统swap"></a>关闭系统swap</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ swapoff -a &amp;&amp; sysctl -w vm.swappiness=0</span><br></pre></td></tr></table></figure>
-<h4 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h4><p>此处忽略,查看docker官方安装教程即可.</p>
-<h3 id="Install-Master"><a href="#Install-Master" class="headerlink" title="Install Master"></a>Install Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$ yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes</span><br><span class="line"></span><br><span class="line">$ systemctl enable kubelet &amp;&amp; systemctl start kubelet</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/06/Blackbox-exporter之安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/06/Blackbox-exporter之安装/" itemprop="url">blackbox_exporter之安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-06T21:57:24+08:00">
-                2018-08-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  223
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境:centos7, blackbox_exporter 0.12.0</li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这里使用blackbox_exporter的ssh和ping的检测功能.</p>
-<h2 id="Build-with-Binary-And-Config-Systemd"><a href="#Build-with-Binary-And-Config-Systemd" class="headerlink" title="Build with Binary And Config Systemd"></a>Build with Binary And Config Systemd</h2><h3 id="Build-with-Binary"><a href="#Build-with-Binary" class="headerlink" title="Build with Binary"></a>Build with Binary</h3><ul>
-<li><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Download</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz &amp;&amp; mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="Config-blackbox-yml"><a href="#Config-blackbox-yml" class="headerlink" title="Config blackbox.yml"></a>Config blackbox.yml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ vim /opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">modules:</span><br><span class="line">  ssh_banner:</span><br><span class="line">    prober: tcp</span><br><span class="line">    timeout: 15s</span><br><span class="line">    tcp:</span><br><span class="line">      query_response:</span><br><span class="line">      - expect: &quot;^SSH-2.0-&quot;</span><br><span class="line">  icmp:</span><br><span class="line">    prober: icmp</span><br><span class="line">    timeout: 5s</span><br><span class="line">    icmp:</span><br><span class="line">      preferred_ip_protocol: &quot;ip4&quot;</span><br></pre></td></tr></table></figure>
-<h3 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/blackbox.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=blackbox.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"></span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable blackbox &amp;&amp; systemctl start blackbox</span><br></pre></td></tr></table></figure>
-<h3 id="Test-blackbox"><a href="#Test-blackbox" class="headerlink" title="Test blackbox"></a>Test blackbox</h3><p>在浏览器中查看:<a href="http://10.1.1.26:9115" target="_blank" rel="noopener">http://10.1.1.26:9115</a></p>
-<h2 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2275,7 +2701,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2297,7 +2723,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2358,7 +2784,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">16.3k</span>
+    <span title="Site words total count">20.2k</span>
   
 </div>
 
