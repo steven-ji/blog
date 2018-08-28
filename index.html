@@ -394,7 +394,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,074
+                  2,070
                 </span>
               
 
@@ -745,16 +745,33 @@
 <p>○ Finally, if you need access to web-framework-specific functionality, you can implement Servlet or Spring <code>@Controller</code> and <code>@RestController</code> endpoints at the cost of them not being available over JMX or when using a different web framework.</p>
 <p>☆ actuator可以提供JMX和HTTP两种方式,所以也提供对应实现的方式.</p>
 <ul>
-<li><p><code>@Endpoint</code>针对JMX和HTTP.</p>
-</li>
-<li><p><code>@JmxEndpoint</code>或<code>@EndpointJmxExtension</code>只针对JMX.</p>
-</li>
-<li><p><code>@WebEndpoint</code>或<code>@EndpointWebExtension</code>只针对HTTP.</p>
-</li>
-<li><p><code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> 这三个用于指定请求方式.</p>
-<p>| Operation          | HTTP method |<br>| —————— | ———– |<br>| <code>@ReadOperation</code>   | <code>GET</code>       |<br>| <code>@WriteOperation</code>  | <code>POST</code>      |<br>| <code>@DeleteOperation</code> | <code>DELETE</code>    |</p>
-</li>
+<li><code>@Endpoint</code>针对JMX和HTTP.</li>
+<li><code>@JmxEndpoint</code>或<code>@EndpointJmxExtension</code>只针对JMX.</li>
+<li><code>@WebEndpoint</code>或<code>@EndpointWebExtension</code>只针对HTTP.</li>
+<li><code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> 这三个用于指定请求方式.</li>
 </ul>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>HTTP method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@ReadOperation</code></td>
+<td><code>GET</code></td>
+</tr>
+<tr>
+<td><code>@WriteOperation</code></td>
+<td><code>POST</code></td>
+</tr>
+<tr>
+<td><code>@DeleteOperation</code></td>
+<td><code>DELETE</code></td>
+</tr>
+</tbody>
+</table>
 <h5 id="☆-使用actuator的自定义端点有特别的意义吗"><a href="#☆-使用actuator的自定义端点有特别的意义吗" class="headerlink" title="☆ 使用actuator的自定义端点有特别的意义吗?"></a>☆ 使用actuator的自定义端点有特别的意义吗?</h5><p>目前看,针对HTTP的方式,与平常我自己暴露端点也没区别.但针对JMX监控的话,这就是它优势之处了.</p>
 <p>另外,个人认为没有特殊要求,使用<code>@Endpoint</code>更好,既提供了JMX监控端点,也同时提供了HTTP监控端点.</p>
 <h5 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h5><p>○ To allow the input to be mapped to the operation method’s parameters, Java code implementing an endpoint should be compiled with <code>-parameters</code>, and Kotlin code implementing an endpoint should be compiled with <code>-java-parameters</code>. This will happen automatically if you are using Spring Boot’s Gradle plugin or if you are using Maven and <code>spring-boot-starter-parent</code>.</p>
