@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
+<meta name="description" content="Environment Centos 7 Gluster 4.1  使用三台机器  192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3  Forewardkubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallPrepareDNS和NTPDN">
 <meta name="keywords" content="Gluster Install">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Gluster安装">
 <meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/20/Gluster安装/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
+<meta property="og:description" content="Environment Centos 7 Gluster 4.1  使用三台机器  192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3  Forewardkubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallPrepareDNS和NTPDN">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-20T08:35:16.619Z">
+<meta property="og:updated_time" content="2018-09-06T10:31:47.646Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Gluster安装">
-<meta name="twitter:description" content="环境 Centos 7 Gluster 4.1  使用三台机器配置. 192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3 前言kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallAdd Yum Repository添加gluster下载仓">
+<meta name="twitter:description" content="Environment Centos 7 Gluster 4.1  使用三台机器  192.168.1.100 server1 192.168.1.101 server2 192.168.1.102 server3  Forewardkubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录. InstallPrepareDNS和NTPDN">
 
 
 
@@ -393,7 +393,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  575
+                  854
                 </span>
               
 
@@ -409,7 +409,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  4
                 </span>
               
             </div>
@@ -430,26 +430,34 @@
       
 
       
-        <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+        <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
 <li>Centos 7</li>
 <li>Gluster 4.1</li>
 </ul>
-<p>使用三台机器配置.</p>
-<p>192.168.1.100 server1</p>
-<p>192.168.1.101 server2</p>
-<p>192.168.1.102 server3</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录.</p>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Add-Yum-Repository"><a href="#Add-Yum-Repository" class="headerlink" title="Add Yum Repository"></a>Add Yum Repository</h3><p>添加gluster下载仓库</p>
+<p>使用三台机器</p>
+<ul>
+<li>192.168.1.100 server1</li>
+<li>192.168.1.101 server2</li>
+<li>192.168.1.102 server3</li>
+</ul>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录.</p>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="DNS和NTP"><a href="#DNS和NTP" class="headerlink" title="DNS和NTP"></a>DNS和NTP</h4><p>DNS如果没有特殊要求,采用默认配置即可,每台服务器对时间进行校对和统一时区.</p>
+<h4 id="Hosts-Set"><a href="#Hosts-Set" class="headerlink" title="Hosts Set"></a>Hosts Set</h4><p>建议使用服务器名的方式管理gluster,则需要配置ip和名称的映射.每台机器都需要配置.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/hosts</span><br><span class="line">192.168.1.100 server1</span><br><span class="line">192.168.1.101 server2</span><br><span class="line">192.168.1.102 server3</span><br></pre></td></tr></table></figure>
+<h3 id="Add-Yum-Repository"><a href="#Add-Yum-Repository" class="headerlink" title="Add Yum Repository"></a>Add Yum Repository</h3><p>添加gluster下载仓库</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install centos-release-gluster</span><br></pre></td></tr></table></figure>
-<h3 id="Use-XFS"><a href="#Use-XFS" class="headerlink" title="Use XFS"></a>Use XFS</h3><p>推荐使用XFS文件系统,这里我还是使用exts4,没有重新格式化文件系统.</p>
+<h3 id="Use-XFS"><a href="#Use-XFS" class="headerlink" title="Use XFS"></a>Use XFS</h3><p>推荐使用XFS文件系统,这里我还是使用exts4,没有重新格式化文件系统.格式化参考教程网上很多.</p>
 <h3 id="Install-Gluster-And-Start"><a href="#Install-Gluster-And-Start" class="headerlink" title="Install Gluster And Start"></a>Install Gluster And Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ yum install glusterfs-server</span><br><span class="line">$ systemctl enable glusterd &amp;&amp; systemctl start glusterd</span><br></pre></td></tr></table></figure>
-<h3 id="Set-Firewalld"><a href="#Set-Firewalld" class="headerlink" title="Set Firewalld"></a>Set Firewalld</h3><p>防火墙配置ip级别允许规则,默认是24007端口,但是每增加bricks都会新增监听端口,所以需要配置ip级别的许可.</p>
-<p>centos7已经使用firewalld.</p>
+<h3 id="Set-Firewalld"><a href="#Set-Firewalld" class="headerlink" title="Set Firewalld"></a>Set Firewalld</h3><p>○  By default, glusterd will listen on tcp/24007. But each time you add a brick, it will open a new port (that you’ll be able to see with “gluster volume status”)</p>
+<p>☆ 默认是24007端口,但是每增加brick都会新增监听端口,具体端口可以通过gluster volume status查看.不过在配置防火墙时,我使用授权ip方式.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 这里的TCP Port指定的49152就是需要开放的端口.</span><br><span class="line">$ gluster volume status</span><br><span class="line">Status of volume: gv0</span><br><span class="line">Gluster process                             TCP Port  RDMA Port  Online  Pid</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Brick server1:/bricks/brick1/gv0            49152     0          Y       6566</span><br><span class="line">Brick server2:/bricks/brick1/gv0            49152     0          Y       26880</span><br><span class="line">Self-heal Daemon on localhost               N/A       N/A        Y       6590</span><br><span class="line">Self-heal Daemon on server2                 N/A       N/A        Y       26903</span><br><span class="line"></span><br><span class="line">Task Status of Volume gv0</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">There are no active volume tasks</span><br></pre></td></tr></table></figure>
+<p>centos7默认使用firewalld,</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 允许指定ip.我使用三台机器做测试,每台机器要配置另外两台服务器的ip.</span><br><span class="line">$ firewall-cmd --permanent --add-rich-rule=&quot;rule family=&apos;ipv4&apos; source address=&apos;192.168.1.101&apos; accept&quot;</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
-<h3 id="Set-Trusted-Pool"><a href="#Set-Trusted-Pool" class="headerlink" title="Set Trusted Pool"></a>Set Trusted Pool</h3><p>这里使用的三台机器,在server1将server2和server3添加到Trust Pool.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># /etc/hosts需要配置映射.</span><br><span class="line">$ gluster peer probe server2</span><br><span class="line">$ gluster peer probe server3</span><br></pre></td></tr></table></figure>
+<h3 id="Set-Trusted-Pool"><a href="#Set-Trusted-Pool" class="headerlink" title="Set Trusted Pool"></a>Set Trusted Pool</h3><p>这里使用三台机器,可以在任意一台服务器,将另外两台服务器添加到Trust Pool即可.</p>
+<p>如在server1上将server2和server3添加到Trust Pool.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 注:/etc/hosts需要配置映射.</span><br><span class="line">$ gluster peer probe server2</span><br><span class="line">$ gluster peer probe server3</span><br></pre></td></tr></table></figure>
 <h3 id="Create-a-Volume"><a href="#Create-a-Volume" class="headerlink" title="Create a Volume"></a>Create a Volume</h3><p>在三台服务器上分别创建/bricks/brick1/gv0目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 官网推荐brick命名方式:/data/glusterfs/&lt;volume&gt;/&lt;brick&gt;/brick</span><br><span class="line">$ mkdir -p /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
 <p>挂载目录到gluster上.(任意节点执行命令)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 这里选择的replicas模式,保证数据丢失,其他模式不在这里讨论.</span><br><span class="line">$ gluster volume create gv0 replica 3 server1:/bricks/brick1/gv0 server2:/bricks/brick1/gv0 server3:/bricks/brick1/gv0</span><br><span class="line">$ gluster volume start gv0</span><br></pre></td></tr></table></figure>
 <p>查看volume信息</p>
@@ -457,7 +465,7 @@
 <h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 将server1:/gv0 挂在到/mnt目录</span><br><span class="line">$ mount -t glusterfs server1:/gv0 /mnt</span><br><span class="line"># 生成100个copy-test的文件</span><br><span class="line">$ for i in `seq -w 1 100`; do cp -rp /var/log/messages /mnt/copy-test-$i; done</span><br><span class="line"># 在三台机器上查看是否都有100个文件.</span><br><span class="line">$ ls -lA /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
 <li>推荐部署机器为奇数,不然会出现脑裂现象.(猜测使用了poxis算法)</li>
-<li>gluster推荐使用<a href="https://zh.wikipedia.org/wiki/XFS" target="_blank" rel="noopener">xfs文件系统</a>,centos/Red Hat Enterprise Linux 7默认使用,创建系统时可能可能没有指定.</li>
+<li>gluster推荐使用<a href="https://zh.wikipedia.org/wiki/XFS" target="_blank" rel="noopener">xfs文件系统</a>,centos/Red Hat Enterprise Linux 7默认使用,磁盘格式化时可能没有指定.</li>
 </ul>
 <h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><ul>
 <li><a href="http://xiaqunfeng.cc/2017/07/06/XFS-vs-EXT4/" target="_blank" rel="noopener">XFS vs EXT4</a></li>
@@ -620,7 +628,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -631,7 +639,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -642,7 +650,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -685,7 +693,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Install"><span class="nav-number">3.</span> <span class="nav-text">Install</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Add-Yum-Repository"><span class="nav-number">3.1.</span> <span class="nav-text">Add Yum Repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-XFS"><span class="nav-number">3.2.</span> <span class="nav-text">Use XFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Install-Gluster-And-Start"><span class="nav-number">3.3.</span> <span class="nav-text">Install Gluster And Start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Firewalld"><span class="nav-number">3.4.</span> <span class="nav-text">Set Firewalld</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Trusted-Pool"><span class="nav-number">3.5.</span> <span class="nav-text">Set Trusted Pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-Volume"><span class="nav-number">3.6.</span> <span class="nav-text">Create a Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Testing"><span class="nav-number">3.7.</span> <span class="nav-text">Testing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓展"><span class="nav-number">5.</span> <span class="nav-text">拓展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gluster-Quickstart"><span class="nav-number">6.1.</span> <span class="nav-text">gluster-Quickstart</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment"><span class="nav-number">1.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Foreward"><span class="nav-number">2.</span> <span class="nav-text">Foreward</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Install"><span class="nav-number">3.</span> <span class="nav-text">Install</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Prepare"><span class="nav-number">3.1.</span> <span class="nav-text">Prepare</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DNS和NTP"><span class="nav-number">3.1.1.</span> <span class="nav-text">DNS和NTP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hosts-Set"><span class="nav-number">3.1.2.</span> <span class="nav-text">Hosts Set</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Add-Yum-Repository"><span class="nav-number">3.2.</span> <span class="nav-text">Add Yum Repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-XFS"><span class="nav-number">3.3.</span> <span class="nav-text">Use XFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Install-Gluster-And-Start"><span class="nav-number">3.4.</span> <span class="nav-text">Install Gluster And Start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Firewalld"><span class="nav-number">3.5.</span> <span class="nav-text">Set Firewalld</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Trusted-Pool"><span class="nav-number">3.6.</span> <span class="nav-text">Set Trusted Pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-Volume"><span class="nav-number">3.7.</span> <span class="nav-text">Create a Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Testing"><span class="nav-number">3.8.</span> <span class="nav-text">Testing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓展"><span class="nav-number">5.</span> <span class="nav-text">拓展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gluster-Quickstart"><span class="nav-number">6.1.</span> <span class="nav-text">gluster-Quickstart</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -719,7 +727,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">20.4k</span>
+    <span title="Site words total count">26.2k</span>
   
 </div>
 

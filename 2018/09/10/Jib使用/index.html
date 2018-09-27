@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/blog/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java应用容器," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Environment Jib 0.9.10 Jdk1.8  Foreward What 针对Java构建容器镜像.提供以maven插件和gradle插件的方式快速构建镜像. 特点:1、快速;2、不依赖docker命令,不需要写Dockerfile;3、同docker一样采用分层构建; 缺点:1、不能指定volume挂载;2、一些java启动命令不能使用,如java -jar **.jar –sp">
+<meta name="keywords" content="java应用容器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jib使用">
+<meta property="og:url" content="http://steven-ji.github.io/blog/2018/09/10/Jib使用/index.html">
+<meta property="og:site_name" content="ttbb玩代码">
+<meta property="og:description" content="Environment Jib 0.9.10 Jdk1.8  Foreward What 针对Java构建容器镜像.提供以maven插件和gradle插件的方式快速构建镜像. 特点:1、快速;2、不依赖docker命令,不需要写Dockerfile;3、同docker一样采用分层构建; 缺点:1、不能指定volume挂载;2、一些java启动命令不能使用,如java -jar **.jar –sp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4h4ia8r6j30gi031dg1.jpg">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4hab4u2vj30ey016web.jpg">
+<meta property="og:updated_time" content="2018-09-27T12:41:05.869Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jib使用">
+<meta name="twitter:description" content="Environment Jib 0.9.10 Jdk1.8  Foreward What 针对Java构建容器镜像.提供以maven插件和gradle插件的方式快速构建镜像. 特点:1、快速;2、不依赖docker命令,不需要写Dockerfile;3、同docker一样采用分层构建; 缺点:1、不能指定volume挂载;2、一些java启动命令不能使用,如java -jar **.jar –sp">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4h4ia8r6j30gi031dg1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://steven-ji.github.io/blog/2018/09/10/Jib使用/"/>
+
+
+
+
+
+  <title>Jib使用 | ttbb玩代码</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?3052eff79e5b319c50246c1e59822cc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ttbb玩代码</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/blog/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/blog/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <input type="text" id="local-search-input" placeholder="search my blog...">
+  <div id="local-search-result"></div>
+  <span class="popup-btn-close">close</span>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/10/Jib使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jib使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-10T09:49:32+08:00">
+                2018-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,685
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
+<li>Jib 0.9.10</li>
+<li>Jdk1.8</li>
+</ul>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><ul>
+<li><p>What</p>
+<p>针对Java构建容器镜像.提供以maven插件和gradle插件的方式快速构建镜像.</p>
+<p>特点:1、快速;2、不依赖docker命令,不需要写Dockerfile;3、同docker一样采用分层构建;</p>
+<p>缺点:1、不能指定volume挂载;2、<del>一些java启动命令不能使用,如java -jar **.jar –spring.profiles.active=prod …</del></p>
+</li>
+</ul>
+<h3 id="Feature"><a href="#Feature" class="headerlink" title="Feature"></a>Feature</h3><ul>
+<li><p>Simple</p>
+<p>原来构建步骤</p>
+</li>
+</ul>
+<p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4h4ia8r6j30gi031dg1.jpg" alt="img"></p>
+<pre><code>现在构建步骤
+</code></pre><p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4hab4u2vj30ey016web.jpg" alt="img"></p>
+<pre><code>开发人员无需了解Dockerfile的细节,通过jib上传镜像.
+</code></pre><ul>
+<li><p>Fast</p>
+<p>为什么会快呢?学习了docker的层概念,增量构建.传统构建是将jar包打入镜像,而jib的策略的将依赖的class文件上传.</p>
+</li>
+<li><p>不依赖于docker</p>
+<p>构建过程完成不依赖于本地是否有安装docker.</p>
+</li>
+<li><p>缺点</p>
+<p>不能通过jib指定volume,只能提前将volume构建在镜像中.</p>
+</li>
+</ul>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><h3 id="配置详解"><a href="#配置详解" class="headerlink" title="配置详解"></a>配置详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">        	&lt;!-- 依赖包 --&gt;</span><br><span class="line">            &lt;groupId&gt;com.google.cloud.tools&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;jib-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;0.9.11&lt;/version&gt; </span><br><span class="line">            &lt;!-- 将jib:build的命令绑定到maven的生命周期中.</span><br><span class="line">                原来执行打包方式为mvn compile jib:build,现在只要执行mvn package --&gt;</span><br><span class="line">            &lt;executions&gt;</span><br><span class="line">                &lt;execution&gt;</span><br><span class="line">                &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">                &lt;goals&gt;</span><br><span class="line">                    &lt;goal&gt;build&lt;/goal&gt;</span><br><span class="line">                &lt;/goals&gt;</span><br><span class="line">                &lt;/execution&gt;</span><br><span class="line">            &lt;/executions&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">                &lt;!-- 镜像拉取配置. --&gt;</span><br><span class="line">                &lt;from&gt;</span><br><span class="line">                	&lt;!-- 镜像地址. --&gt;</span><br><span class="line">                    &lt;image&gt;&lt;/image&gt;</span><br><span class="line">                    &lt;!-- 用户名/密码安全加密,可以不配置.使用auth --&gt;</span><br><span class="line">                    &lt;credHelper&gt;none&lt;/credHelper&gt;</span><br><span class="line">                    &lt;auth&gt;</span><br><span class="line">                        &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                        &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                    &lt;/auth&gt;</span><br><span class="line">                &lt;/from&gt;</span><br><span class="line">                &lt;!-- 镜像上传配置. --&gt;</span><br><span class="line">                &lt;to&gt;</span><br><span class="line">                    &lt;!-- 镜像地址. --&gt;</span><br><span class="line">                    &lt;image&gt;&lt;/image&gt;</span><br><span class="line">                    &lt;credHelper&gt;none&lt;/credHelper&gt;</span><br><span class="line">                    &lt;auth&gt;</span><br><span class="line">                        &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                        &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                    &lt;/auth&gt;</span><br><span class="line">                &lt;/to&gt;</span><br><span class="line">                &lt;!-- 默认值为false,用于gradle的缓存设置. --&gt;</span><br><span class="line">                &lt;useOnlyProjectCache&gt;false&lt;/useOnlyProjectCache&gt;</span><br><span class="line">                &lt;!-- 默认值为false,是否开启HTTPS的认证.(推荐为false) --&gt;</span><br><span class="line">                &lt;allowInsecureRegistries&gt;false&lt;/allowInsecureRegistries&gt;</span><br><span class="line">                &lt;!-- Copies files from &apos;src/main/custom-extra-dir&apos; instead of &apos;src/main/jib&apos; </span><br><span class="line">                用于将其他文件添加到镜像中.--&gt;</span><br><span class="line">                &lt;extraDirectory&gt;$&#123;project.basedir&#125;/src/main/custom-extra-dir&lt;/extraDirectory&gt;</span><br><span class="line">                &lt;container&gt;</span><br><span class="line">                    &lt;mainClass&gt;com.bsd.proxy.monitor.MonitorApplication&lt;/mainClass&gt;</span><br><span class="line">                    &lt;!-- JVM相关参数. --&gt;</span><br><span class="line">                    &lt;jvmFlags&gt;</span><br><span class="line">                        &lt;jvmFlag&gt;-Xms512m&lt;/jvmFlag&gt;</span><br><span class="line">                        &lt;jvmFlag&gt;-Xmx512m&lt;/jvmFlag&gt;</span><br><span class="line">                    &lt;/jvmFlags&gt;</span><br><span class="line">                    &lt;!-- 暴露端口.同docker一样.也可以配置端口范围. --&gt;</span><br><span class="line">                    &lt;ports&gt;</span><br><span class="line">                        &lt;port&gt;9999&lt;/port&gt;</span><br><span class="line">                        &lt;port&gt;2000-2003/udp&lt;/port&gt;</span><br><span class="line">                    &lt;/ports&gt;</span><br><span class="line">                    &lt;!-- 生成的Dockerfile中CMD的参数. --&gt;</span><br><span class="line">                    &lt;args&gt;</span><br><span class="line">                        &lt;arg&gt;some&lt;/arg&gt;</span><br><span class="line">                        &lt;arg&gt;args&lt;/arg&gt;</span><br><span class="line">                    &lt;/args&gt;</span><br><span class="line">                    &lt;!-- 同docker的labels. --&gt;</span><br><span class="line">                    &lt;labels&gt;</span><br><span class="line">                        &lt;key1&gt;value1&lt;/key1&gt;</span><br><span class="line">                    &lt;/labels&gt;</span><br><span class="line">                    &lt;!-- 构建容器镜像类型.还支持OCI --&gt;</span><br><span class="line">                    &lt;format&gt;docker&lt;/format&gt;</span><br><span class="line">                    &lt;!-- 默认值为false,指在打包镜像是是否带时间戳.--&gt;</span><br><span class="line">                    &lt;useCurrentTimestamp&gt;&lt;/useCurrentTimestamp&gt;</span><br><span class="line">                    &lt;!-- (不建议使用)容器启动命令,同docker中的ENTRYPOINT,如果指定了则jvmFlags和mainClass失效.--&gt;</span><br><span class="line">                    &lt;entrypoint&gt;&lt;/entrypoint&gt;</span><br><span class="line">                &lt;/container&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">&lt;/build&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><h4 id="打包应用镜像并上传"><a href="#打包应用镜像并上传" class="headerlink" title="打包应用镜像并上传"></a>打包应用镜像并上传</h4><h5 id="不依赖本地docker"><a href="#不依赖本地docker" class="headerlink" title="不依赖本地docker"></a>不依赖本地docker</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ mvn compile com.google.cloud.tools:jib-maven-plugin:0.9.11:build -Dimage=&lt;MY IMAGE&gt;</span><br><span class="line"># 或者</span><br><span class="line">$ mvn compile jib:build</span><br><span class="line"># 指定上传镜像超时时间(毫秒).默认是20000毫秒.或者设置0为没有超时时间.</span><br><span class="line">$ mvn compile jib:build -Djib.httpTimeout=3000</span><br></pre></td></tr></table></figure>
+<h5 id="依赖本地docker"><a href="#依赖本地docker" class="headerlink" title="依赖本地docker"></a>依赖本地docker</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mvn compile com.google.cloud.tools:jib-maven-plugin:0.9.10:dockerBuild</span><br><span class="line"># 或者</span><br><span class="line">$ mvn compile jib:dockerBuild</span><br></pre></td></tr></table></figure>
+<h4 id="镜像打成tar包"><a href="#镜像打成tar包" class="headerlink" title="镜像打成tar包"></a>镜像打成tar包</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 会在项目路径的target目录下生成jib-image.tar.</span><br><span class="line">$ mvn compile jib:buildTar</span><br><span class="line"># 通过docker导入镜像.</span><br><span class="line">$ docker load --input target/jib-image.tar</span><br></pre></td></tr></table></figure>
+<h4 id="导出镜像的Dockerfile"><a href="#导出镜像的Dockerfile" class="headerlink" title="导出镜像的Dockerfile"></a>导出镜像的Dockerfile</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 默认生成在target/jib-docker-context下.-DjibTargetDir用于指定生成路径.</span><br><span class="line">$ mvn compile jib:exportDockerContext -DjibTargetDir=my/docker/context/</span><br><span class="line"># 下面是我pom中的配置,并生成的一个Dockerfile</span><br><span class="line">FROM registry.cn-hangzhou.aliyuncs.com/jiuming/java-alpine-openjdk8-jre-shanghai</span><br><span class="line">  </span><br><span class="line">COPY libs /app/libs/</span><br><span class="line">COPY resources /app/resources/</span><br><span class="line">COPY classes /app/classes/</span><br><span class="line"></span><br><span class="line">EXPOSE 9999</span><br><span class="line">ENTRYPOINT [&quot;java&quot;,&quot;-Xms512m, -Xmx512m&quot;, -cp&quot;,&quot;/app/resources/:/app/classes/:/app/libs/*&quot;,&quot;com.bsd.proxy.monitor.MonitorApplication&quot;]</span><br><span class="line">CMD []</span><br></pre></td></tr></table></figure>
+<h3 id="配置私仓身份认证"><a href="#配置私仓身份认证" class="headerlink" title="配置私仓身份认证"></a>配置私仓身份认证</h3><p>如果没有使用credHelper,</p>
+<h4 id="通过Docker-Credential-Helps"><a href="#通过Docker-Credential-Helps" class="headerlink" title="通过Docker Credential Helps"></a>通过Docker Credential Helps</h4><p>待补充,<a href="https://github.com/docker/docker-credential-helpers" target="_blank" rel="noopener">Docker Credential Helps</a></p>
+<h4 id="通过Maven配置"><a href="#通过Maven配置" class="headerlink" title="通过Maven配置"></a>通过Maven配置</h4><p>配置Setting.xml文件</p>
+<ul>
+<li>maven加密方式参见<a href="https://maven.apache.org/guides/mini/guide-encryption.html" target="_blank" rel="noopener">Password Encryption</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;settings&gt;</span><br><span class="line">  ...</span><br><span class="line">  &lt;servers&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;server&gt;</span><br><span class="line">      &lt;!-- id为仓库名称 --&gt;</span><br><span class="line">      &lt;id&gt;MY_REGISTRY&lt;/id&gt;</span><br><span class="line">      &lt;username&gt;MY_USERNAME&lt;/username&gt;</span><br><span class="line">      &lt;!-- maven encryption --&gt;</span><br><span class="line">      &lt;password&gt;&#123;MY_SECRET&#125;&lt;/password&gt;</span><br><span class="line">    &lt;/server&gt;</span><br><span class="line">  &lt;/servers&gt;</span><br><span class="line">&lt;/settings&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><ul>
+<li><p>目标描述</p>
+<p>使用spring boot构建一个java应用程序镜像,并指定profile运行.</p>
+</li>
+</ul>
+<p>为了能够指定profile运行,main启动代码要改动.</p>
+<p>平常启动应用的命令是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar -Xms512m -Xmx512m **.jar --spring.profiles.active=prod</span><br></pre></td></tr></table></figure>
+<p>Jib打成的镜像,ENTRYPOINT实际的启动命令是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Xms512m -Xmx512m -cp app/libs/*:app/resources:app/classes package.MonitorApplication</span><br></pre></td></tr></table></figure>
+<p>为了能够指定profile运行,需要在docker启动添加参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">public class MonitorApplication &#123;</span><br><span class="line"></span><br><span class="line">    private final static String ACTIVE = &quot;prod&quot;;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplicationBuilder builder = new SpringApplicationBuilder(MonitorApplication.class);</span><br><span class="line">        if (Arrays.stream(args).anyMatch(t -&gt; t.equals(ACTIVE))) &#123;</span><br><span class="line">            builder.profiles(ACTIVE);</span><br><span class="line">        &#125;</span><br><span class="line">        builder.run(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置pom-xml"><a href="#配置pom-xml" class="headerlink" title="配置pom.xml"></a>配置pom.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;</span><br><span class="line">         </span><br><span class="line">    ......</span><br><span class="line">	&lt;build&gt;</span><br><span class="line">        &lt;plugins&gt;</span><br><span class="line">            &lt;plugin&gt;</span><br><span class="line">                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;/plugin&gt;</span><br><span class="line">            &lt;plugin&gt;</span><br><span class="line">                &lt;groupId&gt;com.google.cloud.tools&lt;/groupId&gt;</span><br><span class="line">                &lt;artifactId&gt;jib-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">                &lt;version&gt;0.9.10&lt;/version&gt;</span><br><span class="line">                &lt;executions&gt;</span><br><span class="line">                    &lt;execution&gt;</span><br><span class="line">                        &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">                        &lt;goals&gt;</span><br><span class="line">                            &lt;goal&gt;build&lt;/goal&gt;</span><br><span class="line">                        &lt;/goals&gt;</span><br><span class="line">                    &lt;/execution&gt;</span><br><span class="line">                &lt;/executions&gt;</span><br><span class="line">                &lt;configuration&gt;</span><br><span class="line">                    &lt;from&gt;</span><br><span class="line">                        &lt;image&gt;指定拉取镜像的私仓地址&lt;/image&gt;</span><br><span class="line">                        &lt;auth&gt;</span><br><span class="line">                            &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                            &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                        &lt;/auth&gt;</span><br><span class="line">                    &lt;/from&gt;</span><br><span class="line">                    &lt;to&gt;</span><br><span class="line">                        &lt;image&gt;指定推送镜像的私仓地址&lt;/image&gt;</span><br><span class="line">                        &lt;auth&gt;</span><br><span class="line">                            &lt;username&gt;指定推送镜像的私仓地址&lt;/username&gt;</span><br><span class="line">                            &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                        &lt;/auth&gt;</span><br><span class="line">                    &lt;/to&gt;</span><br><span class="line">                    &lt;container&gt;</span><br><span class="line">                    	&lt;!-- 指定MonitorApplication的全路径. --&gt;</span><br><span class="line">                        &lt;mainClass&gt;mypackage.MonitorApplication&lt;/mainClass&gt;</span><br><span class="line">                        &lt;jvmFlags&gt;</span><br><span class="line">                            &lt;jvmFlag&gt;-Xms512m&lt;/jvmFlag&gt;</span><br><span class="line">                            &lt;jvmFlag&gt;-Xmx512m&lt;/jvmFlag&gt;</span><br><span class="line">                        &lt;/jvmFlags&gt;</span><br><span class="line">                        &lt;ports&gt;</span><br><span class="line">                            &lt;port&gt;9999&lt;/port&gt;</span><br><span class="line">                        &lt;/ports&gt;</span><br><span class="line">                        &lt;!-- 这里用于配置默认执行的profile,可以不用配置,在docker启动命令中配置 --&gt;</span><br><span class="line">                        &lt;!--args&gt;</span><br><span class="line">                            &lt;arg&gt;prod&lt;/arg&gt;</span><br><span class="line">                        &lt;/args--&gt;</span><br><span class="line">                    &lt;/container&gt;</span><br><span class="line">                &lt;/configuration&gt;</span><br><span class="line">            &lt;/plugin&gt;</span><br><span class="line">        &lt;/plugins&gt;</span><br><span class="line">    &lt;/build&gt;</span><br><span class="line">&lt;profile&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="构建并上传images"><a href="#构建并上传images" class="headerlink" title="构建并上传images"></a>构建并上传images</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mvn package</span><br></pre></td></tr></table></figure>
+<h3 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull [镜像名称]</span><br><span class="line">$ docker run -ti --network host --name [容器名称] -v /store/logs:/store/logs -p 9999:9999 -d [镜像名称] [指定profile]</span><br></pre></td></tr></table></figure>
+<h3 id="结合Ansible-Scripts"><a href="#结合Ansible-Scripts" class="headerlink" title="结合Ansible Scripts"></a>结合Ansible Scripts</h3><h4 id="配置ansible脚本"><a href="#配置ansible脚本" class="headerlink" title="配置ansible脚本"></a>配置ansible脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /opt/ansible-biz/roles/monitor/tasks</span><br><span class="line">$ cd /opt/ansible-biz</span><br><span class="line">$ vim site.yml</span><br><span class="line">- name: deploy proxy</span><br><span class="line">  hosts: all</span><br><span class="line">  gather_facts: false</span><br><span class="line">  roles:</span><br><span class="line">    - &#123;role: monitor, tags: &quot;monitor&quot;&#125;</span><br><span class="line">$ vim hosts</span><br><span class="line">[product]</span><br><span class="line">xxyp-dev ansible_host=192.168.1.222 ansible_port=22</span><br><span class="line">$ vim /opt/ansible-biz/roles/monitor/tasks/main.yml</span><br><span class="line">- pip:</span><br><span class="line">    name: docker-py</span><br><span class="line">    state: present</span><br><span class="line">- name: Pull monitor image</span><br><span class="line">  docker_image:</span><br><span class="line">    name: registry.cn-hangzhou.aliyuncs.com/yuanshi/monitor</span><br><span class="line">    tag: v1.0.0</span><br><span class="line">    force: yes</span><br><span class="line">- name: Restart monitor container</span><br><span class="line">  docker_container:</span><br><span class="line">    name: operation</span><br><span class="line">    image: registry.cn-hangzhou.aliyuncs.com/yuanshi/monitor:v1.0.0</span><br><span class="line">    network_mode: host</span><br><span class="line">    volumes:</span><br><span class="line">      - /store/logs:/store/logs</span><br><span class="line">    exposed_ports:</span><br><span class="line">      - 9082</span><br><span class="line">    recreate: yes</span><br><span class="line">    command: &quot;&#123;&#123; profile &#125;&#125;&quot;</span><br><span class="line">#    env:</span><br><span class="line">#      zooCluster=&quot;&#123;&#123; zooCluster &#125;&#125;&quot;</span><br><span class="line">    restart_policy: always</span><br><span class="line">    state: started</span><br></pre></td></tr></table></figure>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p><code>$ ansible-playbook -i hosts -e profile=prod sity.yml</code></p>
+<h2 id="Expend-Study"><a href="#Expend-Study" class="headerlink" title="Expend Study"></a>Expend Study</h2><p>使用alpine镜像或distroless镜像作为基础构建镜像.</p>
+<h2 id="Reference-Resources"><a href="#Reference-Resources" class="headerlink" title="Reference Resources"></a>Reference Resources</h2><ul>
+<li><a href="[GoogleContainerTools](https://github.com/GoogleContainerTools">Github Jib</a>/jib)</li>
+<li><a href="https://www.youtube.com/watch?v=H6gR_Cv4yWI" target="_blank" rel="noopener">Jib介绍视屏</a></li>
+<li><a href="https://cloudplatform.googleblog.com/2018/07/introducing-jib-build-java-docker-images-better.html" target="_blank" rel="noopener">Jib Blog</a></li>
+<li><a href="https://speakerdeck.com/coollog/build-containers-faster-with-jib-a-google-image-build-tool-for-java-applications" target="_blank" rel="noopener">Jib PPT</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/blog/uploads/wechatpay.png" alt="溏溏爸爸 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/blog/uploads/alipay.png" alt="溏溏爸爸 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/java应用容器/" rel="tag"># java应用容器</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/09/05/zookeeper/" rel="next" title="zookeeper学习视图">
+                <i class="fa fa-chevron-left"></i> zookeeper学习视图
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/09/12/prometheus内存用量估算/" rel="prev" title="prometheus内存用量估算">
+                prometheus内存用量估算 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTI2Mi8xMTc5OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/blog/uploads/avatar.png"
+                alt="溏溏爸爸" />
+            
+              <p class="site-author-name" itemprop="name">溏溏爸爸</p>
+              <p class="site-description motion-element" itemprop="description">向终身学习者致敬</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/blog/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/blog/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/blog/tags/index.html">
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/steven-ji" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment"><span class="nav-number">1.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Foreward"><span class="nav-number">2.</span> <span class="nav-text">Foreward</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Feature"><span class="nav-number">2.1.</span> <span class="nav-text">Feature</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usage"><span class="nav-number">3.</span> <span class="nav-text">Usage</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置详解"><span class="nav-number">3.1.</span> <span class="nav-text">配置详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用命令"><span class="nav-number">3.2.</span> <span class="nav-text">常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#打包应用镜像并上传"><span class="nav-number">3.2.1.</span> <span class="nav-text">打包应用镜像并上传</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不依赖本地docker"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">不依赖本地docker</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#依赖本地docker"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">依赖本地docker</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#镜像打成tar包"><span class="nav-number">3.2.2.</span> <span class="nav-text">镜像打成tar包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#导出镜像的Dockerfile"><span class="nav-number">3.2.3.</span> <span class="nav-text">导出镜像的Dockerfile</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置私仓身份认证"><span class="nav-number">3.3.</span> <span class="nav-text">配置私仓身份认证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过Docker-Credential-Helps"><span class="nav-number">3.3.1.</span> <span class="nav-text">通过Docker Credential Helps</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过Maven配置"><span class="nav-number">3.3.2.</span> <span class="nav-text">通过Maven配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example"><span class="nav-number">4.</span> <span class="nav-text">Example</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置pom-xml"><span class="nav-number">4.1.</span> <span class="nav-text">配置pom.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建并上传images"><span class="nav-number">4.2.</span> <span class="nav-text">构建并上传images</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动容器"><span class="nav-number">4.3.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结合Ansible-Scripts"><span class="nav-number">4.4.</span> <span class="nav-text">结合Ansible Scripts</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置ansible脚本"><span class="nav-number">4.4.1.</span> <span class="nav-text">配置ansible脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动"><span class="nav-number">4.4.2.</span> <span class="nav-text">启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Expend-Study"><span class="nav-number">5.</span> <span class="nav-text">Expend Study</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference-Resources"><span class="nav-number">6.</span> <span class="nav-text">Reference Resources</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">溏溏爸爸</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">26.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/blog/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/blog/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1s');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+  <a href="https://github.com/steven-ji"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+</body>
+</html>

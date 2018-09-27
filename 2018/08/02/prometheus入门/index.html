@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="环境:prometheus 2.3.1, blackbox_exporter 0.12.0, alertmanager 0.15.1, centos 7  前言应用场景:监测500+主机是否存活(通过ping或ssh的方式检测),并报警. 注意点 Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不">
+<meta name="description" content="Foreward在学习每个新技术之前,都有必要弄懂以下6个问题(左耳朵耗子学习模版):  这个技术出现的背景、初衷和要达到什么样的目标或是要解决什么样的问题 这个技术的优势和劣势分别是什么,或者说这个技术的 trade-off 是什么。任何技术都有其好坏，在解决一个问题的时候，也会带来新的问题. 适用的场景(业务场景或技术场景) 它的组成部分和关键点 它的底层原理和关键实现 已有的实现和它之间的">
 <meta name="keywords" content="prometheus入门">
 <meta property="og:type" content="article">
-<meta property="og:title" content="prometheus之入门">
+<meta property="og:title" content="prometheus技术视图">
 <meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/02/prometheus入门/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="环境:prometheus 2.3.1, blackbox_exporter 0.12.0, alertmanager 0.15.1, centos 7  前言应用场景:监测500+主机是否存活(通过ping或ssh的方式检测),并报警. 注意点 Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不">
+<meta property="og:description" content="Foreward在学习每个新技术之前,都有必要弄懂以下6个问题(左耳朵耗子学习模版):  这个技术出现的背景、初衷和要达到什么样的目标或是要解决什么样的问题 这个技术的优势和劣势分别是什么,或者说这个技术的 trade-off 是什么。任何技术都有其好坏，在解决一个问题的时候，也会带来新的问题. 适用的场景(业务场景或技术场景) 它的组成部分和关键点 它的底层原理和关键实现 已有的实现和它之间的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-15T15:38:40.244Z">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/0069RVTdgy1fuzm0y206ej30kw08ljrx.jpg">
+<meta property="og:updated_time" content="2018-09-06T02:33:02.671Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="prometheus之入门">
-<meta name="twitter:description" content="环境:prometheus 2.3.1, blackbox_exporter 0.12.0, alertmanager 0.15.1, centos 7  前言应用场景:监测500+主机是否存活(通过ping或ssh的方式检测),并报警. 注意点 Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不">
+<meta name="twitter:title" content="prometheus技术视图">
+<meta name="twitter:description" content="Foreward在学习每个新技术之前,都有必要弄懂以下6个问题(左耳朵耗子学习模版):  这个技术出现的背景、初衷和要达到什么样的目标或是要解决什么样的问题 这个技术的优势和劣势分别是什么,或者说这个技术的 trade-off 是什么。任何技术都有其好坏，在解决一个问题的时候，也会带来新的问题. 适用的场景(业务场景或技术场景) 它的组成部分和关键点 它的底层原理和关键实现 已有的实现和它之间的">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/0069RVTdgy1fuzm0y206ej30kw08ljrx.jpg">
 
 
 
@@ -126,7 +128,7 @@
 
 
 
-  <title>prometheus之入门 | ttbb玩代码</title>
+  <title>prometheus技术视图 | ttbb玩代码</title>
   
 
 
@@ -327,7 +329,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">prometheus之入门</h1>
+          <h1 class="post-title" itemprop="name headline">prometheus技术视图</h1>
         
 
         <div class="post-meta">
@@ -393,7 +395,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  747
+                  994
                 </span>
               
 
@@ -409,7 +411,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  4
+                  5
                 </span>
               
             </div>
@@ -430,22 +432,49 @@
       
 
       
-        <ul>
-<li>环境:prometheus 2.3.1, blackbox_exporter 0.12.0, alertmanager 0.15.1, centos 7</li>
+        <p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fuzm0y206ej30kw08ljrx.jpg" alt="Prometheus技术视图"></p>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>在学习每个新技术之前,都有必要弄懂以下6个问题(左耳朵耗子学习模版):</p>
+<ul>
+<li>这个技术出现的背景、初衷和要达到什么样的目标或是要解决什么样的问题</li>
+<li>这个技术的优势和劣势分别是什么,或者说这个技术的 trade-off 是什么。任何技术都有其好坏，在解决一个问题的时候，也会带来新的问题.</li>
+<li>适用的场景(业务场景或技术场景)</li>
+<li>它的组成部分和关键点</li>
+<li>它的底层原理和关键实现</li>
+<li>已有的实现和它之间的对比</li>
 </ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>应用场景:监测500+主机是否存活(通过ping或ssh的方式检测),并报警.</p>
-<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><ul>
-<li>Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不必要的业务数据导出），尽量要使用SSD（这个很关键！），因为一旦Prometheus的内存使用量达到阈值会停止抓取数据！这个停止抓取的时间，至少是分钟级，甚至是无法恢复！所以只要有条件就要用SSD。</li>
-<li>Prometheus号称支持reload，但目测不是很好用，比如你修改了告警规则文件，重载之后，新旧告警规则似乎会一起计算执行….</li>
+<p>由于最近在搞代理,需要一个监控和报警来保证稳定性.我的需求也很简单,监控500+主机是否存活(通过ping或ssh的方式检测),如果出现问题,立马报警.</p>
+<p>其实官网已经说的很明白了,我也没必要重复搬运,这里只记录自己的使用和比较关注的信息.</p>
+<h2 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h2><ul>
+<li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank" rel="noopener">官网</a></li>
+<li>博客<ul>
+<li><a href="https://en.fabernovel.com/insights/tech-en/alerting-in-prometheus-or-how-i-can-sleep-well-at-night" target="_blank" rel="noopener">https://en.fabernovel.com/insights/tech-en/alerting-in-prometheus-or-how-i-can-sleep-well-at-night</a></li>
+<li><a href="http://ylzheng.com/archives/" target="_blank" rel="noopener">Yunlong blog</a></li>
+<li><a href="https://www.slideshare.net/leecalcote/understanding-and-extending-prometheus-alertmanager" target="_blank" rel="noopener">https://www.slideshare.net/leecalcote/understanding-and-extending-prometheus-alertmanager</a></li>
+<li><a href="https://kairen.github.io/2018/06/29/devops/prometheus-federation/" target="_blank" rel="noopener">了解 Prometheus Federation 功能</a></li>
+<li>[使用Prometheus+grafana打造高逼格监控平台](<a href="http://blog.51cto.com/youerning/2050543" target="_blank" rel="noopener">http://blog.51cto.com/youerning/2050543</a></li>
+<li><a href="https://github.com/1046102779/prometheus" target="_blank" rel="noopener">Prometheus 非官方中文手册</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/24811652" target="_blank" rel="noopener">基于Prometheus的分布式在线服务监控实践</a></li>
 </ul>
-<h2 id="Execute-Prometheus"><a href="#Execute-Prometheus" class="headerlink" title="Execute Prometheus"></a>Execute Prometheus</h2><h3 id="Build-with-Binary-And-Config"><a href="#Build-with-Binary-And-Config" class="headerlink" title="Build with Binary And Config"></a>Build with Binary And Config</h3><h4 id="Build-with-Binary"><a href="#Build-with-Binary" class="headerlink" title="Build with Binary"></a>Build with Binary</h4><ul>
-<li>Download<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/prometheus/releases/download/v2.3.2/prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv prometheus-2.3.2.linux-amd64 prometheus-2.3.2</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h3 id="Config-prometheus-yml"><a href="#Config-prometheus-yml" class="headerlink" title="Config prometheus.yml"></a>Config prometheus.yml</h3><p>blackbox_exporter和alertmanager的安装可以参见另外两篇文章《alertmanager之初体验》、《blackbox_exporter之安装》<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 由于机器数量较多,使用prometheus的服务发现,将所有机器配置到单独的文件中.</span><br><span class="line">$ vim /opt/machine.json</span><br><span class="line">[</span><br><span class="line"> &#123;&quot;targets&quot;:[&quot;122.227.184.61:20065&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d9&quot;&#125;&#125;,</span><br><span class="line">&#123;&quot;targets&quot;:[&quot;122.227.184.61:20063&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d8&quot;&#125;&#125;,</span><br><span class="line">...</span><br><span class="line">]</span><br><span class="line"># 配置prometheus.yml</span><br><span class="line">$ vim /opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">global:</span><br><span class="line">  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.</span><br><span class="line">  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.</span><br><span class="line">  # scrape_timeout is set to the global default (10s).</span><br><span class="line"># Alertmanager configuration</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: [&quot;10.1.1.26:9093&quot;]  # alertmanager的地址.</span><br><span class="line"># Load rules once and periodically evaluate them according to the global &apos;evaluation_interval&apos;.</span><br><span class="line">rule_files:</span><br><span class="line">  - &quot;/opt/proxy_rules.yml&quot;  # 规则文件.</span><br><span class="line"># A scrape configuration containing exactly one endpoint to scrape:</span><br><span class="line"># Here it&apos;s Prometheus itself.</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;machine_heart&apos;</span><br><span class="line">    metrics_path: /probe</span><br><span class="line">    params:</span><br><span class="line">      module: [ssh_banner]</span><br><span class="line">    file_sd_configs:</span><br><span class="line">    - files: [&apos;/opt/machine.json&apos;]   # 机器地址列表文件</span><br><span class="line">      refresh_interval: 5m</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [address]</span><br><span class="line">      regex: (.*)</span><br><span class="line">      replacement: $&#123;1&#125;</span><br><span class="line">      target_label: __param_target  # 请求http://10.1.1.26:9155的请求参数target</span><br><span class="line">    - source_labels: [__param_target]</span><br><span class="line">      target_label: instance</span><br><span class="line">    - target_label: address</span><br><span class="line">      replacement: 10.1.1.26:9115  # blackbox_exporter的地址.</span><br></pre></td></tr></table></figure></p>
-<h3 id="Config-rules-yml"><a href="#Config-rules-yml" class="headerlink" title="Config rules.yml"></a>Config rules.yml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ vim /opt/proxy_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: machine_heart</span><br><span class="line">    rules:</span><br><span class="line">    - alert: &apos;ssh&apos;</span><br><span class="line">      expr: probe_success&#123;job=&quot;machine_heart&quot;&#125; &lt; 1</span><br><span class="line">      for: 1m</span><br><span class="line">      labels:</span><br><span class="line">        severity: critical</span><br><span class="line">      # team: &apos;proxy-team&apos;</span><br><span class="line">      annotations:</span><br><span class="line">        summary: &quot;Instance &#123;&#123; $labels.instance &#125;&#125; down.&quot;</span><br><span class="line">        description: &quot;&#123;&#123; $labels.instance &#125;&#125; of job &#123;&#123; $labels.job &#125;&#125; has been down for more than 1 minutes.&quot;</span><br></pre></td></tr></table></figure>
-<h3 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=prometheus.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/prometheus-2.3.1/prometheus --config.file=/opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable prometheus &amp;&amp; systemctl start prometheus</span><br></pre></td></tr></table></figure>
-<h3 id="Test-Prometheus"><a href="#Test-Prometheus" class="headerlink" title="Test Prometheus"></a>Test Prometheus</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="基于Prometheus的分布式在线服务监控实践"><a href="#基于Prometheus的分布式在线服务监控实践" class="headerlink" title="基于Prometheus的分布式在线服务监控实践"></a><a href="https://zhuanlan.zhihu.com/p/24811652" target="_blank" rel="noopener">基于Prometheus的分布式在线服务监控实践</a></h3><h3 id="Prometheus-非官方中文手册"><a href="#Prometheus-非官方中文手册" class="headerlink" title="Prometheus 非官方中文手册"></a><a href="https://github.com/1046102779/prometheus" target="_blank" rel="noopener">Prometheus 非官方中文手册</a></h3><h3 id="使用Prometheus-grafana打造高逼格监控平台"><a href="#使用Prometheus-grafana打造高逼格监控平台" class="headerlink" title="使用Prometheus+grafana打造高逼格监控平台"></a><a href="http://blog.51cto.com/youerning/2050543" target="_blank" rel="noopener">使用Prometheus+grafana打造高逼格监控平台</a></h3>
+<h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
+<li>prometheus 2.3.1</li>
+<li>blackbox_exporter 0.12.0</li>
+<li>alertmanager 0.15.1</li>
+<li>centos 7</li>
+</ul>
+<h2 id="Notices"><a href="#Notices" class="headerlink" title="Notices"></a>Notices</h2><ul>
+<li>Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不必要的业务数据导出），尽量要使用SSD（这个很关键！），因为一旦Prometheus的内存使用量达到阈值会停止抓取数据！这个停止抓取的时间，至少是分钟级，甚至是无法恢复！所以只要有条件就要用SSD.</li>
+</ul>
+<h2 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><h4 id="部署测试场景"><a href="#部署测试场景" class="headerlink" title="部署测试场景"></a>部署测试场景</h4><p>Config prometheus.yml</p>
+<p>blackbox_exporter和alertmanager的安装可以参见另外两篇文章《alertmanager之初体验》、《blackbox_exporter之安装》</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 由于机器数量较多,使用prometheus的服务发现,将所有机器配置到单独的文件中.</span><br><span class="line">$ vim /opt/machine.json</span><br><span class="line">[</span><br><span class="line"> &#123;&quot;targets&quot;:[&quot;122.227.184.61:20065&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d9&quot;&#125;&#125;,</span><br><span class="line">&#123;&quot;targets&quot;:[&quot;122.227.184.61:20063&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d8&quot;&#125;&#125;,</span><br><span class="line">...</span><br><span class="line">]</span><br><span class="line"># 配置prometheus.yml</span><br><span class="line">$ vim /opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">global:</span><br><span class="line">  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.</span><br><span class="line">  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.</span><br><span class="line">  # scrape_timeout is set to the global default (10s).</span><br><span class="line"># Alertmanager configuration</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: [&quot;10.1.1.26:9093&quot;]  # alertmanager的地址.</span><br><span class="line"># Load rules once and periodically evaluate them according to the global &apos;evaluation_interval&apos;.</span><br><span class="line">rule_files:</span><br><span class="line">  - &quot;/opt/proxy_rules.yml&quot;  # 规则文件.</span><br><span class="line"># A scrape configuration containing exactly one endpoint to scrape:</span><br><span class="line"># Here it&apos;s Prometheus itself.</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;machine_heart&apos;</span><br><span class="line">    metrics_path: /probe</span><br><span class="line">    params:</span><br><span class="line">      module: [ssh_banner]</span><br><span class="line">    file_sd_configs:</span><br><span class="line">    - files: [&apos;/opt/machine.json&apos;]   # 机器地址列表文件</span><br><span class="line">      refresh_interval: 5m</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [address]</span><br><span class="line">      regex: (.*)</span><br><span class="line">      replacement: $&#123;1&#125;</span><br><span class="line">      target_label: __param_target  # 请求http://10.1.1.26:9155的请求参数target</span><br><span class="line">    - source_labels: [__param_target]</span><br><span class="line">      target_label: instance</span><br><span class="line">    - target_label: address</span><br><span class="line">      replacement: 10.1.1.26:9115  # blackbox_exporter的地址.</span><br></pre></td></tr></table></figure>
+<p>Config rules.yml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ vim /opt/proxy_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: machine_heart</span><br><span class="line">    rules:</span><br><span class="line">    - alert: &apos;ssh&apos;</span><br><span class="line">      expr: probe_success&#123;job=&quot;machine_heart&quot;&#125; &lt; 1</span><br><span class="line">      for: 1m</span><br><span class="line">      labels:</span><br><span class="line">        severity: critical</span><br><span class="line">      # team: &apos;proxy-team&apos;</span><br><span class="line">      annotations:</span><br><span class="line">        summary: &quot;Instance &#123;&#123; $labels.instance &#125;&#125; down.&quot;</span><br><span class="line">        description: &quot;&#123;&#123; $labels.instance &#125;&#125; of job &#123;&#123; $labels.job &#125;&#125; has been down for more than 1 minutes.&quot;</span><br></pre></td></tr></table></figure>
+<p>Config Systemd</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=prometheus.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/prometheus-2.3.1/prometheus --config.file=/opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable prometheus &amp;&amp; systemctl start prometheus</span><br></pre></td></tr></table></figure>
+<h4 id="常规部署"><a href="#常规部署" class="headerlink" title="常规部署"></a>常规部署</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/prometheus/releases/download/v2.3.2/prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv prometheus-2.3.2.linux-amd64 prometheus-2.3.2</span><br></pre></td></tr></table></figure>
+<h4 id="Docker部署"><a href="#Docker部署" class="headerlink" title="Docker部署"></a>Docker部署</h4><h4 id="Ansible-playbook部署"><a href="#Ansible-playbook部署" class="headerlink" title="Ansible-playbook部署"></a>Ansible-playbook部署</h4><h4 id="Test-Prometheus"><a href="#Test-Prometheus" class="headerlink" title="Test Prometheus"></a>Test Prometheus</h4><h3 id="关联组件"><a href="#关联组件" class="headerlink" title="关联组件"></a>关联组件</h3>
       
     </div>
     
@@ -602,7 +631,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -613,7 +642,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -624,7 +653,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -667,7 +696,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意点"><span class="nav-number">2.</span> <span class="nav-text">注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Execute-Prometheus"><span class="nav-number">3.</span> <span class="nav-text">Execute Prometheus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-with-Binary-And-Config"><span class="nav-number">3.1.</span> <span class="nav-text">Build with Binary And Config</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Build-with-Binary"><span class="nav-number">3.1.1.</span> <span class="nav-text">Build with Binary</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Config-prometheus-yml"><span class="nav-number">3.2.</span> <span class="nav-text">Config prometheus.yml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Config-rules-yml"><span class="nav-number">3.3.</span> <span class="nav-text">Config rules.yml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Config-Systemd"><span class="nav-number">3.4.</span> <span class="nav-text">Config Systemd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-Prometheus"><span class="nav-number">3.5.</span> <span class="nav-text">Test Prometheus</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于Prometheus的分布式在线服务监控实践"><span class="nav-number">4.1.</span> <span class="nav-text">基于Prometheus的分布式在线服务监控实践</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prometheus-非官方中文手册"><span class="nav-number">4.2.</span> <span class="nav-text">Prometheus 非官方中文手册</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Prometheus-grafana打造高逼格监控平台"><span class="nav-number">4.3.</span> <span class="nav-text">使用Prometheus+grafana打造高逼格监控平台</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Foreward"><span class="nav-number">1.</span> <span class="nav-text">Foreward</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resources"><span class="nav-number">2.</span> <span class="nav-text">Resources</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment"><span class="nav-number">3.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Notices"><span class="nav-number">4.</span> <span class="nav-text">Notices</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prometheus"><span class="nav-number">5.</span> <span class="nav-text">Prometheus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Install"><span class="nav-number">5.1.</span> <span class="nav-text">Install</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#部署测试场景"><span class="nav-number">5.1.1.</span> <span class="nav-text">部署测试场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常规部署"><span class="nav-number">5.1.2.</span> <span class="nav-text">常规部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker部署"><span class="nav-number">5.1.3.</span> <span class="nav-text">Docker部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ansible-playbook部署"><span class="nav-number">5.1.4.</span> <span class="nav-text">Ansible-playbook部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Test-Prometheus"><span class="nav-number">5.1.5.</span> <span class="nav-text">Test Prometheus</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联组件"><span class="nav-number">5.2.</span> <span class="nav-text">关联组件</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -701,7 +730,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">20.4k</span>
+    <span title="Site words total count">26.2k</span>
   
 </div>
 

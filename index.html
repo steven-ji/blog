@@ -309,6 +309,891 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/17/ansible使用常见问题汇总-md/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/09/17/ansible使用常见问题汇总-md/" itemprop="url">ansible使用常见问题汇总.md</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-17T15:29:25+08:00">
+                2018-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  105
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Cannot-have-both-the-docker-py-and-docker-python-modules-installed-together"><a href="#Cannot-have-both-the-docker-py-and-docker-python-modules-installed-together" class="headerlink" title="Cannot have both the docker-py and docker python modules installed together"></a>Cannot have both the docker-py and docker python modules installed together</h2><p>问题很明显,目标服务器pip即安装了docker-py又安装了docker,解决办法:两者都写在后,重新安装docker-py.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 查询版本</span><br><span class="line">$ pip show docker-py</span><br><span class="line">$ pip show docker</span><br><span class="line"># 卸载,同理pip、pip2、pip3</span><br><span class="line">$ pip uninstall docker</span><br><span class="line">$ pip uninstall docker-py</span><br><span class="line">$ pip uninstall docker-compose</span><br><span class="line"># 安装(--ignore-installed)</span><br><span class="line">$ pip install &apos;docker-compose&gt;=1.7.0&apos;</span><br><span class="line">$ pip install &apos;docker-py&gt;=1.7.0&apos;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/12/prometheus内存用量估算/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/09/12/prometheus内存用量估算/" itemprop="url">prometheus内存用量估算</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-12T09:28:19+08:00">
+                2018-09-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  0
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/10/Jib使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/09/10/Jib使用/" itemprop="url">Jib使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-10T09:49:32+08:00">
+                2018-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,685
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
+<li>Jib 0.9.10</li>
+<li>Jdk1.8</li>
+</ul>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><ul>
+<li><p>What</p>
+<p>针对Java构建容器镜像.提供以maven插件和gradle插件的方式快速构建镜像.</p>
+<p>特点:1、快速;2、不依赖docker命令,不需要写Dockerfile;3、同docker一样采用分层构建;</p>
+<p>缺点:1、不能指定volume挂载;2、<del>一些java启动命令不能使用,如java -jar **.jar –spring.profiles.active=prod …</del></p>
+</li>
+</ul>
+<h3 id="Feature"><a href="#Feature" class="headerlink" title="Feature"></a>Feature</h3><ul>
+<li><p>Simple</p>
+<p>原来构建步骤</p>
+</li>
+</ul>
+<p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4h4ia8r6j30gi031dg1.jpg" alt="img"></p>
+<pre><code>现在构建步骤
+</code></pre><p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fv4hab4u2vj30ey016web.jpg" alt="img"></p>
+<pre><code>开发人员无需了解Dockerfile的细节,通过jib上传镜像.
+</code></pre><ul>
+<li><p>Fast</p>
+<p>为什么会快呢?学习了docker的层概念,增量构建.传统构建是将jar包打入镜像,而jib的策略的将依赖的class文件上传.</p>
+</li>
+<li><p>不依赖于docker</p>
+<p>构建过程完成不依赖于本地是否有安装docker.</p>
+</li>
+<li><p>缺点</p>
+<p>不能通过jib指定volume,只能提前将volume构建在镜像中.</p>
+</li>
+</ul>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><h3 id="配置详解"><a href="#配置详解" class="headerlink" title="配置详解"></a>配置详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">        	&lt;!-- 依赖包 --&gt;</span><br><span class="line">            &lt;groupId&gt;com.google.cloud.tools&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;jib-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;0.9.11&lt;/version&gt; </span><br><span class="line">            &lt;!-- 将jib:build的命令绑定到maven的生命周期中.</span><br><span class="line">                原来执行打包方式为mvn compile jib:build,现在只要执行mvn package --&gt;</span><br><span class="line">            &lt;executions&gt;</span><br><span class="line">                &lt;execution&gt;</span><br><span class="line">                &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">                &lt;goals&gt;</span><br><span class="line">                    &lt;goal&gt;build&lt;/goal&gt;</span><br><span class="line">                &lt;/goals&gt;</span><br><span class="line">                &lt;/execution&gt;</span><br><span class="line">            &lt;/executions&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">                &lt;!-- 镜像拉取配置. --&gt;</span><br><span class="line">                &lt;from&gt;</span><br><span class="line">                	&lt;!-- 镜像地址. --&gt;</span><br><span class="line">                    &lt;image&gt;&lt;/image&gt;</span><br><span class="line">                    &lt;!-- 用户名/密码安全加密,可以不配置.使用auth --&gt;</span><br><span class="line">                    &lt;credHelper&gt;none&lt;/credHelper&gt;</span><br><span class="line">                    &lt;auth&gt;</span><br><span class="line">                        &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                        &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                    &lt;/auth&gt;</span><br><span class="line">                &lt;/from&gt;</span><br><span class="line">                &lt;!-- 镜像上传配置. --&gt;</span><br><span class="line">                &lt;to&gt;</span><br><span class="line">                    &lt;!-- 镜像地址. --&gt;</span><br><span class="line">                    &lt;image&gt;&lt;/image&gt;</span><br><span class="line">                    &lt;credHelper&gt;none&lt;/credHelper&gt;</span><br><span class="line">                    &lt;auth&gt;</span><br><span class="line">                        &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                        &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                    &lt;/auth&gt;</span><br><span class="line">                &lt;/to&gt;</span><br><span class="line">                &lt;!-- 默认值为false,用于gradle的缓存设置. --&gt;</span><br><span class="line">                &lt;useOnlyProjectCache&gt;false&lt;/useOnlyProjectCache&gt;</span><br><span class="line">                &lt;!-- 默认值为false,是否开启HTTPS的认证.(推荐为false) --&gt;</span><br><span class="line">                &lt;allowInsecureRegistries&gt;false&lt;/allowInsecureRegistries&gt;</span><br><span class="line">                &lt;!-- Copies files from &apos;src/main/custom-extra-dir&apos; instead of &apos;src/main/jib&apos; </span><br><span class="line">                用于将其他文件添加到镜像中.--&gt;</span><br><span class="line">                &lt;extraDirectory&gt;$&#123;project.basedir&#125;/src/main/custom-extra-dir&lt;/extraDirectory&gt;</span><br><span class="line">                &lt;container&gt;</span><br><span class="line">                    &lt;mainClass&gt;com.bsd.proxy.monitor.MonitorApplication&lt;/mainClass&gt;</span><br><span class="line">                    &lt;!-- JVM相关参数. --&gt;</span><br><span class="line">                    &lt;jvmFlags&gt;</span><br><span class="line">                        &lt;jvmFlag&gt;-Xms512m&lt;/jvmFlag&gt;</span><br><span class="line">                        &lt;jvmFlag&gt;-Xmx512m&lt;/jvmFlag&gt;</span><br><span class="line">                    &lt;/jvmFlags&gt;</span><br><span class="line">                    &lt;!-- 暴露端口.同docker一样.也可以配置端口范围. --&gt;</span><br><span class="line">                    &lt;ports&gt;</span><br><span class="line">                        &lt;port&gt;9999&lt;/port&gt;</span><br><span class="line">                        &lt;port&gt;2000-2003/udp&lt;/port&gt;</span><br><span class="line">                    &lt;/ports&gt;</span><br><span class="line">                    &lt;!-- 生成的Dockerfile中CMD的参数. --&gt;</span><br><span class="line">                    &lt;args&gt;</span><br><span class="line">                        &lt;arg&gt;some&lt;/arg&gt;</span><br><span class="line">                        &lt;arg&gt;args&lt;/arg&gt;</span><br><span class="line">                    &lt;/args&gt;</span><br><span class="line">                    &lt;!-- 同docker的labels. --&gt;</span><br><span class="line">                    &lt;labels&gt;</span><br><span class="line">                        &lt;key1&gt;value1&lt;/key1&gt;</span><br><span class="line">                    &lt;/labels&gt;</span><br><span class="line">                    &lt;!-- 构建容器镜像类型.还支持OCI --&gt;</span><br><span class="line">                    &lt;format&gt;docker&lt;/format&gt;</span><br><span class="line">                    &lt;!-- 默认值为false,指在打包镜像是是否带时间戳.--&gt;</span><br><span class="line">                    &lt;useCurrentTimestamp&gt;&lt;/useCurrentTimestamp&gt;</span><br><span class="line">                    &lt;!-- (不建议使用)容器启动命令,同docker中的ENTRYPOINT,如果指定了则jvmFlags和mainClass失效.--&gt;</span><br><span class="line">                    &lt;entrypoint&gt;&lt;/entrypoint&gt;</span><br><span class="line">                &lt;/container&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">&lt;/build&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><h4 id="打包应用镜像并上传"><a href="#打包应用镜像并上传" class="headerlink" title="打包应用镜像并上传"></a>打包应用镜像并上传</h4><h5 id="不依赖本地docker"><a href="#不依赖本地docker" class="headerlink" title="不依赖本地docker"></a>不依赖本地docker</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ mvn compile com.google.cloud.tools:jib-maven-plugin:0.9.11:build -Dimage=&lt;MY IMAGE&gt;</span><br><span class="line"># 或者</span><br><span class="line">$ mvn compile jib:build</span><br><span class="line"># 指定上传镜像超时时间(毫秒).默认是20000毫秒.或者设置0为没有超时时间.</span><br><span class="line">$ mvn compile jib:build -Djib.httpTimeout=3000</span><br></pre></td></tr></table></figure>
+<h5 id="依赖本地docker"><a href="#依赖本地docker" class="headerlink" title="依赖本地docker"></a>依赖本地docker</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mvn compile com.google.cloud.tools:jib-maven-plugin:0.9.10:dockerBuild</span><br><span class="line"># 或者</span><br><span class="line">$ mvn compile jib:dockerBuild</span><br></pre></td></tr></table></figure>
+<h4 id="镜像打成tar包"><a href="#镜像打成tar包" class="headerlink" title="镜像打成tar包"></a>镜像打成tar包</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 会在项目路径的target目录下生成jib-image.tar.</span><br><span class="line">$ mvn compile jib:buildTar</span><br><span class="line"># 通过docker导入镜像.</span><br><span class="line">$ docker load --input target/jib-image.tar</span><br></pre></td></tr></table></figure>
+<h4 id="导出镜像的Dockerfile"><a href="#导出镜像的Dockerfile" class="headerlink" title="导出镜像的Dockerfile"></a>导出镜像的Dockerfile</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 默认生成在target/jib-docker-context下.-DjibTargetDir用于指定生成路径.</span><br><span class="line">$ mvn compile jib:exportDockerContext -DjibTargetDir=my/docker/context/</span><br><span class="line"># 下面是我pom中的配置,并生成的一个Dockerfile</span><br><span class="line">FROM registry.cn-hangzhou.aliyuncs.com/jiuming/java-alpine-openjdk8-jre-shanghai</span><br><span class="line">  </span><br><span class="line">COPY libs /app/libs/</span><br><span class="line">COPY resources /app/resources/</span><br><span class="line">COPY classes /app/classes/</span><br><span class="line"></span><br><span class="line">EXPOSE 9999</span><br><span class="line">ENTRYPOINT [&quot;java&quot;,&quot;-Xms512m, -Xmx512m&quot;, -cp&quot;,&quot;/app/resources/:/app/classes/:/app/libs/*&quot;,&quot;com.bsd.proxy.monitor.MonitorApplication&quot;]</span><br><span class="line">CMD []</span><br></pre></td></tr></table></figure>
+<h3 id="配置私仓身份认证"><a href="#配置私仓身份认证" class="headerlink" title="配置私仓身份认证"></a>配置私仓身份认证</h3><p>如果没有使用credHelper,</p>
+<h4 id="通过Docker-Credential-Helps"><a href="#通过Docker-Credential-Helps" class="headerlink" title="通过Docker Credential Helps"></a>通过Docker Credential Helps</h4><p>待补充,<a href="https://github.com/docker/docker-credential-helpers" target="_blank" rel="noopener">Docker Credential Helps</a></p>
+<h4 id="通过Maven配置"><a href="#通过Maven配置" class="headerlink" title="通过Maven配置"></a>通过Maven配置</h4><p>配置Setting.xml文件</p>
+<ul>
+<li>maven加密方式参见<a href="https://maven.apache.org/guides/mini/guide-encryption.html" target="_blank" rel="noopener">Password Encryption</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;settings&gt;</span><br><span class="line">  ...</span><br><span class="line">  &lt;servers&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;server&gt;</span><br><span class="line">      &lt;!-- id为仓库名称 --&gt;</span><br><span class="line">      &lt;id&gt;MY_REGISTRY&lt;/id&gt;</span><br><span class="line">      &lt;username&gt;MY_USERNAME&lt;/username&gt;</span><br><span class="line">      &lt;!-- maven encryption --&gt;</span><br><span class="line">      &lt;password&gt;&#123;MY_SECRET&#125;&lt;/password&gt;</span><br><span class="line">    &lt;/server&gt;</span><br><span class="line">  &lt;/servers&gt;</span><br><span class="line">&lt;/settings&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><ul>
+<li><p>目标描述</p>
+<p>使用spring boot构建一个java应用程序镜像,并指定profile运行.</p>
+</li>
+</ul>
+<p>为了能够指定profile运行,main启动代码要改动.</p>
+<p>平常启动应用的命令是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar -Xms512m -Xmx512m **.jar --spring.profiles.active=prod</span><br></pre></td></tr></table></figure>
+<p>Jib打成的镜像,ENTRYPOINT实际的启动命令是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Xms512m -Xmx512m -cp app/libs/*:app/resources:app/classes package.MonitorApplication</span><br></pre></td></tr></table></figure>
+<p>为了能够指定profile运行,需要在docker启动添加参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">public class MonitorApplication &#123;</span><br><span class="line"></span><br><span class="line">    private final static String ACTIVE = &quot;prod&quot;;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplicationBuilder builder = new SpringApplicationBuilder(MonitorApplication.class);</span><br><span class="line">        if (Arrays.stream(args).anyMatch(t -&gt; t.equals(ACTIVE))) &#123;</span><br><span class="line">            builder.profiles(ACTIVE);</span><br><span class="line">        &#125;</span><br><span class="line">        builder.run(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置pom-xml"><a href="#配置pom-xml" class="headerlink" title="配置pom.xml"></a>配置pom.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;</span><br><span class="line">         </span><br><span class="line">    ......</span><br><span class="line">	&lt;build&gt;</span><br><span class="line">        &lt;plugins&gt;</span><br><span class="line">            &lt;plugin&gt;</span><br><span class="line">                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;/plugin&gt;</span><br><span class="line">            &lt;plugin&gt;</span><br><span class="line">                &lt;groupId&gt;com.google.cloud.tools&lt;/groupId&gt;</span><br><span class="line">                &lt;artifactId&gt;jib-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">                &lt;version&gt;0.9.10&lt;/version&gt;</span><br><span class="line">                &lt;executions&gt;</span><br><span class="line">                    &lt;execution&gt;</span><br><span class="line">                        &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">                        &lt;goals&gt;</span><br><span class="line">                            &lt;goal&gt;build&lt;/goal&gt;</span><br><span class="line">                        &lt;/goals&gt;</span><br><span class="line">                    &lt;/execution&gt;</span><br><span class="line">                &lt;/executions&gt;</span><br><span class="line">                &lt;configuration&gt;</span><br><span class="line">                    &lt;from&gt;</span><br><span class="line">                        &lt;image&gt;指定拉取镜像的私仓地址&lt;/image&gt;</span><br><span class="line">                        &lt;auth&gt;</span><br><span class="line">                            &lt;username&gt;私仓用户名&lt;/username&gt;</span><br><span class="line">                            &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                        &lt;/auth&gt;</span><br><span class="line">                    &lt;/from&gt;</span><br><span class="line">                    &lt;to&gt;</span><br><span class="line">                        &lt;image&gt;指定推送镜像的私仓地址&lt;/image&gt;</span><br><span class="line">                        &lt;auth&gt;</span><br><span class="line">                            &lt;username&gt;指定推送镜像的私仓地址&lt;/username&gt;</span><br><span class="line">                            &lt;password&gt;私仓密码&lt;/password&gt;</span><br><span class="line">                        &lt;/auth&gt;</span><br><span class="line">                    &lt;/to&gt;</span><br><span class="line">                    &lt;container&gt;</span><br><span class="line">                    	&lt;!-- 指定MonitorApplication的全路径. --&gt;</span><br><span class="line">                        &lt;mainClass&gt;mypackage.MonitorApplication&lt;/mainClass&gt;</span><br><span class="line">                        &lt;jvmFlags&gt;</span><br><span class="line">                            &lt;jvmFlag&gt;-Xms512m&lt;/jvmFlag&gt;</span><br><span class="line">                            &lt;jvmFlag&gt;-Xmx512m&lt;/jvmFlag&gt;</span><br><span class="line">                        &lt;/jvmFlags&gt;</span><br><span class="line">                        &lt;ports&gt;</span><br><span class="line">                            &lt;port&gt;9999&lt;/port&gt;</span><br><span class="line">                        &lt;/ports&gt;</span><br><span class="line">                        &lt;!-- 这里用于配置默认执行的profile,可以不用配置,在docker启动命令中配置 --&gt;</span><br><span class="line">                        &lt;!--args&gt;</span><br><span class="line">                            &lt;arg&gt;prod&lt;/arg&gt;</span><br><span class="line">                        &lt;/args--&gt;</span><br><span class="line">                    &lt;/container&gt;</span><br><span class="line">                &lt;/configuration&gt;</span><br><span class="line">            &lt;/plugin&gt;</span><br><span class="line">        &lt;/plugins&gt;</span><br><span class="line">    &lt;/build&gt;</span><br><span class="line">&lt;profile&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="构建并上传images"><a href="#构建并上传images" class="headerlink" title="构建并上传images"></a>构建并上传images</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mvn package</span><br></pre></td></tr></table></figure>
+<h3 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull [镜像名称]</span><br><span class="line">$ docker run -ti --network host --name [容器名称] -v /store/logs:/store/logs -p 9999:9999 -d [镜像名称] [指定profile]</span><br></pre></td></tr></table></figure>
+<h3 id="结合Ansible-Scripts"><a href="#结合Ansible-Scripts" class="headerlink" title="结合Ansible Scripts"></a>结合Ansible Scripts</h3><h4 id="配置ansible脚本"><a href="#配置ansible脚本" class="headerlink" title="配置ansible脚本"></a>配置ansible脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /opt/ansible-biz/roles/monitor/tasks</span><br><span class="line">$ cd /opt/ansible-biz</span><br><span class="line">$ vim site.yml</span><br><span class="line">- name: deploy proxy</span><br><span class="line">  hosts: all</span><br><span class="line">  gather_facts: false</span><br><span class="line">  roles:</span><br><span class="line">    - &#123;role: monitor, tags: &quot;monitor&quot;&#125;</span><br><span class="line">$ vim hosts</span><br><span class="line">[product]</span><br><span class="line">xxyp-dev ansible_host=192.168.1.222 ansible_port=22</span><br><span class="line">$ vim /opt/ansible-biz/roles/monitor/tasks/main.yml</span><br><span class="line">- pip:</span><br><span class="line">    name: docker-py</span><br><span class="line">    state: present</span><br><span class="line">- name: Pull monitor image</span><br><span class="line">  docker_image:</span><br><span class="line">    name: registry.cn-hangzhou.aliyuncs.com/yuanshi/monitor</span><br><span class="line">    tag: v1.0.0</span><br><span class="line">    force: yes</span><br><span class="line">- name: Restart monitor container</span><br><span class="line">  docker_container:</span><br><span class="line">    name: operation</span><br><span class="line">    image: registry.cn-hangzhou.aliyuncs.com/yuanshi/monitor:v1.0.0</span><br><span class="line">    network_mode: host</span><br><span class="line">    volumes:</span><br><span class="line">      - /store/logs:/store/logs</span><br><span class="line">    exposed_ports:</span><br><span class="line">      - 9082</span><br><span class="line">    recreate: yes</span><br><span class="line">    command: &quot;&#123;&#123; profile &#125;&#125;&quot;</span><br><span class="line">#    env:</span><br><span class="line">#      zooCluster=&quot;&#123;&#123; zooCluster &#125;&#125;&quot;</span><br><span class="line">    restart_policy: always</span><br><span class="line">    state: started</span><br></pre></td></tr></table></figure>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p><code>$ ansible-playbook -i hosts -e profile=prod sity.yml</code></p>
+<h2 id="Expend-Study"><a href="#Expend-Study" class="headerlink" title="Expend Study"></a>Expend Study</h2><p>使用alpine镜像或distroless镜像作为基础构建镜像.</p>
+<h2 id="Reference-Resources"><a href="#Reference-Resources" class="headerlink" title="Reference Resources"></a>Reference Resources</h2><ul>
+<li><a href="[GoogleContainerTools](https://github.com/GoogleContainerTools">Github Jib</a>/jib)</li>
+<li><a href="https://www.youtube.com/watch?v=H6gR_Cv4yWI" target="_blank" rel="noopener">Jib介绍视屏</a></li>
+<li><a href="https://cloudplatform.googleblog.com/2018/07/introducing-jib-build-java-docker-images-better.html" target="_blank" rel="noopener">Jib Blog</a></li>
+<li><a href="https://speakerdeck.com/coollog/build-containers-faster-with-jib-a-google-image-build-tool-for-java-applications" target="_blank" rel="noopener">Jib PPT</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/05/zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/09/05/zookeeper/" itemprop="url">zookeeper学习视图</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-05T22:13:31+08:00">
+                2018-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  84
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="https://ws4.sinaimg.cn/large/0069RVTdgy1fuz15j25jpj30os0ergmp.jpg" alt="Zookeeper技术视图"></p>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>上面这个视图,就是我对zookeeper需要学习知识的总结.我也将按照这个方式记录自己学习的内容.</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">官网</a></li>
+<li>书籍:《从Paxos到ZooKeeper》</li>
+</ul>
+<h2 id="服务端部署"><a href="#服务端部署" class="headerlink" title="服务端部署"></a>服务端部署</h2><h3 id="常规部署"><a href="#常规部署" class="headerlink" title="常规部署"></a>常规部署</h3><h3 id="docker部署"><a href="#docker部署" class="headerlink" title="docker部署"></a>docker部署</h3><h3 id="ansible-playbook部署"><a href="#ansible-playbook部署" class="headerlink" title="ansible-playbook部署"></a>ansible-playbook部署</h3><h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><h3 id="ZKClient"><a href="#ZKClient" class="headerlink" title="ZKClient"></a>ZKClient</h3><h3 id="Curator"><a href="#Curator" class="headerlink" title="Curator"></a>Curator</h3><h2 id="ZAB"><a href="#ZAB" class="headerlink" title="ZAB"></a>ZAB</h2><h2 id="典型应用场景"><a href="#典型应用场景" class="headerlink" title="典型应用场景"></a>典型应用场景</h2><h2 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h2><h2 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h2>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/29/docker实战之zookeeper集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/29/docker实战之zookeeper集群/" itemprop="url">docker实战之zookeeper集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-29T10:11:16+08:00">
+                2018-08-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  700
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>centos7</li>
+<li>zookeeper 3.4.12</li>
+<li>docker 18.03.1-ce</li>
+</ul>
+<h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>基于docker创建zookeeper集群.</p>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>开始之前,先梳理下几个关键问题:</p>
+<ul>
+<li>zookeeper的配置文件、日志、数据文件需要映射到宿主机中</li>
+<li>docker hub中提供的镜像,其在容器中zookeeper的路径(需查阅<a href="https://github.com/31z4/zookeeper-docker/blob/0e558d7a6df4031a6be7c1df4ba1e2367666d004/3.4.12/Dockerfile" target="_blank" rel="noopener">dockerfile文件</a>)</li>
+</ul>
+<h3 id="Pull-Image"><a href="#Pull-Image" class="headerlink" title="Pull Image"></a>Pull Image</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull zookeeper:3.4.12</span><br></pre></td></tr></table></figure>
+<h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="create-persistent-directory"><a href="#create-persistent-directory" class="headerlink" title="create persistent directory"></a>create persistent directory</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 创建数据持久目录、日志目录、启动配置文件目录</span><br><span class="line">$ mkdir -p &#123;/opt/zookeeper/conf,/data/zookeeper,/data/logs/zookeeper&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="create-zoo-cfg、myid"><a href="#create-zoo-cfg、myid" class="headerlink" title="create zoo.cfg、myid"></a>create zoo.cfg、myid</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 这里看需要多少节点的集群,配置文件有适当调整,这里以三台为例.</span><br><span class="line">$ vim /opt/zookeeper/conf/zoo.cfg</span><br><span class="line">tickTime=2000</span><br><span class="line">initLimit=10</span><br><span class="line">syncLimit=5</span><br><span class="line">dataDir=/data</span><br><span class="line">dataLogDir=/datalog</span><br><span class="line">clientPort=20181</span><br><span class="line">server.1=58.221.62.131:2888:3888</span><br><span class="line">server.2=58.221.61.57:2888:3888    </span><br><span class="line">server.3=58.221.61.62:2888:3888</span><br><span class="line"># 对应机器,都需要myid文件里的值不能重复.</span><br><span class="line">$ echo 1 &gt; /data/zookeeper/myid</span><br></pre></td></tr></table></figure>
+<h3 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"># 每台机器分别启动,注意替换--name的值</span><br><span class="line">$ docker run -ti --restart always -d \</span><br><span class="line">-v /opt/zookeeper/conf/zoo.cfg:/conf/zoo.cfg \</span><br><span class="line">-v /data/zookeeper:/data \</span><br><span class="line">-v /data/logs/zookeeper:/datalog \</span><br><span class="line">--network host \</span><br><span class="line">--name zoo1 \</span><br><span class="line">zookeeper:3.4.12</span><br><span class="line"># 如果使用--network host参数,则不需要映射端口</span><br><span class="line">-p 20181:20181 \</span><br><span class="line">-p 2888:2888 \</span><br><span class="line">-p 3888:3888 \</span><br><span class="line"># 查询容器日志,需要全部启动才不会报错.</span><br><span class="line">$ docker logs -t zoo1</span><br><span class="line"># 查看集群,stat</span><br><span class="line">$ telnet 58.221.62.131 20181</span><br><span class="line">Trying 58.221.61.57...</span><br><span class="line">Connected to 58.221.61.57.</span><br><span class="line">Escape character is &apos;^]&apos;.</span><br><span class="line">stat # 输入</span><br><span class="line">Zookeeper version: 3.4.12-e5259e437540f349646870ea94dc2658c4e44b3b, built on 03/27/2018 03:55 GMT</span><br><span class="line">Clients:</span><br><span class="line"> /58.221.62.131:52061[0](queued=0,recved=1,sent=0)</span><br><span class="line"></span><br><span class="line">Latency min/avg/max: 0/2/17</span><br><span class="line">Received: 16</span><br><span class="line">Sent: 15</span><br><span class="line">Connections: 1</span><br><span class="line">Outstanding: 0</span><br><span class="line">Zxid: 0x100000bb0</span><br><span class="line">Mode: follower</span><br><span class="line">Node count: 1009</span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"></span><br><span class="line"># 以下只做记录,不会出现这种问题.可用于其他docker容器启动报错排查参考.</span><br><span class="line">mkdir: can&apos;t create directory &apos;/opt/&apos;: Permission denied</span><br><span class="line"># 查看容器使用用户</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;whoami &amp;&amp; id&quot;</span><br><span class="line"># 查询容器中zookeeper目录权限</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;ls -la&quot;</span><br><span class="line">......</span><br><span class="line">drwxr-xr-x 2 zookeepe zookeepe 4096 Jun 12 01:28 bin</span><br><span class="line">-rw-rw-r-- 1 zookeepe zookeepe 87945 Mar 27 04:32 build.xml</span><br><span class="line">drwxr-xr-x 2 zookeepe zookeepe 6 Jun 12 01:28 conf</span><br><span class="line">....</span><br><span class="line"># 查询容器启动用户id</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;cat /etc/passwd | grep zookeeper&quot;</span><br><span class="line">zookeeper:x:1000:1000:Linux User,,,:/home/zookeeper:</span><br><span class="line"># 修改目录权限所属用户</span><br><span class="line">$ chown -R 1000:1000 /opt/zookeeper</span><br></pre></td></tr></table></figure>
+<h3 id="Don’t-Forget"><a href="#Don’t-Forget" class="headerlink" title="Don’t Forget"></a>Don’t Forget</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 防火墙添加端口</span><br><span class="line">## zookeeper访问端口,和配置文件中的clientPort一致</span><br><span class="line">$ firewall-cmd --add-port=20181/tcp --permanent</span><br><span class="line">$ firewall-cmd --add-port=2888/tcp --permanent</span><br><span class="line">$ firewall-cmd --add-port=3888/tcp --permanent</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+<h2 id="Use-Ansible-playbook"><a href="#Use-Ansible-playbook" class="headerlink" title="Use Ansible-playbook"></a>Use Ansible-playbook</h2><p>待完成</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="docker-zookeeper"><a href="#docker-zookeeper" class="headerlink" title="docker zookeeper"></a><a href="https://hub.docker.com/_/zookeeper/" target="_blank" rel="noopener">docker zookeeper</a></h3><h3 id="Docker部署Zookeeper集群"><a href="#Docker部署Zookeeper集群" class="headerlink" title="Docker部署Zookeeper集群"></a><a href="https://www.waitig.com/docker%E9%83%A8%E7%BD%B2zookeeper%E9%9B%86%E7%BE%A4.html" target="_blank" rel="noopener">Docker部署Zookeeper集群</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/27/Spring-boot之Actuator理解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1632,7 +2517,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  476
+                  2,888
                 </span>
               
 
@@ -1648,7 +2533,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  14
                 </span>
               
             </div>
@@ -1671,990 +2556,176 @@
       
         
           
-            <h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><p>First, it is important to understand that GlusterFS isn’t really a filesystem in and of itself. It concatenates existing filesystems into one (or more) big chunks so that data being written into or read out of Gluster gets distributed across multiple hosts simultaneously. This means that you can use space from any host that you have available. Typically, XFS is recommended but it can be used with other filesystems as well. Most commonly EXT4 is used when XFS isn’t, but you can (and many, many people do) use another filesystem that suits you. Now that we understand that, we can define a few of the common terms used in Gluster.</p>
-<ul>
-<li>A <strong>trusted pool</strong> refers collectively to the hosts in a given Gluster Cluster.</li>
-<li>A <strong>node</strong> or “server” refers to any server that is part of a trusted pool. In general, this assumes all nodes are in the same trusted pool.</li>
-<li>A <strong>brick</strong> is used to refer to any device (really this means filesystem) that is being used for Gluster storage.</li>
-<li>An <strong>export</strong> refers to the mount path of the brick(s) on a given server, for example, /export/brick1</li>
-<li>The term <strong>Global Namespace</strong> is a fancy way of saying a Gluster volume</li>
-<li>A <strong>Gluster volume</strong> is a collection of one or more bricks (of course, typically this is two or more). This is analogous to /etc/exports entries for NFS.</li>
-<li><strong>GNFS</strong> and <strong>kNFS</strong>. GNFS is how we refer to our inline NFS server. kNFS stands for kernel NFS, or, as most people would say, just plain NFS. Most often, you will want kNFS services disabled on the Gluster nodes. Gluster NFS doesn’t take any additional configuration and works just like you would expect with NFSv3. It is possible to configure Gluster and NFS to live in harmony if you want to.</li>
-</ul>
-<p>Other notes:</p>
-<ul>
-<li>For this test, if you do not have DNS set up, you can get away with using /etc/hosts entries for the two nodes. However, when you move from this basic setup to using Gluster in production, correct DNS entries (forward and reverse) and NTP are essential.</li>
-<li>When you install the Operating System, do not format the Gluster storage disks! We will use specific settings with the mkfs command later on when we set up Gluster. If you are testing with a single disk (not recommended), make sure to carve out a free partition or two to be used by Gluster later, so that you can format or reformat at will during your testing.</li>
-<li>Firewalls are great, except when they aren’t. For storage servers, being able to operate in a trusted environment without firewalls can mean huge gains in performance, and is recommended. In case you absolutely need to set up a firewall, have a look at <a href="https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/" target="_blank" rel="noopener">Setting up clients</a>for information on the ports used.</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/20/Gluster安装/" itemprop="url">Gluster安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T09:17:43+08:00">
-                2018-08-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  575
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
-<li>Centos 7</li>
-<li>Gluster 4.1</li>
-</ul>
-<p>使用三台机器配置.</p>
-<p>192.168.1.100 server1</p>
-<p>192.168.1.101 server2</p>
-<p>192.168.1.102 server3</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>kubernetes的持久化需要使用gluster.这里基于Centos提供的Quick-Start教程验证后的记录.</p>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><h3 id="Add-Yum-Repository"><a href="#Add-Yum-Repository" class="headerlink" title="Add Yum Repository"></a>Add Yum Repository</h3><p>添加gluster下载仓库</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install centos-release-gluster</span><br></pre></td></tr></table></figure>
-<h3 id="Use-XFS"><a href="#Use-XFS" class="headerlink" title="Use XFS"></a>Use XFS</h3><p>推荐使用XFS文件系统,这里我还是使用exts4,没有重新格式化文件系统.</p>
-<h3 id="Install-Gluster-And-Start"><a href="#Install-Gluster-And-Start" class="headerlink" title="Install Gluster And Start"></a>Install Gluster And Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ yum install glusterfs-server</span><br><span class="line">$ systemctl enable glusterd &amp;&amp; systemctl start glusterd</span><br></pre></td></tr></table></figure>
-<h3 id="Set-Firewalld"><a href="#Set-Firewalld" class="headerlink" title="Set Firewalld"></a>Set Firewalld</h3><p>防火墙配置ip级别允许规则,默认是24007端口,但是每增加bricks都会新增监听端口,所以需要配置ip级别的许可.</p>
-<p>centos7已经使用firewalld.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 允许指定ip.我使用三台机器做测试,每台机器要配置另外两台服务器的ip.</span><br><span class="line">$ firewall-cmd --permanent --add-rich-rule=&quot;rule family=&apos;ipv4&apos; source address=&apos;192.168.1.101&apos; accept&quot;</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
-<h3 id="Set-Trusted-Pool"><a href="#Set-Trusted-Pool" class="headerlink" title="Set Trusted Pool"></a>Set Trusted Pool</h3><p>这里使用的三台机器,在server1将server2和server3添加到Trust Pool.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># /etc/hosts需要配置映射.</span><br><span class="line">$ gluster peer probe server2</span><br><span class="line">$ gluster peer probe server3</span><br></pre></td></tr></table></figure>
-<h3 id="Create-a-Volume"><a href="#Create-a-Volume" class="headerlink" title="Create a Volume"></a>Create a Volume</h3><p>在三台服务器上分别创建/bricks/brick1/gv0目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
-<p>挂载目录到gluster上.(任意节点执行命令)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 这里选择的replicas模式,保证数据丢失,其他模式不在这里讨论.</span><br><span class="line">$ gluster volume create gv0 replica 3 server1:/bricks/brick1/gv0 server2:/bricks/brick1/gv0 server3:/bricks/brick1/gv0</span><br><span class="line">$ gluster volume start gv0</span><br></pre></td></tr></table></figure>
-<p>查看volume信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Replicate</span><br><span class="line">Volume ID: 5835a014-b598-467d-ba34-3301d6730d6f</span><br><span class="line">Status: Started</span><br><span class="line">Snapshot Count: 0</span><br><span class="line">Number of Bricks: 1 x 3 = 3</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/bricks/brick1/gv0</span><br><span class="line">Brick2: server2:/bricks/brick1/gv0</span><br><span class="line">Brick3: server3:/bricks/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">transport.address-family: inet</span><br><span class="line">nfs.disable: on</span><br><span class="line">performance.client-io-threads: off</span><br></pre></td></tr></table></figure>
-<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 将server1:/gv0 挂在到/mnt目录</span><br><span class="line">$ mount -t glusterfs server1:/gv0 /mnt</span><br><span class="line"># 生成100个copy-test的文件</span><br><span class="line">$ for i in `seq -w 1 100`; do cp -rp /var/log/messages /mnt/copy-test-$i; done</span><br><span class="line"># 在三台机器上查看是否都有100个文件.</span><br><span class="line">$ ls -lA /bricks/brick1/gv0</span><br></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>推荐部署机器为奇数,不然会出现脑裂现象.(猜测使用了poxis算法)</li>
-<li>gluster推荐使用<a href="https://zh.wikipedia.org/wiki/XFS" target="_blank" rel="noopener">xfs文件系统</a>,centos/Red Hat Enterprise Linux 7默认使用,创建系统时可能可能没有指定.</li>
-</ul>
-<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><ul>
-<li><a href="http://xiaqunfeng.cc/2017/07/06/XFS-vs-EXT4/" target="_blank" rel="noopener">XFS vs EXT4</a></li>
-<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-xfs" target="_blank" rel="noopener">THE XFS FILE SYSTEM</a></li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="gluster-Quickstart"><a href="#gluster-Quickstart" class="headerlink" title="gluster-Quickstart"></a><a href="https://wiki.centos.org/SpecialInterestGroup/Storage/gluster-Quickstart" target="_blank" rel="noopener">gluster-Quickstart</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/" itemprop="url">Kubernetes Pods指定镜像仓库</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-15T22:49:52+08:00">
-                2018-08-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  521
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>在创建pod时,image是从哪个仓库下载?应该如何指定公司的Regitry?最佳实践是什么?带着这些问题,记录自己的爬坑经历.</p>
-<h2 id="镜像建议"><a href="#镜像建议" class="headerlink" title="镜像建议"></a>镜像建议</h2><ul>
-<li>对每个镜像都指定明确的版本号(不要使用latest这样的版本号),减少去镜像仓库拉取的消耗.(可以学习kube的api,版本为X.Y.Z. X is the major version, Y is the minor version, and Z is the patch version) </li>
-</ul>
-<h2 id="使用镜像私仓"><a href="#使用镜像私仓" class="headerlink" title="使用镜像私仓"></a>使用镜像私仓</h2><ul>
-<li><p>使用私仓时,需要配置认证信息.</p>
+            <p><img src="https://ws4.sinaimg.cn/large/0069RVTdgy1fuzxicxxpzj30jx08rq3v.jpg" alt="Gluster技术视图"></p>
+<h2 id="Notice"><a href="#Notice" class="headerlink" title="Notice"></a>Notice</h2><ul>
+<li><p>Recommend use XFS filesystem.</p>
+<p>○  Typically, XFS is recommended but it can be used with other filesystems as well. Most commonly EXT4 is used when XFS isn’t, but you can (and many, many people do) use another filesystem that suits you. </p>
+<p>☆ 推荐使用XFS文件系统.EXT4等其他文件系统也是可以.</p>
 </li>
-<li><p>pod中指定私仓优先级高于node指定私仓.</p>
+<li><p>Correct DNS entries (forward and reverse) and NTP are essential.</p>
+<p>☆ DNS一般不需要特殊配置,采用默认即可.NTP,就是要求每台机器的时钟进行校对,节点机器都在同一个时区,并校对.校对方式很多,使用一致的即可.</p>
+</li>
+<li><p>Firewalls are great, except when they aren’t.In case you absolutely need to set up a firewall, have a look at <a href="https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/" target="_blank" rel="noopener">Setting up clients</a> for information on the ports used.</p>
+<p>☆ 不建议Gluster节点之间开启防火墙.如果实在有必要开启防火墙,我是配置IP级别的,这样可以减少一些复杂度.</p>
+</li>
+<li><p>2 CPU’s, 2GB of RAM, 1GBE(千兆带宽)</p>
+<p>☆ 服务端配置至少需要这种配置</p>
 </li>
 </ul>
-<h3 id="在node节点中配置-推荐"><a href="#在node节点中配置-推荐" class="headerlink" title="在node节点中配置(推荐)"></a>在node节点中配置(推荐)</h3><ul>
-<li>与在每个pod中使用ImagePullSecrets相比,少了重复的配置代码.</li>
-</ul>
-<h4 id="配置认证信息"><a href="#配置认证信息" class="headerlink" title="配置认证信息"></a>配置认证信息</h4><ul>
-<li>docker添加私仓认证信息,可参考<a href="https://docs.docker.com/engine/reference/commandline/login/#provide-a-password-using-stdin" target="_blank" rel="noopener">这里</a></li>
-</ul>
-<p>一般使用docker时,默认都是从docker hub上拉取镜像.正常拉取是不需要认证信息的,但在上传时需要认证信息.</p>
-<p>在每个节点上配置登录认证信息.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 默认docker hub的地址是:https://index.docker.io/v1</span><br><span class="line">$ echo [密码] | docker login --username [用户名] --password-stdin [私仓服务器地址]</span><br><span class="line"># 认证后,会在$HOME/.docker/下生成config.json文件.如果指定退出则会删除该文件.</span><br></pre></td></tr></table></figure>
-<h4 id="认证信息优先级"><a href="#认证信息优先级" class="headerlink" title="认证信息优先级"></a>认证信息优先级</h4><ul>
-<li>{–root-dir:-/var/lib/kubelet}/config.json </li>
-</ul>
-<p>默认config.json不存在</p>
-<ul>
-<li>{cwd of kubelet}/config.json </li>
-</ul>
-<p>指定kubelet的工作空间路径,这种方式暂不考虑.</p>
-<ul>
-<li>${HOME}/.docker/config.json </li>
-</ul>
-<p>默认config.json是不存在的</p>
-<ul>
-<li>/.docker/config.json</li>
-</ul>
-<p>默认该目录不存在</p>
-<h3 id="在pod中指定ImagePullSecrets"><a href="#在pod中指定ImagePullSecrets" class="headerlink" title="在pod中指定ImagePullSecrets"></a>在pod中指定ImagePullSecrets</h3><h4 id="创建secret"><a href="#创建secret" class="headerlink" title="创建secret"></a>创建secret</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 实际上在pull镜像时创建一个虚拟的.docker/config.json文件.</span><br><span class="line">$ kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL</span><br></pre></td></tr></table></figure>
-<h4 id="pod中使用imagePulSecrets"><a href="#pod中使用imagePulSecrets" class="headerlink" title="pod中使用imagePulSecrets"></a>pod中使用imagePulSecrets</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apiVersion: apps/v1 # 可以使用kubectl api-versions确定指定的版本</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: foo</span><br><span class="line">  namespace: awesomeapps</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: foo</span><br><span class="line">      image: janedoe/awesomeapp:v1</span><br><span class="line">  imagePullSecrets:</span><br><span class="line">    - name: myregistryke</span><br></pre></td></tr></table></figure>
-<p>以上两种方式,可以结合使用,建议每台node上都先配置认证信息,有需要再使用第二种方式.</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><h3 id="Images"><a href="#Images" class="headerlink" title="Images"></a><a href="https://kubernetes.io/docs/concepts/containers/images/" target="_blank" rel="noopener">Images</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/12/kubernetes之pause容器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/12/kubernetes之pause容器/" itemprop="url">kubernetes之pause容器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T22:29:12+08:00">
-                2018-08-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  408
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?<br>docker容器实际是利用Linux的namespace和cgroup达到容器化的目的.</p>
-<h2 id="Two-feature-of-Linux-kernel"><a href="#Two-feature-of-Linux-kernel" class="headerlink" title="Two feature of Linux kernel"></a>Two feature of Linux kernel</h2><p>linux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行隔离.<br>打个比方,就像你去买商品房,每套都是用混泥土墙隔开,保证别人不会闯到你家.这个可以类比为cgroup,而cgroup就是linux对机器的物理资源(cpu,内存,磁盘io)的隔离.买完了房子,那产权当然是属于你,而不是别人(可能有小三),另外,住进去后你要用水、用电、用网络,对其他人也一样,但是每户各自结算,这就像linux环境中的user namespace、network namespace等,属于环境的隔离.<br>由于能力有限,只能先这么去理解.这里罗列左耳朵耗子的文章.</p>
-<ul>
-<li><a href="https://coolshell.cn/articles/17010.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（上）</a></li>
-<li><a href="https://coolshell.cn/articles/17029.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（下）</a></li>
-<li><a href="https://coolshell.cn/articles/17049.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX CGROUP</a></li>
-</ul>
-<h2 id="AUFS-、DEVICEMAPPER"><a href="#AUFS-、DEVICEMAPPER" class="headerlink" title="AUFS 、DEVICEMAPPER"></a>AUFS 、DEVICEMAPPER</h2><p>对于这两个的理解,AUFS是文件管理系统,用于对文件进行分层.<br>具体可以看耗子叔的这两篇文章.<br><a href="https://coolshell.cn/articles/17061.html" target="_blank" rel="noopener">DOCKER基础技术：AUFS</a><br><a href="https://coolshell.cn/articles/17200.html" target="_blank" rel="noopener">DOCKER基础技术：DEVICEMAPPER</a></p>
-<h2 id="Pause"><a href="#Pause" class="headerlink" title="Pause"></a>Pause</h2><p>In Kubernetes, the pause container serves as the “parent container” for all of the containers in your pod. The pause container has two core responsibilities. First, it serves as the basis of Linux namespace sharing in the pod. And second, with PID (process ID) namespace sharing enabled, it serves as PID 1 for each pod and reaps zombie processes.<br>对于pause的理解</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="What-are-Kubernetes-Pods-Anyway"><a href="#What-are-Kubernetes-Pods-Anyway" class="headerlink" title="What are Kubernetes Pods Anyway?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">What are Kubernetes Pods Anyway?</a></h3><h3 id="The-Almighty-Pause-Container"><a href="#The-Almighty-Pause-Container" class="headerlink" title="The Almighty Pause Container"></a><a href="https://www.ianlewis.org/en/almighty-pause-container" target="_blank" rel="noopener">The Almighty Pause Container</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/11/kubernetes常见问题汇总/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/11/kubernetes常见问题汇总/" itemprop="url">kubernetes常见问题汇总</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T21:25:08+08:00">
-                2018-08-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  144
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="报错-etc-kubernetes-pki-ca-crt-already-exists"><a href="#报错-etc-kubernetes-pki-ca-crt-already-exists" class="headerlink" title="报错:/etc/kubernetes/pki/ca.crt already exists"></a>报错:/etc/kubernetes/pki/ca.crt already exists</h3><ul>
-<li><p>错误描述<br>在node节点操作kubeadm join时报出的错误.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[preflight] Running pre-flight checks.</span><br><span class="line">        [WARNING FileExisting-crictl]: crictl not found in system path</span><br><span class="line">[preflight] Some fatal errors occurred:</span><br><span class="line">        [ERROR Port-10250]: Port 10250 is in use</span><br><span class="line">        [ERROR DirAvailable--etc-kubernetes-manifests]: /etc/kubernetes/manifests is not empty</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-kubelet.conf]: /etc/kubernetes/kubelet.conf already exists</span><br><span class="line">[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`</span><br></pre></td></tr></table></figure>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><h3 id="Gluster-Native-Client"><a href="#Gluster-Native-Client" class="headerlink" title="Gluster Native Client"></a>Gluster Native Client</h3><p>○ The Gluster Native Client is a FUSE-based client running in user space. Gluster Native Client is the recommended method for accessing volumes when high concurrency and high write performance is required.</p>
+<p>☆ 推荐使用这种方式,其基于内核提供的FUSE,在高并发、大数据量写入时效果更好.</p>
+<h3 id="NFS-Client"><a href="#NFS-Client" class="headerlink" title="NFS Client"></a>NFS Client</h3><h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><h3 id="What"><a href="#What" class="headerlink" title="What"></a>What</h3><p>○  GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.</p>
+<p>GlusterFS isn’t really a filesystem in and of itself. It concatenates existing filesystems into one (or more) big chunks so that data being written into or read out of Gluster gets distributed across multiple hosts simultaneously</p>
+<p>☆ Gluster是一个开源的、可扩展的、分布式数据存储管理软件.其并不是一个文件系统,只是提供连接能力,将分布的文件系统组装成一个更大的文件存储系统.</p>
+<h3 id="Concept"><a href="#Concept" class="headerlink" title="Concept"></a>Concept</h3><ul>
+<li><p>TSP</p>
+<p>○  A trusted storage pool(TSP) is a trusted network of storage servers. Before you can configure a GlusterFS volume, you must create a trusted storage pool of the storage servers that will provide bricks to the volume by peer probing the servers. The servers in a TSP are peers of each other.</p>
+<p>☆ Gluster通过TSP(信任存储池)来确定可提供存储服务的机器有哪些.</p>
 </li>
-<li><p>解决方案:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubeadm reset</span><br><span class="line"># 再次执行kubeadm join</span><br><span class="line">$ kubeadm join &lt;ip&gt;:&lt;port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;*******&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>Brick</p>
+<p>○  A brick is used to refer to any device (really this means filesystem) that is being used for Gluster storage.</p>
+<p>☆ Gluster使用的存储单位.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick对Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
+</li>
+<li><p>Gluster volume</p>
+<p>○  A <strong>Gluster volume</strong> is a collection of one or more bricks (of course, typically this is two or more). This is analogous(类似的) to /etc/exports entries for NFS.</p>
+<p>☆ Brick的集合.</p>
+</li>
+<li><p>Global Namespace</p>
+<p>○  The term <strong>Global Namespace</strong> is a fancy way of saying a Gluster volume.</p>
+<p>☆ 对Cluster volume的另一种叫法.</p>
+</li>
+<li><p>Export</p>
+<p>○  An <strong>export</strong> refers to the mount path of the brick(s) on a given server, for example, /export/brick1.</p>
+<p>☆ 暂时不能理解,待补充.</p>
+</li>
+<li><p><strong>GNFS</strong> and <strong>kNFS</strong></p>
+<p>○  GNFS is how we refer to our inline NFS server. kNFS stands for kernel NFS, or, as most people would say, just plain NFS. Most often, you will want kNFS services disabled on the Gluster nodes. Gluster NFS doesn’t take any additional configuration and works just like you would expect with NFSv3. It is possible to configure Gluster and NFS to live in harmony if you want to.</p>
+<p>☆ Gluster内部的NFS服务,启动好Glusterd Daemon后,通过GNFS其他Gluster进行数据交互.kNFS是Linux系统内核的NFS服务.两者不会互相干扰,可以共同使用.</p>
+</li>
 </ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/09/kubernetes之master搭建/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/09/kubernetes之master搭建/" itemprop="url">kubernetes之master搭建.md</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-09T22:19:25+08:00">
-                2018-08-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,194
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  6
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境: centos7, kubernetes 1.11.2, docker-ce-17.03.2.ce</li>
+<h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p>Centos系统可参考&lt;&lt;Gluster安装&gt;&gt;.<a href="https://docs.gluster.org/en/latest/Install-Guide/Install/" target="_blank" rel="noopener">其他系统安装</a>.</p>
+<h3 id="System-Packaged-version"><a href="#System-Packaged-version" class="headerlink" title="System Packaged version"></a>System Packaged version</h3><p>各系统的安装包版本及依赖包.<a href="https://docs.gluster.org/en/latest/Install-Guide/Community_Packages/" target="_blank" rel="noopener">Packages</a></p>
+<h3 id="Manage-Trust-Storage-Pool"><a href="#Manage-Trust-Storage-Pool" class="headerlink" title="Manage Trust Storage Pool"></a>Manage Trust Storage Pool</h3><p>○  The firewall on the servers must be configured to allow access to port 24007.</p>
+<p>☆ 存储节点使用24007端口进行通信</p>
+<p>假设有4台机器,server1,server2,server3,server4在一个TSP中.</p>
+<h4 id="Add-to-trust-storage-pool"><a href="#Add-to-trust-storage-pool" class="headerlink" title="Add to trust storage pool"></a>Add to trust storage pool</h4><p>在任意一台机器上机器上执行.</p>
+<ul>
+<li>gluster peer probe <server></server></li>
 </ul>
-<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>Kubernetes对于Master机器的配置最低的要求是2G内存和2 Core CPU.<br>使用kubeadm来安装master cluster.</p>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>1个master,2个node<br>k8s-master-1<br>192.168.1.100<br>k8s-node-1<br>192.168.1.101<br>k8s-node-2<br>192.168.1.102</p>
-<h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="端口检查"><a href="#端口检查" class="headerlink" title="端口检查"></a>端口检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># Master node(s)</span><br><span class="line">Protocol Direction Port Range Purpose</span><br><span class="line">TCP Inbound 6443* Kubernetes API server</span><br><span class="line">TCP Inbound 2379-2380 etcd server client API</span><br><span class="line">TCP Inbound 10250 Kubelet API</span><br><span class="line">TCP Inbound 10251 kube-scheduler</span><br><span class="line">TCP Inbound 10252 kube-controller-manager</span><br><span class="line">TCP Inbound 10255 Read-only Kubelet API</span><br><span class="line"># Worker node(s)</span><br><span class="line">Protocol Direction Port Range Purpose</span><br><span class="line">TCP Inbound 10250 Kubelet API</span><br><span class="line">TCP Inbound 10255 Read-only Kubelet API</span><br><span class="line">TCP Inbound 30000-32767 NodePort Services**</span><br></pre></td></tr></table></figure>
-<h4 id="环境调整"><a href="#环境调整" class="headerlink" title="环境调整"></a>环境调整</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 关闭SELinux(临时)</span><br><span class="line">$ setenforce 0</span><br><span class="line"># 永久关闭SELinux</span><br><span class="line">$ vim /etc/selinux/config</span><br><span class="line">SELINUX=disabled</span><br><span class="line"># 关闭swap</span><br><span class="line">$ swapoff -a</span><br><span class="line"># 添加kubernetes的yum仓库,这里使用阿里云的.</span><br><span class="line">$ vim /etc/yum.repos.d/kubernetes.repo</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line">repo_gpgcheck=0</span><br><span class="line">gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg</span><br><span class="line">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br></pre></td></tr></table></figure>
-<h4 id="设置hosts"><a href="#设置hosts" class="headerlink" title="设置hosts"></a>设置hosts</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/hosts</span><br><span class="line">192.1.1.100 k8s-master-1 </span><br><span class="line">192.1.1.100 k8s-node-1 </span><br><span class="line">192.1.1.100 k8s-node-2</span><br></pre></td></tr></table></figure>
-<h3 id="Install-kubeadm-kubectl-kubelet"><a href="#Install-kubeadm-kubectl-kubelet" class="headerlink" title="Install kubeadm kubectl kubelet"></a>Install kubeadm kubectl kubelet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y kubeadm kubectl kubelet</span><br></pre></td></tr></table></figure>
-<h3 id="Install-Docker"><a href="#Install-Docker" class="headerlink" title="Install Docker"></a>Install Docker</h3><p>kubernetes v1.11.2建议是用的docker版本是17.03版本,这里安装过程忽略.</p>
-<h3 id="下载k8s相关镜像"><a href="#下载k8s相关镜像" class="headerlink" title="下载k8s相关镜像"></a>下载k8s相关镜像</h3><p>由于在使用kubeadm init时,下载的镜像从k8s.gcr.io上下载,国内网络被墙了,这边只能曲线救国.</p>
-<p>利用docker hub做中转(因为docker hub是在国外的).</p>
-<p>具体操作是先在github上创建相关的Docekrfile,然后再在docker hub上创建auto build仓库.最后从自己的docker hub仓库下载镜像后,重命名为k8s.gcr.io/kube-scheduler-amd64:v1.11.2等即可.</p>
-<p>这里有个镜像拉取脚本.</p>
-<p>(注意:v1.11版本以后,DNS服务使用coredns:1.1.3,不再使用k8s-dns相关容器,即k8s-dns-sidecar,k8s-dns-kube-dns,k8s-dns-dnsmasq)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">images=(</span><br><span class="line">  kube-proxy-amd64:v1.11.2</span><br><span class="line">  kube-scheduler-amd64:v1.11.2</span><br><span class="line">  kube-controller-manager-amd64:v1.11.2</span><br><span class="line">  kube-apiserver-amd64:v1.11.2</span><br><span class="line">  etcd-amd64:3.2.18</span><br><span class="line">  pause:3.1</span><br><span class="line">  kubernetes-dashboard-amd64:v1.8.3</span><br><span class="line">  k8s-dns-sidecar-amd64:1.14.8</span><br><span class="line">  k8s-dns-kube-dns-amd64:1.14.8</span><br><span class="line">  k8s-dns-dnsmasq-nanny-amd64:1.14.8</span><br><span class="line">  coredns:1.1.3</span><br><span class="line">)</span><br><span class="line">for imageName in $&#123;images[@]&#125; ; do</span><br><span class="line">  docker pull jilingjun1014/$imageName</span><br><span class="line">  docker tag jilingjun1014/$imageName k8s.gcr.io/$imageName</span><br><span class="line">  docker rmi jilingjun1014/$imageName</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
-<h3 id="master初始化"><a href="#master初始化" class="headerlink" title="master初始化"></a>master初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># master初始化</span><br><span class="line">$ kubeadm init --kubernetes-version=v1.11.2 --pod-network-cidr=10.244.0.0/16</span><br><span class="line">Your Kubernetes master has initialized successfully!</span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line">You can now join any number of machines by running the following on each node</span><br><span class="line">as root:</span><br><span class="line">  kubeadm join 116.62.177.233:6443 --token mfv9of.3bo96kuhwiuf2sh5 --discovery-token-ca-cert-hash sha256:d04a7670ef39c41900ca142e807e96a326d6f37300076e94ce2bda4c0934ff52</span><br><span class="line"># 配置kubectl认证(官方推荐用非root用户,这里为了方便起见,使用root用户)</span><br><span class="line">$ mkdir -p ~/.kube</span><br><span class="line">$ cp -i /etc/kubernetes/admin.conf ~/.kube/config</span><br><span class="line"># 非root用户需要配置</span><br><span class="line">$ chown $(id -u):$(id -g) $HOME/.kube/config </span><br><span class="line"># root用户需要配置</span><br><span class="line">$ echo &quot;export KUBECONFIG=/etc/kubernetes/admin.conf&quot; &gt;&gt; /etc/profile $ source /etc/profile</span><br></pre></td></tr></table></figure>
-<h4 id="Pod网络设置-flannel网络设置"><a href="#Pod网络设置-flannel网络设置" class="headerlink" title="Pod网络设置(flannel网络设置)"></a>Pod网络设置(flannel网络设置)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /etc/cni/net.d/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /etc/cni/net.d/10-flannel.conf</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;cbr0&quot;,</span><br><span class="line">  &quot;type&quot;: &quot;flannel&quot;,</span><br><span class="line">  &quot;delegate&quot;: &#123;</span><br><span class="line">    &quot;isDefaultGateway&quot;: true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF </span><br><span class="line">$ mkdir /run/flannel/</span><br><span class="line">$ cat &lt;&lt;EOF&gt; /run/flannel/subnet.env</span><br><span class="line">FLANNEL_NETWORK=10.244.0.0/16</span><br><span class="line">FLANNEL_SUBNET=10.244.1.0/24</span><br><span class="line">FLANNEL_MTU=1450</span><br><span class="line">FLANNEL_IPMASQ=true</span><br><span class="line">EOF</span><br><span class="line"># 添加网络类型</span><br><span class="line">$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
-<h4 id="检查master是否创建成功"><a href="#检查master是否创建成功" class="headerlink" title="检查master是否创建成功"></a>检查master是否创建成功</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># ready全部为1/1表示成功</span><br><span class="line">$ kubectl get pod --all-namespaces</span><br><span class="line">NAMESPACE    NAME                  READY STATUS RESTARTS AGE</span><br><span class="line">kube-system coredns-78fcdf6894-cvrzg 1/1 Running 0 3h   # 1/1表示正常</span><br><span class="line">kube-system coredns-78fcdf6894-sc2zd 1/1 Running 0 3h  # 1/1表示正常</span><br><span class="line">kube-system etcd-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-apiserver-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-controller-manager-k8s-master-1 1/1 Running 0 3h</span><br><span class="line">kube-system kube-flannel-ds-2dzz9 1/1 Running 0 3h   # 1/1表示正常</span><br><span class="line">kube-system kube-proxy-zgbcp 1/1 Running 0 3h</span><br><span class="line">kube-system kube-scheduler-k8s-master-1 1/1 Running 0 3h</span><br></pre></td></tr></table></figure>
-<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有pod信息,需要使用--all-namespaces,不然默认参数是default</span><br><span class="line">$ kubectl get pod --all-namespaces</span><br><span class="line"># 查看节点信息</span><br><span class="line">$ kubectl get nodes</span><br><span class="line">NAME STATUS ROLES AGE VERSION</span><br><span class="line">k8s-master-1 Ready master 1d v1.11.1</span><br><span class="line">k8s-node-1 Ready &lt;none&gt; 2h v1.11.1</span><br><span class="line">k8s-node-2 Ready &lt;none&gt; 1d v1.11.1</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="使用-kubeadm-搭建-kubernetes-1-10-2-集群"><a href="#使用-kubeadm-搭建-kubernetes-1-10-2-集群" class="headerlink" title="使用 kubeadm 搭建 kubernetes 1.10.2 集群"></a><a href="https://maiyang.me/post/2018-05-15-use-kubeadm-install-kubernetes-1.10.2/" target="_blank" rel="noopener">使用 kubeadm 搭建 kubernetes 1.10.2 集群</a></h3><h3 id="利用docker-hub做中转拉取google的k8s镜像"><a href="#利用docker-hub做中转拉取google的k8s镜像" class="headerlink" title="利用docker hub做中转拉取google的k8s镜像"></a><a href="https://www.cnblogs.com/cuishuai/p/8483496.html" target="_blank" rel="noopener">利用docker hub做中转拉取google的k8s镜像</a></h3><h3 id="深入玩转K8S之使用kubeadm安装Kubernetes-v1-10以及常见问题解答"><a href="#深入玩转K8S之使用kubeadm安装Kubernetes-v1-10以及常见问题解答" class="headerlink" title="深入玩转K8S之使用kubeadm安装Kubernetes v1.10以及常见问题解答"></a><a href="http://blog.51cto.com/devingeng/2096495" target="_blank" rel="noopener">深入玩转K8S之使用kubeadm安装Kubernetes v1.10以及常见问题解答</a></h3>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster peer probe &lt;server&gt;</span><br><span class="line">Probe successful</span><br></pre></td></tr></table></figure>
+<h4 id="List-Servers"><a href="#List-Servers" class="headerlink" title="List Servers"></a>List Servers</h4><p>在任意一台机器上执行.</p>
+<ul>
+<li>gluster pool list</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster pool list</span><br><span class="line">UUID                                    Hostname        State</span><br><span class="line">d18d36c5-533a-4541-ac92-c471241d5418    localhost       Connected</span><br><span class="line">5e987bda-16dd-43c2-835b-08b7d55e94e5    server2         Connected</span><br><span class="line">1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7    server3         Connected</span><br><span class="line">3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7    server4         Connected</span><br></pre></td></tr></table></figure>
+<h4 id="Views-peer-status"><a href="#Views-peer-status" class="headerlink" title="Views peer status"></a>Views peer status</h4><ul>
+<li>gluster peer status</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster peer status</span><br><span class="line">Hostname: server2</span><br><span class="line">Uuid: 5e987bda-16dd-43c2-835b-08b7d55e94e5</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server3</span><br><span class="line">Uuid: 1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server4</span><br><span class="line">Uuid: 3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<h4 id="Removing-Servers"><a href="#Removing-Servers" class="headerlink" title="Removing Servers"></a>Removing Servers</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gluster peer detach &lt;server&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="Brick-Naming-Convertions"><a href="#Brick-Naming-Convertions" class="headerlink" title="Brick Naming Convertions"></a>Brick Naming Convertions</h3><ul>
+<li><p>/data/glusterfs/<volume>/<brick>/brick</brick></volume></p>
+<p><volume>是对linux磁盘绑定起的别名,如系统中<em>/dev/sdb</em>磁盘,我们绑定后,可以命名为test(环境使用类型),这样可区分所属环境.</volume></p>
+<p><brick>就可以任意命名了,我是通过业务进行区分.如es表示搜索引擎业务使用,logs表示日志使用.不同的业务可能对磁盘性能可能也是不一样的,可以通过多个磁盘分出来.</brick></p>
+</li>
+</ul>
+<p>要搞明白Brick的命名规范,就需要先理解brick的概念.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick就Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
+<p>举个例子:</p>
+<p>比如一块物理磁盘/dev/sdb,现在我用于测试环境中,用户通常的业务,存储一些日志等.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line">$ mount /dev/sdb /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br><span class="line"># 如果要启用还要start</span><br><span class="line">$ gluster volume start test</span><br></pre></td></tr></table></figure>
+<p>这里有个疑问,为什么需要使用brick呢?</p>
+<p>假如server1有两个磁盘/dev/sda,/dev/sdb.而server2有两个/dev/sdb1,/dev/sdb2.磁盘名称就存在不同,要通过brick去屏蔽底层磁盘的名称的不同和性能的不同.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line"># server1</span><br><span class="line">$ mount /dev/sda /data/glusterfs/test/biz</span><br><span class="line"># server2</span><br><span class="line">$ mount /dev/sdb1 /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br></pre></td></tr></table></figure>
+<h3 id="Formatting-and-Mounting-Bricks"><a href="#Formatting-and-Mounting-Bricks" class="headerlink" title="Formatting and Mounting Bricks"></a>Formatting and Mounting Bricks</h3><p>待完善.这里主要涉及Linux卷相关概念:lV逻辑卷,VG卷组,PV物理卷.</p>
+<p><a href="https://wiki.archlinux.org/index.php/LVM" target="_blank" rel="noopener">https://wiki.archlinux.org/index.php/LVM</a></p>
+<p><a href="https://linux.cn/article-5117-1.html" target="_blank" rel="noopener">https://linux.cn/article-5117-1.html</a></p>
+<p><a href="https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups" target="_blank" rel="noopener">https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups</a></p>
+<h3 id="Set-ACL"><a href="#Set-ACL" class="headerlink" title="Set ACL"></a>Set ACL</h3><p>待完善.这里主要是Linux中ACL与Gluster的使用.</p>
+<h3 id="Volume-Types"><a href="#Volume-Types" class="headerlink" title="Volume Types"></a>Volume Types</h3><p>○ A volume is a logical collection of bricks.</p>
+<p>以下罗列了Gluster提供的Volume类型.</p>
+<ul>
+<li><p><strong>Distributed</strong> - Distributed volumes distribute files across the bricks in the volume. You can use distributed volumes where the requirement is to scale storage and the redundancy is either not important or is provided by other hardware/software layers.</p>
+</li>
+<li><p><strong>Replicated</strong> – Replicated volumes replicate files across bricks in the volume. You can use replicated volumes in environments where high-availability and high-reliability are critical.</p>
+</li>
+<li><p><strong>Distributed Replicated</strong> - Distributed replicated volumes distribute files across replicated bricks in the volume. You can use distributed replicated volumes in environments where the requirement is to scale storage and high-reliability is critical. Distributed replicated volumes also offer improved read performance in most environments.</p>
+</li>
+<li><p><strong>Dispersed</strong> - Dispersed volumes are based on erasure codes, providing space-efficient protection against disk or server failures. It stores an encoded fragment of the original file to each brick in a way that only a subset of the fragments is needed to recover the original file. The number of bricks that can be missing without losing access to data is configured by the administrator on volume creation time.</p>
+<p>☆ 这里的关键是erasure codes算法.<a href="https://en.wikipedia.org/wiki/Erasure_code" target="_blank" rel="noopener">Erasure-Code</a>, 简称 EC, 也叫做 <strong>擦除码</strong> 或 <strong>纠删码</strong>, 指使用 范德蒙(<a href="https://en.wikipedia.org/wiki/Vandermonde_matrix" target="_blank" rel="noopener">Vandermonde</a>) 矩阵的 里德-所罗门码(<a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed-Solomon</a>) 擦除码算法.</p>
+<p>通过较少的数据冗余能够找回丢失数据.相比于Relica百分百冗余来说,这个方式更节省空间.</p>
+<p>推荐学习这篇文章<a href="http://drmingdrmer.github.io/tech/distributed/2017/02/01/ec.html" target="_blank" rel="noopener">drdr.xp Blog</a></p>
+</li>
+<li><p><strong>Distributed Dispersed</strong> - Distributed dispersed volumes distribute files across dispersed subvolumes. This has the same advantages of distribute replicate volumes, but using disperse to store the data into the bricks.</p>
+</li>
+<li><strong>Striped [Deprecated]</strong> 、<strong>Distributed Striped [Deprecated]</strong> 、<strong>Distributed Striped Replicated [Deprecated]</strong>、<strong>Striped Replicated [Deprecated]</strong> </li>
+</ul>
+<p>☆ 上面主要有三种volume类型:Distributed, Replicated, Dispersed. 和组合后的二种:Distributed Replicated, Distributed Dispersed.</p>
+<h4 id="Create-Command"><a href="#Create-Command" class="headerlink" title="Create Command"></a>Create Command</h4><p>stripe已经废弃,所以目前只有replica和disperse两种volume类型.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [stripe | replica | disperse] [transport tcp | rdma | tcp,rdma]</span><br><span class="line">  volume  create  &lt;NEW-VOLNAME&gt; [stripe &lt;COUNT&gt;] [replica &lt;COUNT&gt;] [disperse</span><br><span class="line">  [&lt;COUNT&gt;]] [redundancy &lt;COUNT&gt;] [transport &lt;tcp|rdma|tcp,rdma&gt;] &lt;NEW-BRICK&gt;</span><br><span class="line">  ...</span><br><span class="line">  Create a new volume of the specified type using the specified bricks</span><br><span class="line">  and transport type (the default transport type is tcp).  To create a</span><br><span class="line">  volume   with  both  transports  (tcp  and  rdma),  give  &apos;transport</span><br><span class="line">  tcp,rdma&apos; as an option.</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed"><a href="#Distributed" class="headerlink" title="Distributed"></a>Distributed</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904111824011.png" alt="image-20180904111824011"></p>
+<ul>
+<li><p>优点</p>
+<p>节省空间,易扩展.</p>
+</li>
+<li><p>缺点</p>
+<p>数据丢失风险:由于数据没有冗余,一旦机器故障数据就会丢失.</p>
+</li>
+</ul>
+<p><strong>Note</strong>: Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># If the transport type is not specified, tcp is used as the default.</span><br><span class="line">$ gluster volume create test-volume server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: test-volume</span><br><span class="line">Type: Distribute</span><br><span class="line">Status: Created</span><br><span class="line">Number of Bricks: 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/exp1</span><br><span class="line">Brick2: server2:/exp2</span><br><span class="line">Brick3: server3:/exp3</span><br><span class="line">Brick4: server4:/exp4</span><br></pre></td></tr></table></figure>
+<h4 id="Replicated"><a href="#Replicated" class="headerlink" title="Replicated"></a>Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904112531086.png" alt="image-20180904112531086"></p>
+<ul>
+<li><p>优点</p>
+<p>数据有冗余,数据丢失依然可用.</p>
+</li>
+<li><p>缺点</p>
+<p>存储空间消耗较多</p>
+</li>
+</ul>
+<p><strong>Note</strong>:</p>
+<ul>
+<li><p>Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+</li>
+<li><p>GlusterFS will fail to create a replicate volume if more than one brick of a replica set is present on the same peer. For eg. a four node replicated volume where more than one brick of a replica set is present on the same peer.</p>
+<p>☆ 这种Volume类型不能指定同一台机器.如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
+<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># transport type is not specified, tcp is used as the default. </span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2</span><br></pre></td></tr></table></figure>
+<h4 id="Dispersed"><a href="#Dispersed" class="headerlink" title="Dispersed"></a>Dispersed</h4><ul>
+<li><p>优点</p>
+<p>同replica一样,数据高可用,而且数据存储量更少.</p>
+</li>
+<li><p>缺点</p>
+<p>暂未发现</p>
+</li>
+</ul>
+<p>○  Dispersed volumes are based on erasure codes.</p>
+<p>☆ 基于纠偏码算法.不同于replica,冗余数据量大幅减少的情况下,依然做到数据高可用.</p>
+<p>分布式系统中,为了保证数据高可用,一般选择副本数为3,这个可靠性的预期大约是11个9以上(99.999999999%的概率不丢数据).这里有业界报告来支撑这个数值.<a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener"><a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener">backblaze发布的硬盘故障率统计</a></a></p>
+<p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904153714497.png" alt="image-20180904153714497"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 正常可以不用指定redundancy,在创建时会提示指定数量.</span><br><span class="line"># gluster volume create [disperse [&lt;count&gt;]] [redundancy &lt;count&gt;] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 如下:提示使用redundancy.</span><br><span class="line">$ gluster volume create test-volume disperse 4 server&#123;1..4&#125;:/bricks/test-volume</span><br><span class="line">There isn&apos;t an optimal redundancy value for this configuration. Do you want to create the volume with redundancy 1 ? (y/n)</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed-Replicated"><a href="#Distributed-Replicated" class="headerlink" title="Distributed Replicated"></a>Distributed Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904114809633.png" alt="image-20180904114809633"></p>
+<ul>
+<li><p>优点</p>
+<p>数据冗余,数据丢失后依然可用.</p>
+</li>
+<li><p>缺点</p>
+<p>于Replica不同的是,冗余的数据存在随机性,不便于管理.另外,存储空间消耗大.</p>
+</li>
+</ul>
+<p><strong>Note</strong>: - Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+<ul>
+<li><p>GlusterFS will fail to create a distribute replicate volume if more than one brick of a replica set is present on the same peer. For eg. for a four node distribute (replicated) volume where more than one brick of a replica set is present on the same peer.</p>
+<p>☆ 这种类型的Volume,同样不能指定同一台机器,不然报错.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
+<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
+</li>
+</ul>
+<p>从执行指令上看,Relicated和Distributed Relicated是相同的.只是后面的节点数量多于replica的数量.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 这个执行结果结果就是上图所示.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line"># 如果指定6个节点,replica为2,则会随机选取2个节点存储数据,1个节点存储原数据,1个节点冗余数据.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4 server5:/exp5 server6:/exp6</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed-Dispersed"><a href="#Distributed-Dispersed" class="headerlink" title="Distributed Dispersed"></a>Distributed Dispersed</h4>
           
         
       
@@ -2743,7 +2814,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2754,7 +2825,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2765,7 +2836,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2826,7 +2897,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">20.4k</span>
+    <span title="Site words total count">26.2k</span>
   
 </div>
 

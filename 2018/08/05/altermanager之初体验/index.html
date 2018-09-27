@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="alertmanager之初体验," />
+  <meta name="keywords" content="alertmanager使用," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="环境:centos7, alertmanager 0.15.1 github  前言刚入门alertmanager,权当记录. Execute AlertmanagerBuild with Binary and Config SystemdBuild Binary Download123456# 安装在/opt下.下载地址prometheus官网有提供.$ cd /opt$ wget https">
-<meta name="keywords" content="alertmanager之初体验">
+<meta name="description" content="环境:centos7, alertmanager 0.15.1 github  Foreward What ○  The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routi">
+<meta name="keywords" content="alertmanager使用">
 <meta property="og:type" content="article">
-<meta property="og:title" content="altermanager之初体验">
+<meta property="og:title" content="altermanager使用">
 <meta property="og:url" content="http://steven-ji.github.io/blog/2018/08/05/altermanager之初体验/index.html">
 <meta property="og:site_name" content="ttbb玩代码">
-<meta property="og:description" content="环境:centos7, alertmanager 0.15.1 github  前言刚入门alertmanager,权当记录. Execute AlertmanagerBuild with Binary and Config SystemdBuild Binary Download123456# 安装在/opt下.下载地址prometheus官网有提供.$ cd /opt$ wget https">
+<meta property="og:description" content="环境:centos7, alertmanager 0.15.1 github  Foreward What ○  The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routi">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-15T16:09:48.468Z">
+<meta property="og:updated_time" content="2018-09-04T09:57:05.589Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="altermanager之初体验">
-<meta name="twitter:description" content="环境:centos7, alertmanager 0.15.1 github  前言刚入门alertmanager,权当记录. Execute AlertmanagerBuild with Binary and Config SystemdBuild Binary Download123456# 安装在/opt下.下载地址prometheus官网有提供.$ cd /opt$ wget https">
+<meta name="twitter:title" content="altermanager使用">
+<meta name="twitter:description" content="环境:centos7, alertmanager 0.15.1 github  Foreward What ○  The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routi">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>altermanager之初体验 | ttbb玩代码</title>
+  <title>altermanager使用 | ttbb玩代码</title>
   
 
 
@@ -327,7 +327,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">altermanager之初体验</h1>
+          <h1 class="post-title" itemprop="name headline">altermanager使用</h1>
         
 
         <div class="post-meta">
@@ -393,7 +393,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  335
+                  571
                 </span>
               
 
@@ -409,7 +409,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  3
                 </span>
               
             </div>
@@ -434,7 +434,18 @@
 <li>环境:centos7, alertmanager 0.15.1</li>
 <li><a href="https://github.com/prometheus/alertmanager" target="_blank" rel="noopener">github</a></li>
 </ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚入门alertmanager,权当记录.</p>
+<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><ul>
+<li><p>What</p>
+<p>○  The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie. It also takes care of silencing and inhibition of alerts.</p>
+<p>☆ Alertmanager用于接收报警信息并发送报警信息,经常和prometheus结合使用.它提供对报警信息分组、去重,并发送到指定的接收方,如email等.它同样关注沉默报警和抑制报警.</p>
+<p>什么是沉默报警?</p>
+<p>什么是抑制报警?</p>
+</li>
+</ul>
+<h2 id="Concepts"><a href="#Concepts" class="headerlink" title="Concepts"></a>Concepts</h2><h3 id="Grouping"><a href="#Grouping" class="headerlink" title="Grouping"></a>Grouping</h3><p>○ Grouping categorizes alerts of similar nature into a single notification. This is especially useful during larger outages when many systems fail at once and hundreds to thousands of alerts may be firing simultaneously.</p>
+<p>☆ 报警信息分组合并.这个比较好理解,如果同时有100台机器有问题,你肯定不希望收到100封邮件.grouping就是将这些分组合并.这样只要收到1封邮件,里面有100台机器的报警信息.</p>
+<h3 id="Inhibition"><a href="#Inhibition" class="headerlink" title="Inhibition"></a>Inhibition</h3><p>○ Inhibition is a concept of suppressing notifications for certain alerts if certain other alerts are already firing.</p>
+<p>☆ </p>
 <h2 id="Execute-Alertmanager"><a href="#Execute-Alertmanager" class="headerlink" title="Execute Alertmanager"></a>Execute Alertmanager</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><ul>
 <li><a href="https://prometheus.io/download/" target="_blank" rel="noopener">Download</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 安装在/opt下.下载地址prometheus官网有提供.</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/alertmanager/releases/download/v0.15.1/alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf alertmanager-0.15.1.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv alertmanager-0.15.1.linux-amd64 alertmanager-0.15.1</span><br></pre></td></tr></table></figure>
 </li>
@@ -489,7 +500,7 @@
       
         <div class="post-tags">
           
-            <a href="/blog/tags/alertmanager之初体验/" rel="tag"># alertmanager之初体验</a>
+            <a href="/blog/tags/alertmanager使用/" rel="tag"># alertmanager使用</a>
           
         </div>
       
@@ -600,7 +611,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -611,7 +622,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -622,7 +633,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -665,7 +676,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Execute-Alertmanager"><span class="nav-number">2.</span> <span class="nav-text">Execute Alertmanager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-with-Binary-and-Config-Systemd"><span class="nav-number">2.1.</span> <span class="nav-text">Build with Binary and Config Systemd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Build-Binary"><span class="nav-number">2.1.1.</span> <span class="nav-text">Build Binary</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Config-Systemd"><span class="nav-number">2.1.2.</span> <span class="nav-text">Config Systemd</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-with-Docker"><span class="nav-number">2.2.</span> <span class="nav-text">Build with Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Configuration"><span class="nav-number">2.3.</span> <span class="nav-text">Configuration</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Foreward"><span class="nav-number">1.</span> <span class="nav-text">Foreward</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Concepts"><span class="nav-number">2.</span> <span class="nav-text">Concepts</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Grouping"><span class="nav-number">2.1.</span> <span class="nav-text">Grouping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inhibition"><span class="nav-number">2.2.</span> <span class="nav-text">Inhibition</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Execute-Alertmanager"><span class="nav-number">3.</span> <span class="nav-text">Execute Alertmanager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-with-Binary-and-Config-Systemd"><span class="nav-number">3.1.</span> <span class="nav-text">Build with Binary and Config Systemd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Build-Binary"><span class="nav-number">3.1.1.</span> <span class="nav-text">Build Binary</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Config-Systemd"><span class="nav-number">3.1.2.</span> <span class="nav-text">Config Systemd</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-with-Docker"><span class="nav-number">3.2.</span> <span class="nav-text">Build with Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Configuration"><span class="nav-number">3.3.</span> <span class="nav-text">Configuration</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -699,7 +710,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">20.4k</span>
+    <span title="Site words total count">26.2k</span>
   
 </div>
 
