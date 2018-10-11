@@ -439,7 +439,9 @@
 <li>不影响线上性能,基于binary log的,异步的处理增量数据.而其他工具基于triggle.<a href="https://github.com/github/gh-ost/blob/master/doc/why-triggerless.md" target="_blank" rel="noopener">为什么不使用triggle?</a></li>
 </ul>
 <h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
-<li>伪装成一个mysql的从节点,读取binary log.<img src="/Users/jilingjun/Downloads/gh-ost-general-flow.png" alt="gh-ost-general-flow"></li>
+<li><p>伪装成一个mysql的从节点,读取binary log.</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fw42o0dt06j31bw0lgjxf.jpg" alt="gh-ost-general-flow"></p>
+</li>
 </ul>
 <h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>在阿里云上的一台mysql,一张2000w数据的表,需要增加一个int型字段.</p>
 <p>使用gh-ost,耗时37分钟.</p>

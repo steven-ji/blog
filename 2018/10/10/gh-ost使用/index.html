@@ -87,12 +87,12 @@
 <meta property="og:site_name" content="ttbb玩代码">
 <meta property="og:description" content="前言生产上,有时需要对一些大表(几千万数据)的表中字段进行增、改操作.如果直接操作,很可能对线上有比较大的影响.很多时候,需要在非忙时(大多是凌晨)进行表修改.想想都折磨人. 这里记录使用工具gh-ost(go语言编写)进行表字段修改. 为什么用它 不影响线上性能,基于binary log的,异步的处理增量数据.而其他工具基于triggle.为什么不使用triggle?  原理 伪装成一个mysq">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://steven-ji.github.io/Users/jilingjun/Downloads/gh-ost-general-flow.png">
-<meta property="og:updated_time" content="2018-10-11T02:23:00.851Z">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tNbRwly1fw42o0dt06j31bw0lgjxf.jpg">
+<meta property="og:updated_time" content="2018-10-11T02:26:00.718Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gh-ost使用">
 <meta name="twitter:description" content="前言生产上,有时需要对一些大表(几千万数据)的表中字段进行增、改操作.如果直接操作,很可能对线上有比较大的影响.很多时候,需要在非忙时(大多是凌晨)进行表修改.想想都折磨人. 这里记录使用工具gh-ost(go语言编写)进行表字段修改. 为什么用它 不影响线上性能,基于binary log的,异步的处理增量数据.而其他工具基于triggle.为什么不使用triggle?  原理 伪装成一个mysq">
-<meta name="twitter:image" content="http://steven-ji.github.io/Users/jilingjun/Downloads/gh-ost-general-flow.png">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/006tNbRwly1fw42o0dt06j31bw0lgjxf.jpg">
 
 
 
@@ -438,7 +438,9 @@
 <li>不影响线上性能,基于binary log的,异步的处理增量数据.而其他工具基于triggle.<a href="https://github.com/github/gh-ost/blob/master/doc/why-triggerless.md" target="_blank" rel="noopener">为什么不使用triggle?</a></li>
 </ul>
 <h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
-<li>伪装成一个mysql的从节点,读取binary log.<img src="/Users/jilingjun/Downloads/gh-ost-general-flow.png" alt="gh-ost-general-flow"></li>
+<li><p>伪装成一个mysql的从节点,读取binary log.</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fw42o0dt06j31bw0lgjxf.jpg" alt="gh-ost-general-flow"></p>
+</li>
 </ul>
 <h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>在阿里云上的一台mysql,一张2000w数据的表,需要增加一个int型字段.</p>
 <p>使用gh-ost,耗时37分钟.</p>
