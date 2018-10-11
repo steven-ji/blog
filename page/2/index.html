@@ -309,6 +309,347 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/20/Gluster入门/" itemprop="url">Gluster入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T14:20:27+08:00">
+                2018-08-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,888
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  14
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="https://ws4.sinaimg.cn/large/0069RVTdgy1fuzxicxxpzj30jx08rq3v.jpg" alt="Gluster技术视图"></p>
+<h2 id="Notice"><a href="#Notice" class="headerlink" title="Notice"></a>Notice</h2><ul>
+<li><p>Recommend use XFS filesystem.</p>
+<p>○  Typically, XFS is recommended but it can be used with other filesystems as well. Most commonly EXT4 is used when XFS isn’t, but you can (and many, many people do) use another filesystem that suits you. </p>
+<p>☆ 推荐使用XFS文件系统.EXT4等其他文件系统也是可以.</p>
+</li>
+<li><p>Correct DNS entries (forward and reverse) and NTP are essential.</p>
+<p>☆ DNS一般不需要特殊配置,采用默认即可.NTP,就是要求每台机器的时钟进行校对,节点机器都在同一个时区,并校对.校对方式很多,使用一致的即可.</p>
+</li>
+<li><p>Firewalls are great, except when they aren’t.In case you absolutely need to set up a firewall, have a look at <a href="https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/" target="_blank" rel="noopener">Setting up clients</a> for information on the ports used.</p>
+<p>☆ 不建议Gluster节点之间开启防火墙.如果实在有必要开启防火墙,我是配置IP级别的,这样可以减少一些复杂度.</p>
+</li>
+<li><p>2 CPU’s, 2GB of RAM, 1GBE(千兆带宽)</p>
+<p>☆ 服务端配置至少需要这种配置</p>
+</li>
+</ul>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><h3 id="Gluster-Native-Client"><a href="#Gluster-Native-Client" class="headerlink" title="Gluster Native Client"></a>Gluster Native Client</h3><p>○ The Gluster Native Client is a FUSE-based client running in user space. Gluster Native Client is the recommended method for accessing volumes when high concurrency and high write performance is required.</p>
+<p>☆ 推荐使用这种方式,其基于内核提供的FUSE,在高并发、大数据量写入时效果更好.</p>
+<h3 id="NFS-Client"><a href="#NFS-Client" class="headerlink" title="NFS Client"></a>NFS Client</h3><h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><h3 id="What"><a href="#What" class="headerlink" title="What"></a>What</h3><p>○  GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.</p>
+<p>GlusterFS isn’t really a filesystem in and of itself. It concatenates existing filesystems into one (or more) big chunks so that data being written into or read out of Gluster gets distributed across multiple hosts simultaneously</p>
+<p>☆ Gluster是一个开源的、可扩展的、分布式数据存储管理软件.其并不是一个文件系统,只是提供连接能力,将分布的文件系统组装成一个更大的文件存储系统.</p>
+<h3 id="Concept"><a href="#Concept" class="headerlink" title="Concept"></a>Concept</h3><ul>
+<li><p>TSP</p>
+<p>○  A trusted storage pool(TSP) is a trusted network of storage servers. Before you can configure a GlusterFS volume, you must create a trusted storage pool of the storage servers that will provide bricks to the volume by peer probing the servers. The servers in a TSP are peers of each other.</p>
+<p>☆ Gluster通过TSP(信任存储池)来确定可提供存储服务的机器有哪些.</p>
+</li>
+<li><p>Brick</p>
+<p>○  A brick is used to refer to any device (really this means filesystem) that is being used for Gluster storage.</p>
+<p>☆ Gluster使用的存储单位.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick对Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
+</li>
+<li><p>Gluster volume</p>
+<p>○  A <strong>Gluster volume</strong> is a collection of one or more bricks (of course, typically this is two or more). This is analogous(类似的) to /etc/exports entries for NFS.</p>
+<p>☆ Brick的集合.</p>
+</li>
+<li><p>Global Namespace</p>
+<p>○  The term <strong>Global Namespace</strong> is a fancy way of saying a Gluster volume.</p>
+<p>☆ 对Cluster volume的另一种叫法.</p>
+</li>
+<li><p>Export</p>
+<p>○  An <strong>export</strong> refers to the mount path of the brick(s) on a given server, for example, /export/brick1.</p>
+<p>☆ 暂时不能理解,待补充.</p>
+</li>
+<li><p><strong>GNFS</strong> and <strong>kNFS</strong></p>
+<p>○  GNFS is how we refer to our inline NFS server. kNFS stands for kernel NFS, or, as most people would say, just plain NFS. Most often, you will want kNFS services disabled on the Gluster nodes. Gluster NFS doesn’t take any additional configuration and works just like you would expect with NFSv3. It is possible to configure Gluster and NFS to live in harmony if you want to.</p>
+<p>☆ Gluster内部的NFS服务,启动好Glusterd Daemon后,通过GNFS其他Gluster进行数据交互.kNFS是Linux系统内核的NFS服务.两者不会互相干扰,可以共同使用.</p>
+</li>
+</ul>
+<h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p>Centos系统可参考&lt;&lt;Gluster安装&gt;&gt;.<a href="https://docs.gluster.org/en/latest/Install-Guide/Install/" target="_blank" rel="noopener">其他系统安装</a>.</p>
+<h3 id="System-Packaged-version"><a href="#System-Packaged-version" class="headerlink" title="System Packaged version"></a>System Packaged version</h3><p>各系统的安装包版本及依赖包.<a href="https://docs.gluster.org/en/latest/Install-Guide/Community_Packages/" target="_blank" rel="noopener">Packages</a></p>
+<h3 id="Manage-Trust-Storage-Pool"><a href="#Manage-Trust-Storage-Pool" class="headerlink" title="Manage Trust Storage Pool"></a>Manage Trust Storage Pool</h3><p>○  The firewall on the servers must be configured to allow access to port 24007.</p>
+<p>☆ 存储节点使用24007端口进行通信</p>
+<p>假设有4台机器,server1,server2,server3,server4在一个TSP中.</p>
+<h4 id="Add-to-trust-storage-pool"><a href="#Add-to-trust-storage-pool" class="headerlink" title="Add to trust storage pool"></a>Add to trust storage pool</h4><p>在任意一台机器上机器上执行.</p>
+<ul>
+<li>gluster peer probe <server></server></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster peer probe &lt;server&gt;</span><br><span class="line">Probe successful</span><br></pre></td></tr></table></figure>
+<h4 id="List-Servers"><a href="#List-Servers" class="headerlink" title="List Servers"></a>List Servers</h4><p>在任意一台机器上执行.</p>
+<ul>
+<li>gluster pool list</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster pool list</span><br><span class="line">UUID                                    Hostname        State</span><br><span class="line">d18d36c5-533a-4541-ac92-c471241d5418    localhost       Connected</span><br><span class="line">5e987bda-16dd-43c2-835b-08b7d55e94e5    server2         Connected</span><br><span class="line">1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7    server3         Connected</span><br><span class="line">3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7    server4         Connected</span><br></pre></td></tr></table></figure>
+<h4 id="Views-peer-status"><a href="#Views-peer-status" class="headerlink" title="Views peer status"></a>Views peer status</h4><ul>
+<li>gluster peer status</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster peer status</span><br><span class="line">Hostname: server2</span><br><span class="line">Uuid: 5e987bda-16dd-43c2-835b-08b7d55e94e5</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server3</span><br><span class="line">Uuid: 1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server4</span><br><span class="line">Uuid: 3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<h4 id="Removing-Servers"><a href="#Removing-Servers" class="headerlink" title="Removing Servers"></a>Removing Servers</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gluster peer detach &lt;server&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="Brick-Naming-Convertions"><a href="#Brick-Naming-Convertions" class="headerlink" title="Brick Naming Convertions"></a>Brick Naming Convertions</h3><ul>
+<li><p>/data/glusterfs/<volume>/<brick>/brick</brick></volume></p>
+<p><volume>是对linux磁盘绑定起的别名,如系统中<em>/dev/sdb</em>磁盘,我们绑定后,可以命名为test(环境使用类型),这样可区分所属环境.</volume></p>
+<p><brick>就可以任意命名了,我是通过业务进行区分.如es表示搜索引擎业务使用,logs表示日志使用.不同的业务可能对磁盘性能可能也是不一样的,可以通过多个磁盘分出来.</brick></p>
+</li>
+</ul>
+<p>要搞明白Brick的命名规范,就需要先理解brick的概念.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick就Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
+<p>举个例子:</p>
+<p>比如一块物理磁盘/dev/sdb,现在我用于测试环境中,用户通常的业务,存储一些日志等.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line">$ mount /dev/sdb /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br><span class="line"># 如果要启用还要start</span><br><span class="line">$ gluster volume start test</span><br></pre></td></tr></table></figure>
+<p>这里有个疑问,为什么需要使用brick呢?</p>
+<p>假如server1有两个磁盘/dev/sda,/dev/sdb.而server2有两个/dev/sdb1,/dev/sdb2.磁盘名称就存在不同,要通过brick去屏蔽底层磁盘的名称的不同和性能的不同.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line"># server1</span><br><span class="line">$ mount /dev/sda /data/glusterfs/test/biz</span><br><span class="line"># server2</span><br><span class="line">$ mount /dev/sdb1 /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br></pre></td></tr></table></figure>
+<h3 id="Formatting-and-Mounting-Bricks"><a href="#Formatting-and-Mounting-Bricks" class="headerlink" title="Formatting and Mounting Bricks"></a>Formatting and Mounting Bricks</h3><p>待完善.这里主要涉及Linux卷相关概念:lV逻辑卷,VG卷组,PV物理卷.</p>
+<p><a href="https://wiki.archlinux.org/index.php/LVM" target="_blank" rel="noopener">https://wiki.archlinux.org/index.php/LVM</a></p>
+<p><a href="https://linux.cn/article-5117-1.html" target="_blank" rel="noopener">https://linux.cn/article-5117-1.html</a></p>
+<p><a href="https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups" target="_blank" rel="noopener">https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups</a></p>
+<h3 id="Set-ACL"><a href="#Set-ACL" class="headerlink" title="Set ACL"></a>Set ACL</h3><p>待完善.这里主要是Linux中ACL与Gluster的使用.</p>
+<h3 id="Volume-Types"><a href="#Volume-Types" class="headerlink" title="Volume Types"></a>Volume Types</h3><p>○ A volume is a logical collection of bricks.</p>
+<p>以下罗列了Gluster提供的Volume类型.</p>
+<ul>
+<li><p><strong>Distributed</strong> - Distributed volumes distribute files across the bricks in the volume. You can use distributed volumes where the requirement is to scale storage and the redundancy is either not important or is provided by other hardware/software layers.</p>
+</li>
+<li><p><strong>Replicated</strong> – Replicated volumes replicate files across bricks in the volume. You can use replicated volumes in environments where high-availability and high-reliability are critical.</p>
+</li>
+<li><p><strong>Distributed Replicated</strong> - Distributed replicated volumes distribute files across replicated bricks in the volume. You can use distributed replicated volumes in environments where the requirement is to scale storage and high-reliability is critical. Distributed replicated volumes also offer improved read performance in most environments.</p>
+</li>
+<li><p><strong>Dispersed</strong> - Dispersed volumes are based on erasure codes, providing space-efficient protection against disk or server failures. It stores an encoded fragment of the original file to each brick in a way that only a subset of the fragments is needed to recover the original file. The number of bricks that can be missing without losing access to data is configured by the administrator on volume creation time.</p>
+<p>☆ 这里的关键是erasure codes算法.<a href="https://en.wikipedia.org/wiki/Erasure_code" target="_blank" rel="noopener">Erasure-Code</a>, 简称 EC, 也叫做 <strong>擦除码</strong> 或 <strong>纠删码</strong>, 指使用 范德蒙(<a href="https://en.wikipedia.org/wiki/Vandermonde_matrix" target="_blank" rel="noopener">Vandermonde</a>) 矩阵的 里德-所罗门码(<a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed-Solomon</a>) 擦除码算法.</p>
+<p>通过较少的数据冗余能够找回丢失数据.相比于Relica百分百冗余来说,这个方式更节省空间.</p>
+<p>推荐学习这篇文章<a href="http://drmingdrmer.github.io/tech/distributed/2017/02/01/ec.html" target="_blank" rel="noopener">drdr.xp Blog</a></p>
+</li>
+<li><p><strong>Distributed Dispersed</strong> - Distributed dispersed volumes distribute files across dispersed subvolumes. This has the same advantages of distribute replicate volumes, but using disperse to store the data into the bricks.</p>
+</li>
+<li><strong>Striped [Deprecated]</strong> 、<strong>Distributed Striped [Deprecated]</strong> 、<strong>Distributed Striped Replicated [Deprecated]</strong>、<strong>Striped Replicated [Deprecated]</strong> </li>
+</ul>
+<p>☆ 上面主要有三种volume类型:Distributed, Replicated, Dispersed. 和组合后的二种:Distributed Replicated, Distributed Dispersed.</p>
+<h4 id="Create-Command"><a href="#Create-Command" class="headerlink" title="Create Command"></a>Create Command</h4><p>stripe已经废弃,所以目前只有replica和disperse两种volume类型.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [stripe | replica | disperse] [transport tcp | rdma | tcp,rdma]</span><br><span class="line">  volume  create  &lt;NEW-VOLNAME&gt; [stripe &lt;COUNT&gt;] [replica &lt;COUNT&gt;] [disperse</span><br><span class="line">  [&lt;COUNT&gt;]] [redundancy &lt;COUNT&gt;] [transport &lt;tcp|rdma|tcp,rdma&gt;] &lt;NEW-BRICK&gt;</span><br><span class="line">  ...</span><br><span class="line">  Create a new volume of the specified type using the specified bricks</span><br><span class="line">  and transport type (the default transport type is tcp).  To create a</span><br><span class="line">  volume   with  both  transports  (tcp  and  rdma),  give  &apos;transport</span><br><span class="line">  tcp,rdma&apos; as an option.</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed"><a href="#Distributed" class="headerlink" title="Distributed"></a>Distributed</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904111824011.png" alt="image-20180904111824011"></p>
+<ul>
+<li><p>优点</p>
+<p>节省空间,易扩展.</p>
+</li>
+<li><p>缺点</p>
+<p>数据丢失风险:由于数据没有冗余,一旦机器故障数据就会丢失.</p>
+</li>
+</ul>
+<p><strong>Note</strong>: Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># If the transport type is not specified, tcp is used as the default.</span><br><span class="line">$ gluster volume create test-volume server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: test-volume</span><br><span class="line">Type: Distribute</span><br><span class="line">Status: Created</span><br><span class="line">Number of Bricks: 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/exp1</span><br><span class="line">Brick2: server2:/exp2</span><br><span class="line">Brick3: server3:/exp3</span><br><span class="line">Brick4: server4:/exp4</span><br></pre></td></tr></table></figure>
+<h4 id="Replicated"><a href="#Replicated" class="headerlink" title="Replicated"></a>Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904112531086.png" alt="image-20180904112531086"></p>
+<ul>
+<li><p>优点</p>
+<p>数据有冗余,数据丢失依然可用.</p>
+</li>
+<li><p>缺点</p>
+<p>存储空间消耗较多</p>
+</li>
+</ul>
+<p><strong>Note</strong>:</p>
+<ul>
+<li><p>Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+</li>
+<li><p>GlusterFS will fail to create a replicate volume if more than one brick of a replica set is present on the same peer. For eg. a four node replicated volume where more than one brick of a replica set is present on the same peer.</p>
+<p>☆ 这种Volume类型不能指定同一台机器.如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
+<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># transport type is not specified, tcp is used as the default. </span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2</span><br></pre></td></tr></table></figure>
+<h4 id="Dispersed"><a href="#Dispersed" class="headerlink" title="Dispersed"></a>Dispersed</h4><ul>
+<li><p>优点</p>
+<p>同replica一样,数据高可用,而且数据存储量更少.</p>
+</li>
+<li><p>缺点</p>
+<p>暂未发现</p>
+</li>
+</ul>
+<p>○  Dispersed volumes are based on erasure codes.</p>
+<p>☆ 基于纠偏码算法.不同于replica,冗余数据量大幅减少的情况下,依然做到数据高可用.</p>
+<p>分布式系统中,为了保证数据高可用,一般选择副本数为3,这个可靠性的预期大约是11个9以上(99.999999999%的概率不丢数据).这里有业界报告来支撑这个数值.<a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener"><a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener">backblaze发布的硬盘故障率统计</a></a></p>
+<p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904153714497.png" alt="image-20180904153714497"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 正常可以不用指定redundancy,在创建时会提示指定数量.</span><br><span class="line"># gluster volume create [disperse [&lt;count&gt;]] [redundancy &lt;count&gt;] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 如下:提示使用redundancy.</span><br><span class="line">$ gluster volume create test-volume disperse 4 server&#123;1..4&#125;:/bricks/test-volume</span><br><span class="line">There isn&apos;t an optimal redundancy value for this configuration. Do you want to create the volume with redundancy 1 ? (y/n)</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed-Replicated"><a href="#Distributed-Replicated" class="headerlink" title="Distributed Replicated"></a>Distributed Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904114809633.png" alt="image-20180904114809633"></p>
+<ul>
+<li><p>优点</p>
+<p>数据冗余,数据丢失后依然可用.</p>
+</li>
+<li><p>缺点</p>
+<p>于Replica不同的是,冗余的数据存在随机性,不便于管理.另外,存储空间消耗大.</p>
+</li>
+</ul>
+<p><strong>Note</strong>: - Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
+<ul>
+<li><p>GlusterFS will fail to create a distribute replicate volume if more than one brick of a replica set is present on the same peer. For eg. for a four node distribute (replicated) volume where more than one brick of a replica set is present on the same peer.</p>
+<p>☆ 这种类型的Volume,同样不能指定同一台机器,不然报错.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
+<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
+</li>
+</ul>
+<p>从执行指令上看,Relicated和Distributed Relicated是相同的.只是后面的节点数量多于replica的数量.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 这个执行结果结果就是上图所示.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line"># 如果指定6个节点,replica为2,则会随机选取2个节点存储数据,1个节点存储原数据,1个节点冗余数据.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4 server5:/exp5 server6:/exp6</span><br></pre></td></tr></table></figure>
+<h4 id="Distributed-Dispersed"><a href="#Distributed-Dispersed" class="headerlink" title="Distributed Dispersed"></a>Distributed Dispersed</h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster安装/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2014,192 +2355,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/04/prometheus之监测服务器心跳/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/04/prometheus之监测服务器心跳/" itemprop="url">prometheus之监测服务器心跳</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T21:42:33+08:00">
-                2018-08-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  509
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境:centos7, prometheus 2.3.1, blackbox_export 0.12.0</li>
-<li>其他<a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener">exporter</a></li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>blackbox能支持什么协议:HTTP, HTTPS (via the http prober), DNS, TCP socket and ICMP.<br>对于机器可用性的监测,最简单的莫过于使用ping或者ssh的方式.这里使用blackbox_exporter,基于使用node_exporter的经验,可能会认为需要将blackbox_exporter部署到每个节点下,而实际上通过一个部署了blackbox_exporter的节点去检测其他机器.</p>
-<p><img src="file:///var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/WizNote/df0296f8-6c9a-4642-991a-8b3679667974/index_files/82906877.png" alt="img"></p>
-<h2 id="Execute-blackbox-exporter"><a href="#Execute-blackbox-exporter" class="headerlink" title="Execute blackbox_exporter"></a>Execute blackbox_exporter</h2><h3 id="Build-with-Binary-and-Config-Systemd"><a href="#Build-with-Binary-and-Config-Systemd" class="headerlink" title="Build with Binary and Config Systemd"></a>Build with Binary and Config Systemd</h3><h4 id="Build-Binary"><a href="#Build-Binary" class="headerlink" title="Build Binary"></a>Build Binary</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.12.0/blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf blackbox_exporter-0.12.0.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv blackbox_exporter-0.12.0.linux-amd64 blackbox_exporter-0.12.0</span><br></pre></td></tr></table></figure>
-<h4 id="Config-Systemd"><a href="#Config-Systemd" class="headerlink" title="Config Systemd"></a>Config Systemd</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/blackbox.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=blackbox.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/blackbox_exporter-0.12.0/blackbox_exporter --config.file=/opt/blackbox_exporter-0.12.0/blackbox.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable blackbox &amp;&amp; systemctl start blackbox</span><br></pre></td></tr></table></figure>
-<h3 id="Build-with-Docker"><a href="#Build-with-Docker" class="headerlink" title="Build with Docker"></a>Build with Docker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># pwd指定宿主机配置文件路径,我一般都放在/data/blackbox_exporter/config目录下</span><br><span class="line">$ docker build -t blackbox_exporter .</span><br><span class="line">$ docker run -d -p 9115:9115 --name blackbox_exporter -v `pwd`:/config blackbox_exporter --config.file=/config/blackbox.yml</span><br></pre></td></tr></table></figure>
-<h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><ul>
-<li><a href="https://github.com/prometheus/blackbox_exporter/blob/master/example.yml" target="_blank" rel="noopener">blackbox_exporter example.yml</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 这里暂时只使用ping和ssh验证主机有效性的方式,其他配置可参看github上的example.yml</span><br><span class="line">$ vim blackbox.yml</span><br><span class="line"># probe探测频率由prometheus中的scripe_timeout决定.</span><br><span class="line">modules:</span><br><span class="line">  ssh_banner:</span><br><span class="line">    prober: tcp</span><br><span class="line">    timeout: 10s # 每次探测的网络超时时间,默认为10秒</span><br><span class="line">    tcp:</span><br><span class="line">      query_response:</span><br><span class="line">      - expect: &quot;^SSH-2.0-&quot;</span><br><span class="line">  icmp:</span><br><span class="line">    prober: icmp</span><br><span class="line">    timeout: 10s</span><br><span class="line">    icmp:</span><br><span class="line">      preferred_ip_protocol: &quot;ip4&quot;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="Test-Blackbox-Exporter"><a href="#Test-Blackbox-Exporter" class="headerlink" title="Test Blackbox Exporter"></a>Test Blackbox Exporter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 测试目标10.1.1.21的ping信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=icmp\&amp;target\=10.1.1.25</span><br><span class="line">......</span><br><span class="line">probe_success 0  # 目标主机ping失败</span><br><span class="line"># 测试目标10.1.1.21 22的ssh信息</span><br><span class="line">$ curl http://10.1.1.26:9115/probe\?module\=ssh_banner\&amp;target\=10.1.1.21:22</span><br><span class="line">......</span><br><span class="line">probe_success 1  # 目标主机ssh通过</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="blackbox-exporter-github"><a href="#blackbox-exporter-github" class="headerlink" title="blackbox_exporter github"></a><a href="https://github.com/prometheus/blackbox_exporter" target="_blank" rel="noopener">blackbox_exporter github</a></h3><h3 id="用Prometheus进行网络质量ping"><a href="#用Prometheus进行网络质量ping" class="headerlink" title="用Prometheus进行网络质量ping"></a><a href="https://www.iamle.com/archives/2130.html" target="_blank" rel="noopener">用Prometheus进行网络质量ping</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2254,7 +2409,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">38</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2265,7 +2420,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2276,7 +2431,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2337,7 +2492,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">26.2k</span>
+    <span title="Site words total count">29.1k</span>
   
 </div>
 

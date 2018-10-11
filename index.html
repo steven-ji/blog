@@ -309,6 +309,235 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/10/gh-ost使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/10/gh-ost使用/" itemprop="url">gh-ost使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-10T10:27:11+08:00">
+                2018-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">Mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,882
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  16
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>生产上,有时需要对一些大表(几千万数据)的表中字段进行增、改操作.如果直接操作,很可能对线上有比较大的影响.很多时候,需要在非忙时(大多是凌晨)进行表修改.想想都折磨人.</p>
+<p>这里记录使用工具<a href="https://github.com/github/gh-ost" target="_blank" rel="noopener">gh-ost</a>(go语言编写)进行表字段修改.</p>
+<h3 id="为什么用它"><a href="#为什么用它" class="headerlink" title="为什么用它"></a>为什么用它</h3><ul>
+<li>不影响线上性能,基于binary log的,异步的处理增量数据.而其他工具基于triggle.<a href="https://github.com/github/gh-ost/blob/master/doc/why-triggerless.md" target="_blank" rel="noopener">为什么不使用triggle?</a></li>
+</ul>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
+<li>伪装成一个mysql的从节点,读取binary log.<img src="/Users/jilingjun/Downloads/gh-ost-general-flow.png" alt="gh-ost-general-flow"></li>
+</ul>
+<h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>在阿里云上的一台mysql,一张2000w数据的表,需要增加一个int型字段.</p>
+<p>使用gh-ost,耗时37分钟.</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>mysql 5.7.15-log (阿里云)</li>
+<li>gh-ost 1.0.46</li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><ul>
+<li>If you mysql already using RBR, all is well for you</li>
+<li>If not, convert one of your replicas to <code>binlog_format=&#39;ROW&#39;</code>, or let <code>gh-ost</code> do this for you.<code>gh-ost</code> <strong>will not</strong> convert back to <code>STATEMENT</code> (SBR)</li>
+<li>Replica should support log-slave-updates.</li>
+</ul>
+<p>所以,gh-ost建议连接到mysql的从节点上.原因如上:如果binary log为statement模式时,gh-ost会强制转换到row模式,且需要自己手动改回statement.(注: gh-ost参数中配置–switch-to-rbr)</p>
+<h3 id="limitations"><a href="#limitations" class="headerlink" title="limitations"></a>limitations</h3><ul>
+<li>使用具有管理员账号的权限.</li>
+</ul>
+<ul>
+<li>gh-ost对表名大小写不敏感,如待迁移的表名为:MyTable,且存在一张表为Mytable,则不能使用.</li>
+</ul>
+<ul>
+<li><p>表需要存在主键,且主键的值不是null,否则需要在gh-ost参数中添加<code>--allow-nullable-unique-key</code>.一般表的id都设置为自增主键,通用场景不用考虑这种问题.<a href="https://github.com/github/gh-ost/blob/master/doc/shared-key.md" target="_blank" rel="noopener">Read more</a></p>
+</li>
+<li><p>如果gh-ost连接的是从节点,需要确保主从节点上两张表的表结构一直.</p>
+</li>
+<li>使用google云数据库,参数添加 <code>--gcp</code></li>
+<li>使用阿里云的RDS,参数添加 <code>--aliyun-rds</code> </li>
+<li>对表重命名不能使用</li>
+</ul>
+<h3 id="Install-and-Use"><a href="#Install-and-Use" class="headerlink" title="Install and Use"></a>Install and Use</h3><ul>
+<li><a href="https://github.com/github/gh-ost/releases" target="_blank" rel="noopener">download</a></li>
+</ul>
+<p>下载完成后解压后直接使用即可.</p>
+<p>使用的关键是相关参数的设置及理解.参数的详细信息通过<code>./gh-ost --help</code>查看即可.这里我也罗列了详见附录gh-ost参数详解.</p>
+<p>这里记录下我迁移中设置的相关参数.</p>
+<h4 id="阿里云RDS且无从节点"><a href="#阿里云RDS且无从节点" class="headerlink" title="阿里云RDS且无从节点"></a>阿里云RDS且无从节点</h4><ul>
+<li><p>阿里云的RDS,需要添加参数–aliyun-rds</p>
+</li>
+<li><p>无从节点,直接在主节点上执行–allow-on-master</p>
+</li>
+</ul>
+<h5 id="Check-binlog-format"><a href="#Check-binlog-format" class="headerlink" title="Check binlog_format"></a>Check binlog_format</h5><p>检查mysql的binary log格式(FULL也是支持的).如果是statement,需要添加–switch-to-rbr参数,且最后需要手动将binlog_format设置回statement格式.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ show variables like &apos;binlog_format&apos;;</span><br><span class="line">+-----------------------------------------+--------------------------------+</span><br><span class="line">| Variable_name                           | Value                          |</span><br><span class="line">+-----------------------------------------+--------------------------------+</span><br><span class="line">| binlog_format                           | ROW                            |</span><br></pre></td></tr></table></figure>
+<h5 id="Run-migrate"><a href="#Run-migrate" class="headerlink" title="Run migrate"></a>Run migrate</h5><ul>
+<li><a href="https://github.com/github/gh-ost/blob/master/doc/cut-over.md" target="_blank" rel="noopener">cut-over</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">./gh-ost \</span><br><span class="line">--aliyun-rds=true \</span><br><span class="line">--allow-on-master \</span><br><span class="line">--host= --port= --database= --table= --conf=/opt/account.cnf \</span><br><span class="line">--alter=&quot;ADD COLOUM platform int(2) DEFAULT NULL COMMENT &apos;所属平台&apos;&quot; \</span><br><span class="line">--chunk-size=5000 \</span><br><span class="line">--concurrent-rowcount \</span><br><span class="line">--cut-over=atomic \</span><br><span class="line">--cut-over-lock-timeout-seconds=3 \</span><br><span class="line">--initially-drop-ghost-table=true \</span><br><span class="line">--initially-drop-old-table=true \</span><br><span class="line">--initially-drop-socket-file=true \</span><br><span class="line">--timestamp-old-table=true \</span><br><span class="line">--verbose \</span><br><span class="line">--serve-socket-file=/tmp/gh-ost.test.sock \</span><br><span class="line">--switch-to-rbr \</span><br><span class="line">--execute</span><br><span class="line"></span><br><span class="line"># --conf设置登录mysql的用户名和密码文件的绝对路径.内容格式如下.</span><br><span class="line">[client]</span><br><span class="line">user=gh-ost</span><br><span class="line">password=123456</span><br><span class="line"># --aliyun-rds=true针对使用阿里云的RDS.</span><br><span class="line"># --allow-on-master没有从节点时,直接连接主mysql时指定.</span><br><span class="line"># --alter表结构操作,如我这里添加字段&quot;ADD COLOUM platform int(2) DEFAULT NULL COMMENT &apos;所属平台&apos;&quot;</span><br><span class="line"># --chunk-size每次复制数据的数量,默认是1000,允许100~100,000之间.</span><br><span class="line"># --concurrent-rowcount一边复制数据一边计算数据量</span><br><span class="line"># --cut-over数据复制的最后一步,安全的对原表和新表进行切换.默认是atomic,而two-step则不安全.</span><br><span class="line"># --cut-over-lock-timeout-seconds执行cut-over时间.默认3秒,可以不用配置.</span><br><span class="line"># --cut-over-exponential-backoff执行cut-over失败后执行指数级等待.</span><br><span class="line"># --exponential-backoff-max-interval执行指数级等待的最大时间间隔.默认是64.如:</span><br><span class="line"># --exact-rowcount真实计算数据总量,执行count()操作.个人觉得没必要,比较耗时.</span><br><span class="line"># --initially-drop-ghost-table(建议使用)清除以前操作遗留下的ghost表</span><br><span class="line"># --initially-drop-old-table(建议使用)清除以前操作遗留下的旧表</span><br><span class="line"># --initially-drop-socket-file(建议使用)清除以前遗留的socket文件</span><br><span class="line"># --timestamp-old-table旧表加上时间戳</span><br><span class="line"># --verbose日志界别debug</span><br><span class="line"># --serve-socket-file=/tmp/gh-ost.test.sock </span><br><span class="line"># --panic-flag-file=/tmp/gh-ost.panic.flag(暂时不清楚,先不使用)</span><br><span class="line"># --switch-to-rbr(建议添加)这样不用关注mysql的bin log的格式.让gh-ost去执行设置bin-log格式操作.</span><br></pre></td></tr></table></figure>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="gh-ost参数详解"><a href="#gh-ost参数详解" class="headerlink" title="gh-ost参数详解"></a>gh-ost参数详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">-aliyun-rds</span><br><span class="line">  	set to &apos;true&apos; when you execute on Aliyun RDS.</span><br><span class="line">-allow-master-master</span><br><span class="line">  	explicitly allow running in a master-master setup</span><br><span class="line">-allow-nullable-unique-key</span><br><span class="line">  	allow gh-ost to migrate based on a unique key with nullable columns. As long as no NULL values exist, this should be OK. If NULL values exist in chosen key, data may be corrupted. Use at your own risk!</span><br><span class="line">-allow-on-master</span><br><span class="line">  	allow this migration to run directly on master. Preferably it would run on a replica</span><br><span class="line">-alter string</span><br><span class="line">  	alter statement (mandatory)</span><br><span class="line">-approve-renamed-columns ALTER</span><br><span class="line">  	in case your ALTER statement renames columns, gh-ost will note that and offer its interpretation of the rename. By default gh-ost does not proceed to execute. This flag approves that gh-ost&apos;s interpretation is correct</span><br><span class="line">-ask-pass</span><br><span class="line">  	prompt for MySQL password</span><br><span class="line">-assume-master-host string</span><br><span class="line">  	(optional) explicitly tell gh-ost the identity of the master. Format: some.host.com[:port] This is useful in master-master setups where you wish to pick an explicit master, or in a tungsten-replicator where gh-ost is unable to determine the master</span><br><span class="line">-assume-rbr</span><br><span class="line">  	set to &apos;true&apos; when you know for certain your server uses &apos;ROW&apos; binlog_format. gh-ost is unable to tell, event after reading binlog_format, whether the replication process does indeed use &apos;ROW&apos;, and restarts replication to be certain RBR setting is applied. Such operation requires SUPER privileges which you might not have. Setting this flag avoids restarting replication and you can proceed to use gh-ost without SUPER privileges</span><br><span class="line">-check-flag</span><br><span class="line">  	Check if another flag exists/supported. This allows for cross-version scripting. Exits with 0 when all additional provided flags exist, nonzero otherwise. You must provide (dummy) values for flags that require a value. Example: gh-ost --check-flag --cut-over-lock-timeout-seconds --nice-ratio 0</span><br><span class="line">-chunk-size int</span><br><span class="line">  	amount of rows to handle in each iteration (allowed range: 100-100,000) (default 1000)</span><br><span class="line">-concurrent-rowcount</span><br><span class="line">  	(with --exact-rowcount), when true (default): count rows after row-copy begins, concurrently, and adjust row estimate later on; when false: first count rows, then start row copy (default true)</span><br><span class="line">-conf string</span><br><span class="line">  	Config file</span><br><span class="line">-critical-load string</span><br><span class="line">  	Comma delimited status-name=threshold, same format as --max-load. When status exceeds threshold, app panics and quits</span><br><span class="line">-critical-load-hibernate-seconds int</span><br><span class="line">  	When nonzero, critical-load does not panic and bail out; instead, gh-ost goes into hibernate for the specified duration. It will not read/write anything to from/to any server</span><br><span class="line">-critical-load-interval-millis int</span><br><span class="line">  	When 0, migration immediately bails out upon meeting critical-load. When non-zero, a second check is done after given interval, and migration only bails out if 2nd check still meets critical load</span><br><span class="line">-cut-over string</span><br><span class="line">  	choose cut-over type (default|atomic, two-step) (default &quot;atomic&quot;)</span><br><span class="line">-cut-over-exponential-backoff</span><br><span class="line">  	Wait exponentially longer intervals between failed cut-over attempts. Wait intervals obey a maximum configurable with &apos;exponential-backoff-max-interval&apos;).</span><br><span class="line">-cut-over-lock-timeout-seconds int</span><br><span class="line">  	Max number of seconds to hold locks on tables while attempting to cut-over (retry attempted when lock exceeds timeout) (default 3)</span><br><span class="line">-database string</span><br><span class="line">  	database name (mandatory)</span><br><span class="line">-debug</span><br><span class="line">  	debug mode (very verbose)</span><br><span class="line">-default-retries int</span><br><span class="line">  	Default number of retries for various operations before panicking (default 60)</span><br><span class="line">-discard-foreign-keys</span><br><span class="line">  	DANGER! This flag will migrate a table that has foreign keys and will NOT create foreign keys on the ghost table, thus your altered table will have NO foreign keys. This is useful for intentional dropping of foreign keys</span><br><span class="line">-dml-batch-size int</span><br><span class="line">  	batch size for DML events to apply in a single transaction (range 1-100) (default 10)</span><br><span class="line">-exact-rowcount</span><br><span class="line">  	actually count table rows as opposed to estimate them (results in more accurate progress estimation)</span><br><span class="line">-execute</span><br><span class="line">  	actually execute the alter &amp; migrate the table. Default is noop: do some tests and exit</span><br><span class="line">-exponential-backoff-max-interval int</span><br><span class="line">  	Maximum number of seconds to wait between attempts when performing various operations with exponential backoff. (default 64)</span><br><span class="line">-force-named-cut-over</span><br><span class="line">  	When true, the &apos;unpostpone|cut-over&apos; interactive command must name the migrated table</span><br><span class="line">-force-table-names string</span><br><span class="line">  	table name prefix to be used on the temporary tables</span><br><span class="line">-heartbeat-interval-millis int</span><br><span class="line">  	how frequently would gh-ost inject a heartbeat value (default 100)</span><br><span class="line">-help</span><br><span class="line">  	Display usage</span><br><span class="line">-hooks-hint string</span><br><span class="line">  	arbitrary message to be injected to hooks via GH_OST_HOOKS_HINT, for your convenience</span><br><span class="line">-hooks-path string</span><br><span class="line">  	directory where hook files are found (default: empty, ie. hooks disabled). Hook files found on this path, and conforming to hook naming conventions will be executed</span><br><span class="line">-host string</span><br><span class="line">  	MySQL hostname (preferably a replica, not the master) (default &quot;127.0.0.1&quot;)</span><br><span class="line">-initially-drop-ghost-table</span><br><span class="line">  	Drop a possibly existing Ghost table (remains from a previous run?) before beginning operation. Default is to panic and abort if such table exists</span><br><span class="line">-initially-drop-old-table</span><br><span class="line">  	Drop a possibly existing OLD table (remains from a previous run?) before beginning operation. Default is to panic and abort if such table exists</span><br><span class="line">-initially-drop-socket-file</span><br><span class="line">  	Should gh-ost forcibly delete an existing socket file. Be careful: this might drop the socket file of a running migration!</span><br><span class="line">-master-password string</span><br><span class="line">  	MySQL password on master, if different from that on replica. Requires --assume-master-host</span><br><span class="line">-master-user string</span><br><span class="line">  	MySQL user on master, if different from that on replica. Requires --assume-master-host</span><br><span class="line">-max-lag-millis int</span><br><span class="line">  	replication lag at which to throttle operation (default 1500)</span><br><span class="line">-max-load string</span><br><span class="line">  	Comma delimited status-name=threshold. e.g: &apos;Threads_running=100,Threads_connected=500&apos;. When status exceeds threshold, app throttles writes</span><br><span class="line">-migrate-on-replica</span><br><span class="line">  	Have the migration run on a replica, not on the master. This will do the full migration on the replica including cut-over (as opposed to --test-on-replica)</span><br><span class="line">-nice-ratio float</span><br><span class="line">  	force being &apos;nice&apos;, imply sleep time per chunk time; range: [0.0..100.0]. Example values: 0 is aggressive. 1: for every 1ms spent copying rows, sleep additional 1ms (effectively doubling runtime); 0.7: for every 10ms spend in a rowcopy chunk, spend 7ms sleeping immediately after</span><br><span class="line">-ok-to-drop-table</span><br><span class="line">  	Shall the tool drop the old table at end of operation. DROPping tables can be a long locking operation, which is why I&apos;m not doing it by default. I&apos;m an online tool, yes?</span><br><span class="line">-panic-flag-file string</span><br><span class="line">  	when this file is created, gh-ost will immediately terminate, without cleanup</span><br><span class="line">-password string</span><br><span class="line">  	MySQL password</span><br><span class="line">-port int</span><br><span class="line">  	MySQL port (preferably a replica, not the master) (default 3306)</span><br><span class="line">-postpone-cut-over-flag-file string</span><br><span class="line">  	while this file exists, migration will postpone the final stage of swapping tables, and will keep on syncing the ghost table. Cut-over/swapping would be ready to perform the moment the file is deleted.</span><br><span class="line">-quiet</span><br><span class="line">  	quiet</span><br><span class="line">-replica-server-id uint</span><br><span class="line">  	server id used by gh-ost process. Default: 99999 (default 99999)</span><br><span class="line">-replication-lag-query string</span><br><span class="line">  	Deprecated. gh-ost uses an internal, subsecond resolution query</span><br><span class="line">-serve-socket-file string</span><br><span class="line">  	Unix socket file to serve on. Default: auto-determined and advertised upon startup</span><br><span class="line">-serve-tcp-port int</span><br><span class="line">  	TCP port to serve on. Default: disabled</span><br><span class="line">-skip-foreign-key-checks</span><br><span class="line">  	set to &apos;true&apos; when you know for certain there are no foreign keys on your table, and wish to skip the time it takes for gh-ost to verify that</span><br><span class="line">-skip-renamed-columns ALTER</span><br><span class="line">  	in case your ALTER statement renames columns, gh-ost will note that and offer its interpretation of the rename. By default gh-ost does not proceed to execute. This flag tells gh-ost to skip the renamed columns, i.e. to treat what gh-ost thinks are renamed columns as unrelated columns. NOTE: you may lose column data</span><br><span class="line">-stack</span><br><span class="line">  	add stack trace upon error</span><br><span class="line">-switch-to-rbr</span><br><span class="line">  	let this tool automatically switch binary log format to &apos;ROW&apos; on the replica, if needed. The format will NOT be switched back. I&apos;m too scared to do that, and wish to protect you if you happen to execute another migration while this one is running</span><br><span class="line">-table string</span><br><span class="line">  	table name (mandatory)</span><br><span class="line">-test-on-replica</span><br><span class="line">  	Have the migration run on a replica, not on the master. At the end of migration replication is stopped, and tables are swapped and immediately swap-revert. Replication remains stopped and you can compare the two tables for building trust</span><br><span class="line">-test-on-replica-skip-replica-stop</span><br><span class="line">  	When --test-on-replica is enabled, do not issue commands stop replication (requires --test-on-replica)</span><br><span class="line">-throttle-additional-flag-file string</span><br><span class="line">  	operation pauses when this file exists; hint: keep default, use for throttling multiple gh-ost operations (default &quot;/tmp/gh-ost.throttle&quot;)</span><br><span class="line">-throttle-control-replicas string</span><br><span class="line">  	List of replicas on which to check for lag; comma delimited. Example: myhost1.com:3306,myhost2.com,myhost3.com:3307</span><br><span class="line">-throttle-flag-file string</span><br><span class="line">  	operation pauses when this file exists; hint: use a file that is specific to the table being altered</span><br><span class="line">-throttle-http string</span><br><span class="line">  	when given, gh-ost checks given URL via HEAD request; any response code other than 200 (OK) causes throttling; make sure it has low latency response</span><br><span class="line">-throttle-query string</span><br><span class="line">  	when given, issued (every second) to check if operation should throttle. Expecting to return zero for no-throttle, &gt;0 for throttle. Query is issued on the migrated server. Make sure this query is lightweight</span><br><span class="line">-timestamp-old-table</span><br><span class="line">  	Use a timestamp in old table name. This makes old table names unique and non conflicting cross migrations</span><br><span class="line">-tungsten</span><br><span class="line">  	explicitly let gh-ost know that you are running on a tungsten-replication based topology (you are likely to also provide --assume-master-host)</span><br><span class="line">-user string</span><br><span class="line">  	MySQL user</span><br><span class="line">-verbose</span><br><span class="line">  	verbose</span><br><span class="line">-version</span><br><span class="line">  	Print version &amp; exit</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/github/gh-ost" target="_blank" rel="noopener">gh-ost github</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/09/17/ansible使用常见问题汇总-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2441,347 +2670,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/20/Gluster入门/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/20/Gluster入门/" itemprop="url">Gluster入门</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T14:20:27+08:00">
-                2018-08-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">Kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  2,888
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  14
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="https://ws4.sinaimg.cn/large/0069RVTdgy1fuzxicxxpzj30jx08rq3v.jpg" alt="Gluster技术视图"></p>
-<h2 id="Notice"><a href="#Notice" class="headerlink" title="Notice"></a>Notice</h2><ul>
-<li><p>Recommend use XFS filesystem.</p>
-<p>○  Typically, XFS is recommended but it can be used with other filesystems as well. Most commonly EXT4 is used when XFS isn’t, but you can (and many, many people do) use another filesystem that suits you. </p>
-<p>☆ 推荐使用XFS文件系统.EXT4等其他文件系统也是可以.</p>
-</li>
-<li><p>Correct DNS entries (forward and reverse) and NTP are essential.</p>
-<p>☆ DNS一般不需要特殊配置,采用默认即可.NTP,就是要求每台机器的时钟进行校对,节点机器都在同一个时区,并校对.校对方式很多,使用一致的即可.</p>
-</li>
-<li><p>Firewalls are great, except when they aren’t.In case you absolutely need to set up a firewall, have a look at <a href="https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/" target="_blank" rel="noopener">Setting up clients</a> for information on the ports used.</p>
-<p>☆ 不建议Gluster节点之间开启防火墙.如果实在有必要开启防火墙,我是配置IP级别的,这样可以减少一些复杂度.</p>
-</li>
-<li><p>2 CPU’s, 2GB of RAM, 1GBE(千兆带宽)</p>
-<p>☆ 服务端配置至少需要这种配置</p>
-</li>
-</ul>
-<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><h3 id="Gluster-Native-Client"><a href="#Gluster-Native-Client" class="headerlink" title="Gluster Native Client"></a>Gluster Native Client</h3><p>○ The Gluster Native Client is a FUSE-based client running in user space. Gluster Native Client is the recommended method for accessing volumes when high concurrency and high write performance is required.</p>
-<p>☆ 推荐使用这种方式,其基于内核提供的FUSE,在高并发、大数据量写入时效果更好.</p>
-<h3 id="NFS-Client"><a href="#NFS-Client" class="headerlink" title="NFS Client"></a>NFS Client</h3><h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><h3 id="What"><a href="#What" class="headerlink" title="What"></a>What</h3><p>○  GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.</p>
-<p>GlusterFS isn’t really a filesystem in and of itself. It concatenates existing filesystems into one (or more) big chunks so that data being written into or read out of Gluster gets distributed across multiple hosts simultaneously</p>
-<p>☆ Gluster是一个开源的、可扩展的、分布式数据存储管理软件.其并不是一个文件系统,只是提供连接能力,将分布的文件系统组装成一个更大的文件存储系统.</p>
-<h3 id="Concept"><a href="#Concept" class="headerlink" title="Concept"></a>Concept</h3><ul>
-<li><p>TSP</p>
-<p>○  A trusted storage pool(TSP) is a trusted network of storage servers. Before you can configure a GlusterFS volume, you must create a trusted storage pool of the storage servers that will provide bricks to the volume by peer probing the servers. The servers in a TSP are peers of each other.</p>
-<p>☆ Gluster通过TSP(信任存储池)来确定可提供存储服务的机器有哪些.</p>
-</li>
-<li><p>Brick</p>
-<p>○  A brick is used to refer to any device (really this means filesystem) that is being used for Gluster storage.</p>
-<p>☆ Gluster使用的存储单位.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick对Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
-</li>
-<li><p>Gluster volume</p>
-<p>○  A <strong>Gluster volume</strong> is a collection of one or more bricks (of course, typically this is two or more). This is analogous(类似的) to /etc/exports entries for NFS.</p>
-<p>☆ Brick的集合.</p>
-</li>
-<li><p>Global Namespace</p>
-<p>○  The term <strong>Global Namespace</strong> is a fancy way of saying a Gluster volume.</p>
-<p>☆ 对Cluster volume的另一种叫法.</p>
-</li>
-<li><p>Export</p>
-<p>○  An <strong>export</strong> refers to the mount path of the brick(s) on a given server, for example, /export/brick1.</p>
-<p>☆ 暂时不能理解,待补充.</p>
-</li>
-<li><p><strong>GNFS</strong> and <strong>kNFS</strong></p>
-<p>○  GNFS is how we refer to our inline NFS server. kNFS stands for kernel NFS, or, as most people would say, just plain NFS. Most often, you will want kNFS services disabled on the Gluster nodes. Gluster NFS doesn’t take any additional configuration and works just like you would expect with NFSv3. It is possible to configure Gluster and NFS to live in harmony if you want to.</p>
-<p>☆ Gluster内部的NFS服务,启动好Glusterd Daemon后,通过GNFS其他Gluster进行数据交互.kNFS是Linux系统内核的NFS服务.两者不会互相干扰,可以共同使用.</p>
-</li>
-</ul>
-<h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p>Centos系统可参考&lt;&lt;Gluster安装&gt;&gt;.<a href="https://docs.gluster.org/en/latest/Install-Guide/Install/" target="_blank" rel="noopener">其他系统安装</a>.</p>
-<h3 id="System-Packaged-version"><a href="#System-Packaged-version" class="headerlink" title="System Packaged version"></a>System Packaged version</h3><p>各系统的安装包版本及依赖包.<a href="https://docs.gluster.org/en/latest/Install-Guide/Community_Packages/" target="_blank" rel="noopener">Packages</a></p>
-<h3 id="Manage-Trust-Storage-Pool"><a href="#Manage-Trust-Storage-Pool" class="headerlink" title="Manage Trust Storage Pool"></a>Manage Trust Storage Pool</h3><p>○  The firewall on the servers must be configured to allow access to port 24007.</p>
-<p>☆ 存储节点使用24007端口进行通信</p>
-<p>假设有4台机器,server1,server2,server3,server4在一个TSP中.</p>
-<h4 id="Add-to-trust-storage-pool"><a href="#Add-to-trust-storage-pool" class="headerlink" title="Add to trust storage pool"></a>Add to trust storage pool</h4><p>在任意一台机器上机器上执行.</p>
-<ul>
-<li>gluster peer probe <server></server></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster peer probe &lt;server&gt;</span><br><span class="line">Probe successful</span><br></pre></td></tr></table></figure>
-<h4 id="List-Servers"><a href="#List-Servers" class="headerlink" title="List Servers"></a>List Servers</h4><p>在任意一台机器上执行.</p>
-<ul>
-<li>gluster pool list</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster pool list</span><br><span class="line">UUID                                    Hostname        State</span><br><span class="line">d18d36c5-533a-4541-ac92-c471241d5418    localhost       Connected</span><br><span class="line">5e987bda-16dd-43c2-835b-08b7d55e94e5    server2         Connected</span><br><span class="line">1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7    server3         Connected</span><br><span class="line">3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7    server4         Connected</span><br></pre></td></tr></table></figure>
-<h4 id="Views-peer-status"><a href="#Views-peer-status" class="headerlink" title="Views peer status"></a>Views peer status</h4><ul>
-<li>gluster peer status</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 假设在server1上执行.</span><br><span class="line">$ gluster peer status</span><br><span class="line">Hostname: server2</span><br><span class="line">Uuid: 5e987bda-16dd-43c2-835b-08b7d55e94e5</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server3</span><br><span class="line">Uuid: 1e0ca3aa-9ef7-4f66-8f15-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connect</span><br><span class="line">Hostname: server4</span><br><span class="line">Uuid: 3e0cabaa-9df7-4f66-8e5d-cbc348f29ff7</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
-<h4 id="Removing-Servers"><a href="#Removing-Servers" class="headerlink" title="Removing Servers"></a>Removing Servers</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gluster peer detach &lt;server&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="Brick-Naming-Convertions"><a href="#Brick-Naming-Convertions" class="headerlink" title="Brick Naming Convertions"></a>Brick Naming Convertions</h3><ul>
-<li><p>/data/glusterfs/<volume>/<brick>/brick</brick></volume></p>
-<p><volume>是对linux磁盘绑定起的别名,如系统中<em>/dev/sdb</em>磁盘,我们绑定后,可以命名为test(环境使用类型),这样可区分所属环境.</volume></p>
-<p><brick>就可以任意命名了,我是通过业务进行区分.如es表示搜索引擎业务使用,logs表示日志使用.不同的业务可能对磁盘性能可能也是不一样的,可以通过多个磁盘分出来.</brick></p>
-</li>
-</ul>
-<p>要搞明白Brick的命名规范,就需要先理解brick的概念.在linux系统中,常用<code>fdisk -l</code>来查看挂载的磁盘,而brick就Gluster来说,就是它的挂载的磁盘.只不过这里将brick与磁盘进行一个bind,一一映射.</p>
-<p>举个例子:</p>
-<p>比如一块物理磁盘/dev/sdb,现在我用于测试环境中,用户通常的业务,存储一些日志等.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line">$ mount /dev/sdb /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br><span class="line"># 如果要启用还要start</span><br><span class="line">$ gluster volume start test</span><br></pre></td></tr></table></figure>
-<p>这里有个疑问,为什么需要使用brick呢?</p>
-<p>假如server1有两个磁盘/dev/sda,/dev/sdb.而server2有两个/dev/sdb1,/dev/sdb2.磁盘名称就存在不同,要通过brick去屏蔽底层磁盘的名称的不同和性能的不同.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p /data/glusterfs/test/biz</span><br><span class="line"># server1</span><br><span class="line">$ mount /dev/sda /data/glusterfs/test/biz</span><br><span class="line"># server2</span><br><span class="line">$ mount /dev/sdb1 /data/glusterfs/test/biz</span><br><span class="line">$ gluster volume create test replica 2 server&#123;1..4&#125;:/data/glusterfs/test/biz/brick</span><br></pre></td></tr></table></figure>
-<h3 id="Formatting-and-Mounting-Bricks"><a href="#Formatting-and-Mounting-Bricks" class="headerlink" title="Formatting and Mounting Bricks"></a>Formatting and Mounting Bricks</h3><p>待完善.这里主要涉及Linux卷相关概念:lV逻辑卷,VG卷组,PV物理卷.</p>
-<p><a href="https://wiki.archlinux.org/index.php/LVM" target="_blank" rel="noopener">https://wiki.archlinux.org/index.php/LVM</a></p>
-<p><a href="https://linux.cn/article-5117-1.html" target="_blank" rel="noopener">https://linux.cn/article-5117-1.html</a></p>
-<p><a href="https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups" target="_blank" rel="noopener">https://askubuntu.com/questions/417642/logical-volume-physical-volume-and-volume-groups</a></p>
-<h3 id="Set-ACL"><a href="#Set-ACL" class="headerlink" title="Set ACL"></a>Set ACL</h3><p>待完善.这里主要是Linux中ACL与Gluster的使用.</p>
-<h3 id="Volume-Types"><a href="#Volume-Types" class="headerlink" title="Volume Types"></a>Volume Types</h3><p>○ A volume is a logical collection of bricks.</p>
-<p>以下罗列了Gluster提供的Volume类型.</p>
-<ul>
-<li><p><strong>Distributed</strong> - Distributed volumes distribute files across the bricks in the volume. You can use distributed volumes where the requirement is to scale storage and the redundancy is either not important or is provided by other hardware/software layers.</p>
-</li>
-<li><p><strong>Replicated</strong> – Replicated volumes replicate files across bricks in the volume. You can use replicated volumes in environments where high-availability and high-reliability are critical.</p>
-</li>
-<li><p><strong>Distributed Replicated</strong> - Distributed replicated volumes distribute files across replicated bricks in the volume. You can use distributed replicated volumes in environments where the requirement is to scale storage and high-reliability is critical. Distributed replicated volumes also offer improved read performance in most environments.</p>
-</li>
-<li><p><strong>Dispersed</strong> - Dispersed volumes are based on erasure codes, providing space-efficient protection against disk or server failures. It stores an encoded fragment of the original file to each brick in a way that only a subset of the fragments is needed to recover the original file. The number of bricks that can be missing without losing access to data is configured by the administrator on volume creation time.</p>
-<p>☆ 这里的关键是erasure codes算法.<a href="https://en.wikipedia.org/wiki/Erasure_code" target="_blank" rel="noopener">Erasure-Code</a>, 简称 EC, 也叫做 <strong>擦除码</strong> 或 <strong>纠删码</strong>, 指使用 范德蒙(<a href="https://en.wikipedia.org/wiki/Vandermonde_matrix" target="_blank" rel="noopener">Vandermonde</a>) 矩阵的 里德-所罗门码(<a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed-Solomon</a>) 擦除码算法.</p>
-<p>通过较少的数据冗余能够找回丢失数据.相比于Relica百分百冗余来说,这个方式更节省空间.</p>
-<p>推荐学习这篇文章<a href="http://drmingdrmer.github.io/tech/distributed/2017/02/01/ec.html" target="_blank" rel="noopener">drdr.xp Blog</a></p>
-</li>
-<li><p><strong>Distributed Dispersed</strong> - Distributed dispersed volumes distribute files across dispersed subvolumes. This has the same advantages of distribute replicate volumes, but using disperse to store the data into the bricks.</p>
-</li>
-<li><strong>Striped [Deprecated]</strong> 、<strong>Distributed Striped [Deprecated]</strong> 、<strong>Distributed Striped Replicated [Deprecated]</strong>、<strong>Striped Replicated [Deprecated]</strong> </li>
-</ul>
-<p>☆ 上面主要有三种volume类型:Distributed, Replicated, Dispersed. 和组合后的二种:Distributed Replicated, Distributed Dispersed.</p>
-<h4 id="Create-Command"><a href="#Create-Command" class="headerlink" title="Create Command"></a>Create Command</h4><p>stripe已经废弃,所以目前只有replica和disperse两种volume类型.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [stripe | replica | disperse] [transport tcp | rdma | tcp,rdma]</span><br><span class="line">  volume  create  &lt;NEW-VOLNAME&gt; [stripe &lt;COUNT&gt;] [replica &lt;COUNT&gt;] [disperse</span><br><span class="line">  [&lt;COUNT&gt;]] [redundancy &lt;COUNT&gt;] [transport &lt;tcp|rdma|tcp,rdma&gt;] &lt;NEW-BRICK&gt;</span><br><span class="line">  ...</span><br><span class="line">  Create a new volume of the specified type using the specified bricks</span><br><span class="line">  and transport type (the default transport type is tcp).  To create a</span><br><span class="line">  volume   with  both  transports  (tcp  and  rdma),  give  &apos;transport</span><br><span class="line">  tcp,rdma&apos; as an option.</span><br></pre></td></tr></table></figure>
-<h4 id="Distributed"><a href="#Distributed" class="headerlink" title="Distributed"></a>Distributed</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904111824011.png" alt="image-20180904111824011"></p>
-<ul>
-<li><p>优点</p>
-<p>节省空间,易扩展.</p>
-</li>
-<li><p>缺点</p>
-<p>数据丢失风险:由于数据没有冗余,一旦机器故障数据就会丢失.</p>
-</li>
-</ul>
-<p><strong>Note</strong>: Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># If the transport type is not specified, tcp is used as the default.</span><br><span class="line">$ gluster volume create test-volume server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line">$ gluster volume info</span><br><span class="line">Volume Name: test-volume</span><br><span class="line">Type: Distribute</span><br><span class="line">Status: Created</span><br><span class="line">Number of Bricks: 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: server1:/exp1</span><br><span class="line">Brick2: server2:/exp2</span><br><span class="line">Brick3: server3:/exp3</span><br><span class="line">Brick4: server4:/exp4</span><br></pre></td></tr></table></figure>
-<h4 id="Replicated"><a href="#Replicated" class="headerlink" title="Replicated"></a>Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904112531086.png" alt="image-20180904112531086"></p>
-<ul>
-<li><p>优点</p>
-<p>数据有冗余,数据丢失依然可用.</p>
-</li>
-<li><p>缺点</p>
-<p>存储空间消耗较多</p>
-</li>
-</ul>
-<p><strong>Note</strong>:</p>
-<ul>
-<li><p>Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
-</li>
-<li><p>GlusterFS will fail to create a replicate volume if more than one brick of a replica set is present on the same peer. For eg. a four node replicated volume where more than one brick of a replica set is present on the same peer.</p>
-<p>☆ 这种Volume类型不能指定同一台机器.如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
-<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create  [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># transport type is not specified, tcp is used as the default. </span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2</span><br></pre></td></tr></table></figure>
-<h4 id="Dispersed"><a href="#Dispersed" class="headerlink" title="Dispersed"></a>Dispersed</h4><ul>
-<li><p>优点</p>
-<p>同replica一样,数据高可用,而且数据存储量更少.</p>
-</li>
-<li><p>缺点</p>
-<p>暂未发现</p>
-</li>
-</ul>
-<p>○  Dispersed volumes are based on erasure codes.</p>
-<p>☆ 基于纠偏码算法.不同于replica,冗余数据量大幅减少的情况下,依然做到数据高可用.</p>
-<p>分布式系统中,为了保证数据高可用,一般选择副本数为3,这个可靠性的预期大约是11个9以上(99.999999999%的概率不丢数据).这里有业界报告来支撑这个数值.<a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener"><a href="https://www.backblaze.com/blog/hard-drive-reliability-stats-q1-2016/" target="_blank" rel="noopener">backblaze发布的硬盘故障率统计</a></a></p>
-<p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904153714497.png" alt="image-20180904153714497"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 正常可以不用指定redundancy,在创建时会提示指定数量.</span><br><span class="line"># gluster volume create [disperse [&lt;count&gt;]] [redundancy &lt;count&gt;] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 如下:提示使用redundancy.</span><br><span class="line">$ gluster volume create test-volume disperse 4 server&#123;1..4&#125;:/bricks/test-volume</span><br><span class="line">There isn&apos;t an optimal redundancy value for this configuration. Do you want to create the volume with redundancy 1 ? (y/n)</span><br></pre></td></tr></table></figure>
-<h4 id="Distributed-Replicated"><a href="#Distributed-Replicated" class="headerlink" title="Distributed Replicated"></a>Distributed Replicated</h4><p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180904114809633.png" alt="image-20180904114809633"></p>
-<ul>
-<li><p>优点</p>
-<p>数据冗余,数据丢失后依然可用.</p>
-</li>
-<li><p>缺点</p>
-<p>于Replica不同的是,冗余的数据存在随机性,不便于管理.另外,存储空间消耗大.</p>
-</li>
-</ul>
-<p><strong>Note</strong>: - Make sure you start your volumes before you try to mount them or else client operations after the mount will hang.</p>
-<ul>
-<li><p>GlusterFS will fail to create a distribute replicate volume if more than one brick of a replica set is present on the same peer. For eg. for a four node distribute (replicated) volume where more than one brick of a replica set is present on the same peer.</p>
-<p>☆ 这种类型的Volume,同样不能指定同一台机器,不然报错.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gluster volume create &lt;volname&gt; replica 4 server1:/brick1 server1:/brick2 server2:/brick3 server4:/brick4</span><br><span class="line">volume create: &lt;volname&gt;: failed: Multiple bricks of a replicate volume are present on the same server. This setup is not optimal. Use &apos;force&apos; at the end of the command if you want to override this behavior.</span><br></pre></td></tr></table></figure>
-<p>这里指定了server1:/brick1和server1/brick2,所以报错,不能同时冗余一份到同一台机器.</p>
-</li>
-</ul>
-<p>从执行指令上看,Relicated和Distributed Relicated是相同的.只是后面的节点数量多于replica的数量.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume create [replica ] [transport tcp | rdma | tcp,rdma]</span><br><span class="line"># 这个执行结果结果就是上图所示.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4</span><br><span class="line"># 如果指定6个节点,replica为2,则会随机选取2个节点存储数据,1个节点存储原数据,1个节点冗余数据.</span><br><span class="line">$ gluster volume create test-volume replica 2 transport tcp server1:/exp1 server2:/exp2 server3:/exp3 server4:/exp4 server5:/exp5 server6:/exp6</span><br></pre></td></tr></table></figure>
-<h4 id="Distributed-Dispersed"><a href="#Distributed-Dispersed" class="headerlink" title="Distributed Dispersed"></a>Distributed Dispersed</h4>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2836,7 +2724,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">38</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2847,7 +2735,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2858,7 +2746,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2919,7 +2807,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">26.2k</span>
+    <span title="Site words total count">29.1k</span>
   
 </div>
 
