@@ -309,6 +309,979 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/15/docker之实战技巧/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/15/docker之实战技巧/" itemprop="url">docker之实用技巧</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-15T10:33:23+08:00">
+                2018-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  448
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这里记录自己常用的一些实战技巧.</p>
+<h2 id="技巧一"><a href="#技巧一" class="headerlink" title="技巧一"></a>技巧一</h2><h3 id="容器执行指定命令并后台运行"><a href="#容器执行指定命令并后台运行" class="headerlink" title="容器执行指定命令并后台运行"></a>容器执行指定命令并后台运行</h3><p>容器是否会长久运行，是和 docker run 指定的命令有关，和 -d 参数无关.<br>我就有以下场景需求.制作一个squid镜像,并在运行容器后,容器里执行squid start命令.<br>一般需要让容器可以后台长久运行,需要指定/bin/bash指令.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -ti --name [容器名] -d [镜像名] /bin/bash</span><br></pre></td></tr></table></figure></p>
+<h4 id="方式一-通过Dockerfile来build"><a href="#方式一-通过Dockerfile来build" class="headerlink" title="方式一:通过Dockerfile来build"></a>方式一:通过Dockerfile来build</h4><p>利用ENTRYPOINT实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FROM centos:7</span><br><span class="line">RUN yum install -y squid</span><br><span class="line"># ip高匿与端口</span><br><span class="line">RUN echo &apos;request_header_access Via deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; echo &apos;request_header_access X-Forwarded-For deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; echo &apos;request_header_access From deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; sed -i &apos;s/http_access deny all/http_access allow all/g&apos; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; sed -i &apos;s/http_port 3128/http_port 57112/g&apos; /etc/squid/squid.conf</span><br><span class="line">ENTRYPOINT /usr/sbin/squid start &amp;&amp; /bin/bash # 这个是重点</span><br><span class="line">EXPOSE 57112</span><br></pre></td></tr></table></figure></p>
+<h4 id="方式二-使用supervisor-有问题-待修改"><a href="#方式二-使用supervisor-有问题-待修改" class="headerlink" title="方式二:使用supervisor(有问题,待修改)"></a>方式二:使用supervisor(有问题,待修改)</h4><p>1、容器中需要安装supervisor服务;<br>2、上传本地supervisor配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">FROM centos:7</span><br><span class="line">RUN yum install -y squid python-setuptools</span><br><span class="line">RUN easy_install supervisor</span><br><span class="line">COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf</span><br><span class="line"># ip高匿与端口</span><br><span class="line">RUN echo &apos;request_header_access Via deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; echo &apos;request_header_access X-Forwarded-For deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; echo &apos;request_header_access From deny all&apos; &gt;&gt; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; sed -i &apos;s/http_access deny all/http_access allow all/g&apos; /etc/squid/squid.conf \</span><br><span class="line"> &amp;&amp; sed -i &apos;s/http_port 3128/http_port 57112/g&apos; /etc/squid/squid.conf</span><br><span class="line">EXPOSE 57112</span><br></pre></td></tr></table></figure></p>
+<h5 id="supervisor配置文件"><a href="#supervisor配置文件" class="headerlink" title="supervisor配置文件"></a>supervisor配置文件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[supervisord]</span><br><span class="line">nodaemon=true</span><br><span class="line">[program:squid]</span><br><span class="line">command=/usr/sbin/squid start</span><br></pre></td></tr></table></figure>
+<h2 id="技巧二"><a href="#技巧二" class="headerlink" title="技巧二"></a>技巧二</h2><h3 id="Docker-Hub-自动构建"><a href="#Docker-Hub-自动构建" class="headerlink" title="Docker Hub 自动构建"></a>Docker Hub 自动构建</h3><ul>
+<li>参考:<a href="https://blog.csdn.net/u010246789/article/details/54234217" target="_blank" rel="noopener">https://blog.csdn.net/u010246789/article/details/54234217</a></li>
+<li><a href="http://imquanquan.net/archives/pull-images-to-dockerhub-and-autobuild.html" target="_blank" rel="noopener">http://imquanquan.net/archives/pull-images-to-dockerhub-and-autobuild.html</a></li>
+</ul>
+<h2 id="技巧三"><a href="#技巧三" class="headerlink" title="技巧三"></a>技巧三</h2><h3 id="本地阅读Docker官方文档"><a href="#本地阅读Docker官方文档" class="headerlink" title="本地阅读Docker官方文档"></a>本地阅读Docker官方文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 本地运行Docker官方文档网站</span><br><span class="line">$ docker run -d -p 80:4000 docs/docker.github.io</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/15/docker之安装-新/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/15/docker之安装-新/" itemprop="url">docker之安装(新)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-15T10:27:36+08:00">
+                2018-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  349
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>mac 10.13.4 , Docker version 18.03.1-ce,Centos7</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>目前docker提供ce(community edition)社区版本和ee(enterprise edition)企业版本.选择ce版本即可.</p>
+<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fw8pa4d93nj31kw0e27lx.jpg" alt="img"></p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fw8paisws6j31kw0yedl4.jpg" alt="img"></p>
+<h2 id="Centos7安装"><a href="#Centos7安装" class="headerlink" title="Centos7安装"></a>Centos7安装</h2><h3 id="安装CE版本"><a href="#安装CE版本" class="headerlink" title="安装CE版本"></a>安装CE版本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># 卸载旧版本</span><br><span class="line">$ yum remove docker \</span><br><span class="line">                  docker-ce \</span><br><span class="line">                  docker-client \</span><br><span class="line">                  docker-client-latest \</span><br><span class="line">                  docker-common \</span><br><span class="line">                  docker-latest \</span><br><span class="line">                  docker-latest-logrotate \</span><br><span class="line">                  docker-logrotate \</span><br><span class="line">                  docker-selinux \</span><br><span class="line">                  docker-engine-selinux \</span><br><span class="line">                  docker-engine</span><br><span class="line"># 为了防止之前已经安装的遗留问题,删除镜像储存目录</span><br><span class="line">$ rm -rf /var/lib/docker</span><br><span class="line"># 安装依赖工具</span><br><span class="line">$ yum install -y yum-utils \</span><br><span class="line">  device-mapper-persistent-data \</span><br><span class="line">  lvm2</span><br><span class="line"># 安装docker官方仓库(失败 使用阿里云仓库)</span><br><span class="line">$ yum-config-manager \</span><br><span class="line">    --add-repo \</span><br><span class="line">    https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"># 如果上面执行后如下报错,添加阿里云的源即可.</span><br><span class="line">Loaded plugins: fastestmirror</span><br><span class="line">adding repo from: https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line">grabbing file https://download.docker.com/linux/centos/docker-ce.repo to /etc/yum.repos.d/docker-ce.repo</span><br><span class="line">Could not fetch/save url https://download.docker.com/linux/centos/docker-ce.repo to file /etc/yum.repos.d/docker-ce.repo: [Errno 12] Timeout on https://download.docker.com/linux/centos/docker-ce.repo: (28, &apos;Resolving timed out after 30455 milliseconds&apos;)</span><br><span class="line">$ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br><span class="line"># 安装docker</span><br><span class="line">$ yum install -y docker-ce</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable docker &amp;&amp; systemctl start docker</span><br></pre></td></tr></table></figure>
+<h3 id="添加docker-hub中国官方镜像加速器"><a href="#添加docker-hub中国官方镜像加速器" class="headerlink" title="添加docker hub中国官方镜像加速器"></a>添加docker hub<a href="https://www.docker-cn.com/registry-mirror" target="_blank" rel="noopener">中国官方镜像加速器</a></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://registry.docker-cn.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.docker.com/get-docker" target="_blank" rel="noopener">docker document</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/15/docker常见问题汇总/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/15/docker常见问题汇总/" itemprop="url">docker常见问题汇总</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-15T10:24:37+08:00">
+                2018-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  248
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="常见问题汇总"><a href="#常见问题汇总" class="headerlink" title="常见问题汇总"></a>常见问题汇总</h2><h3 id="阿里云启动报错-error-initializing-graphdriver-driver-not-supported"><a href="#阿里云启动报错-error-initializing-graphdriver-driver-not-supported" class="headerlink" title="阿里云启动报错:error initializing graphdriver: driver not supported"></a>阿里云启动报错:error initializing graphdriver: driver not supported</h3><ul>
+<li><p>问题描述<br>从版本docker-ce-18.06.0.ce降到版本docker-ce-17.03.2.ce,不能启动.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ journalctl -xe</span><br><span class="line">.....</span><br><span class="line">Aug 08 14:27:12 es3-log systemd[1]: Starting Docker Application Container Engine...</span><br><span class="line">Aug 08 14:27:12 es3-log dockerd[23468]: time=&quot;2018-08-08T14:27:12.282682284+08:00&quot; level=info msg=&quot;libcontainerd: new con...23476&quot;</span><br><span class="line">Aug 08 14:27:13 es3-log dockerd[23468]: time=&quot;2018-08-08T14:27:13.286553501+08:00&quot; level=error msg=&quot;[graphdriver] prior s...orted&quot;</span><br><span class="line">Aug 08 14:27:13 es3-log dockerd[23468]: Error starting daemon: error initializing graphdriver: driver not supported</span><br><span class="line">Aug 08 14:27:13 es3-log systemd[1]: docker.service: main process exited, code=exited, status=1/FAILURE</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解决方案<br>删除docker镜像存放目录/var/lib/docker,猜测是新版本目录结构与老版本不通导致.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># docker-ce-17.03.2.ce版本/var/lib/docker目录</span><br><span class="line">containers image network overlay plugins swarm tmp trust volumes</span><br><span class="line"># docker-ce-18.06.0.ce版本/var/lib/docker目录</span><br><span class="line">builder buildkit containerd containers image network overlay2 plugins runtimes	swarm tmp trust volumes</span><br><span class="line">$ rm -rf /var/lib/docker</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/15/docker实战之jenkins集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/15/docker实战之jenkins集群/" itemprop="url">docker实战之jenkins集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-15T10:12:41+08:00">
+                2018-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,343
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>centos 7</li>
+<li>jenkins 2.121.1</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>jenkins集群是必须搭建的,可以提高部署效率,每次只是部署几个job自然不会出现问题,如果一次要执行100个呢?试过就知道有多慢了!</p>
+<h2 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h2><p>jenkins-master只负责分发构建任务.</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fw8owhub28j31kw0s47a1.jpg" alt="img"></p>
+<p>搭建之前,我先把几个关键点梳理下:</p>
+<ul>
+<li>jenkins主节点创建job到目标部署主机的ssh免密登录密钥信息,在集群中的jenkins从节点如何获取?</li>
+<li>jenkins主节点数据必须持久化到本地磁盘</li>
+</ul>
+<h3 id="Pull-jenkins-images"><a href="#Pull-jenkins-images" class="headerlink" title="Pull jenkins images"></a>Pull jenkins images</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull jenkins/jenkins:lts</span><br></pre></td></tr></table></figure>
+<h3 id="Jenkins-master-and-Mount-data-volume"><a href="#Jenkins-master-and-Mount-data-volume" class="headerlink" title="Jenkins master and Mount data volume"></a>Jenkins master and Mount data volume</h3><h4 id="Build-Dockerfile-jenkins-data-and-jenkins-master"><a href="#Build-Dockerfile-jenkins-data-and-jenkins-master" class="headerlink" title="Build Dockerfile: jenkins-data and jenkins-master"></a>Build Dockerfile: jenkins-data and jenkins-master</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -f jenkins-data-dockerfile -t jenkins-data .</span><br><span class="line">$ docker build -f jenkins-master-dockerfile -t jenins-master .</span><br><span class="line"># 从节点宿主机上执行</span><br><span class="line">$ docker build -f jenkins-slave-dockerfile -t jenins-slave .</span><br></pre></td></tr></table></figure>
+<h4 id="Run-jenkins-master"><a href="#Run-jenkins-master" class="headerlink" title="Run jenkins-master"></a>Run jenkins-master</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 创建用户持久化jenkins数据文件的目录及日志目录.</span><br><span class="line">$ mkdir -p &#123;/data/jenkins,/data/logs/jenkins&#125;</span><br><span class="line"># 容器内启动jenkins服务使用的是jenkins用户,所以必须修改目录用户拥有者为</span><br><span class="line">$ chown 1000:1000 &#123;/data/jenkins,/data/logs/jenkins&#125;</span><br><span class="line"># 启动数据卷jenkins-datas</span><br><span class="line">$ docker run --name jenkins-data \</span><br><span class="line">-v /data/jenkins:/var/jenkins_home \</span><br><span class="line">-v /data/logs/jenkins:/var/log/jenkins \</span><br><span class="line">jenkins-data</span><br><span class="line"># 启动jenkins-master.(构建dockerfile见附录.)</span><br><span class="line">$ docker run -d \</span><br><span class="line">-p 19875:8080 \</span><br><span class="line">-p 50000:50000 \</span><br><span class="line">--volumes-from jenkins-data \</span><br><span class="line">--name jenkins-master \</span><br><span class="line">jenkins-master</span><br></pre></td></tr></table></figure>
+<h4 id="Run-jenkins-slave-in-slave-machine"><a href="#Run-jenkins-slave-in-slave-machine" class="headerlink" title="Run jenkins-slave in slave machine"></a>Run jenkins-slave in slave machine</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -ti -d \</span><br><span class="line">-p 19222:22 \</span><br><span class="line">--restart on-failure \</span><br><span class="line">--network host \ </span><br><span class="line">--name jenkins-slave \</span><br><span class="line">jenkins-slave</span><br></pre></td></tr></table></figure>
+<h3 id="Jenkins-master-add-slave-node"><a href="#Jenkins-master-add-slave-node" class="headerlink" title="Jenkins master add slave node"></a>Jenkins master add slave node</h3><h4 id="添加登录slave的用户名密码"><a href="#添加登录slave的用户名密码" class="headerlink" title="添加登录slave的用户名密码"></a>添加登录slave的用户名密码</h4><p>Jenkins-&gt;Credentials</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fw8owuiwo9j31kw0uv165.jpg" alt="img"></p>
+<p>这里可以添加root用户,避免一些权限问题.</p>
+<h4 id="添加节点"><a href="#添加节点" class="headerlink" title="添加节点"></a>添加节点</h4><p>Jenkins-&gt;系统管理-&gt;管理节点</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fw8ox2zmvzj31kw0upn4l.jpg" alt="img"></p>
+<p>指定远程工作目录,如果是用jenkins_slave用户时注意/home/jenkins_home需要jenkins_slave权限.为了方便起见,这里就直接使用root用户</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fw8oxb0mqpj31kw0uq7de.jpg" alt="img"></p>
+<h3 id="同步jenkins-master的密钥及相关脚本"><a href="#同步jenkins-master的密钥及相关脚本" class="headerlink" title="同步jenkins-master的密钥及相关脚本"></a>同步jenkins-master的密钥及相关脚本</h3><p>这里我采用的做法是配置job,通过job将.ssh/id_rsa, .ssh/id_rsa.pub,.ssh/known_hosts拷贝到slave中(见rsa_sysnc.sh脚本).<br>(所有脚本<a href="https://github.com/steven-ji/proxy-scripts.git" target="_blank" rel="noopener">proxy-scripts</a>已同步到git上.)</p>
+<h4 id="新建同步job"><a href="#新建同步job" class="headerlink" title="新建同步job"></a>新建同步job</h4><p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fw8oxhw1j2j31ie0j63zx.jpg" alt="img"></p>
+<h2 id="上传dockerfile到docker-hub个人仓库"><a href="#上传dockerfile到docker-hub个人仓库" class="headerlink" title="上传dockerfile到docker hub个人仓库."></a>上传dockerfile到docker hub个人仓库.</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Getting-started-with-Docker-官方-推荐"><a href="#Getting-started-with-Docker-官方-推荐" class="headerlink" title="Getting started with Docker 官方,推荐"></a><a href="https://jenkins.io/solutions/docker/" target="_blank" rel="noopener">Getting started with Docker</a> 官方,推荐</h3><h3 id="Docker-Volume-之权限管理"><a href="#Docker-Volume-之权限管理" class="headerlink" title="Docker Volume 之权限管理"></a><a href="https://www.cnblogs.com/jackluo/p/5783116.html" target="_blank" rel="noopener">Docker Volume 之权限管理</a></h3><h3 id="Get-Started-with-Jenkins-2-0-with-Docker"><a href="#Get-Started-with-Jenkins-2-0-with-Docker" class="headerlink" title="Get Started with Jenkins 2.0 with Docker"></a><a href="https://www.cloudbees.com/blog/get-started-jenkins-20-docker" target="_blank" rel="noopener">Get Started with Jenkins 2.0 with Docker</a></h3><h3 id="Official-Jenkins-Docker-image"><a href="#Official-Jenkins-Docker-image" class="headerlink" title="Official Jenkins Docker image"></a><a href="https://github.com/jenkinsci/docker/blob/master/README.md" target="_blank" rel="noopener">Official Jenkins Docker image</a></h3><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="jenkins-data-dockerfile"><a href="#jenkins-data-dockerfile" class="headerlink" title="jenkins-data-dockerfile"></a>jenkins-data-dockerfile</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ vim jenkins-data-dockerfile</span><br><span class="line">FROM debian:jessie</span><br><span class="line"># Create the jenkins user</span><br><span class="line">RUN useradd -d &quot;/var/jenkins_home&quot; -u 1000 -m -s /bin/bash jenkins</span><br><span class="line"># Create the folders and volume mount points</span><br><span class="line">RUN mkdir -p /var/log/jenkins</span><br><span class="line">RUN chown -R jenkins:jenkins /var/log/jenkins</span><br><span class="line">VOLUME [&quot;/var/log/jenkins&quot;, &quot;/var/jenkins_home&quot;]</span><br><span class="line">USER jenkins</span><br><span class="line">CMD [&quot;echo&quot;, &quot;Data container for Jenkins&quot;]</span><br></pre></td></tr></table></figure>
+<h3 id="jenkins-master-dockerfile-待补充插件列表"><a href="#jenkins-master-dockerfile-待补充插件列表" class="headerlink" title="jenkins-master-dockerfile(待补充插件列表)"></a>jenkins-master-dockerfile(待补充插件列表)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ vim jenkins-master-dockerfile</span><br><span class="line">FROM jenkins/jenkins:lts</span><br><span class="line"># 增加swarm:3.13插件.https://plugins.jenkins.io/swarm</span><br><span class="line">USER root</span><br><span class="line">RUN /usr/local/bin/install-plugins.sh docker_swarm Ansible Multijob Pipeline</span><br><span class="line">USER jenkins</span><br></pre></td></tr></table></figure>
+<h3 id="jenkins-slave-dockerfile"><a href="#jenkins-slave-dockerfile" class="headerlink" title="jenkins-slave-dockerfile"></a>jenkins-slave-dockerfile</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">FROM centos:centos7</span><br><span class="line"># 创建用户及修改密码</span><br><span class="line">RUN groupadd -g 1000 jenkins_slave</span><br><span class="line">RUN useradd -d /home/jenkins_home -s /bin/bash \</span><br><span class="line">-m jenkins_slave -u 1000 -g jenkins_slave</span><br><span class="line">RUN echo &apos;ys123456&apos; | passwd --stdin root</span><br><span class="line">RUN echo &apos;jpass&apos; | passwd --stdin jenkins_slave</span><br><span class="line"># 安装依赖包</span><br><span class="line">RUN yum install -y passwd openssl openssh-server wget git vim java-1.8.0-openjdk java-1.8.0-openjdk-devel ansible</span><br><span class="line"># 设置maven,安装路径保持和jenkins-master中的一致.</span><br><span class="line">RUN rm -rf /opt/apache-maven* &amp;&amp; \</span><br><span class="line">wget -O /opt/apache-maven-3.5.4.tar.gz http://mirrors.shu.edu.cn/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz &amp;&amp; \</span><br><span class="line">tar -xvf /opt/apache-maven-3.5.4.tar.gz -C /opt/ &amp;&amp; \</span><br><span class="line">mv /opt/apache-maven-3.5.4 /opt/maven &amp;&amp; \</span><br><span class="line">rm -rf /opt/apache-maven-3.5.4 &amp;&amp; \</span><br><span class="line">rm -rf /opt/apache-maven-3.5.4.tar.gz &amp;&amp; \</span><br><span class="line">echo &quot;export MAVEN_HOME=/opt/maven&quot; &gt;&gt; /etc/profile &amp;&amp; \</span><br><span class="line">echo &apos;PATH=$PATH:$MAVEN_HOME/bin&apos; &gt;&gt; /etc/profile &amp;&amp; \</span><br><span class="line">source /etc/profile</span><br><span class="line"># 设置jdk,安装路径保持和jenkins-master中的一致.</span><br><span class="line">RUN mkdir -p /usr/local/java &amp;&amp; \</span><br><span class="line">wget --no-cookies \</span><br><span class="line">--no-check-certificate \</span><br><span class="line">--header &quot;Cookie: oraclelicense=accept-securebackup-cookie&quot; \</span><br><span class="line">http://download.oracle.com/otn-pub/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u171-linux-x64.tar.gz \</span><br><span class="line">-O /usr/local/java/jdk1.8.tar.gz</span><br><span class="line">RUN tar -xvf /usr/local/java/jdk1.8.tar.gz -C /usr/local/java &amp;&amp; mv /usr/local/java/jdk1.8.0_171 /usr/local/java/jdk1.8 &amp;&amp; echo &apos;export JAVA_HOME=/usr/local/java/jdk1.8&apos; &gt;&gt; /etc/profile &amp;&amp; echo &apos;PATH=$PATH:$JAVA_HOME/bin&apos; &amp;&amp; source /etc/profile</span><br><span class="line"># 设置jenkins_home目录,保持和jenkins-master一致.(根据需要自己修改路径)</span><br><span class="line">RUN mkdir -p /root/.jenkins &amp;&amp; echo &apos;export JENKINS_HOME=/root/.jenkins/&apos; &gt;&gt; /etc/profile &amp;&amp; source /etc/profile</span><br><span class="line"># 生成密钥</span><br><span class="line">RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N &apos;&apos;</span><br><span class="line">RUN ssh-keygen -q -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N &apos;&apos;</span><br><span class="line">RUN sed -i &apos;s|session required pam_loginuid.so|session optional pam_loginuid.so|g&apos; /etc/pam.d/sshd</span><br><span class="line">RUN mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh</span><br><span class="line"></span><br><span class="line"># 下载脚本.这里是因为脚本构建用到了许多脚本.</span><br><span class="line">RUN git clone https://github.com/steven-ji/proxy-scripts.git /opt/scripts</span><br><span class="line">RUN chown -R 1000:1000 /opt/scripts</span><br><span class="line"></span><br><span class="line">#设置时区</span><br><span class="line">RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &amp;&amp; echo &apos;Asia/Shanghai&apos; &gt;/etc/timezone</span><br><span class="line"></span><br><span class="line">EXPOSE 22</span><br><span class="line"></span><br><span class="line">CMD ip addr ls eth0 | awk &apos;&#123;print $2&#125;&apos; | egrep -o &apos;([0-9]+\.)&#123;3&#125;[0-9]+&apos;;/usr/sbin/sshd -D</span><br></pre></td></tr></table></figure>
+<h3 id="jenkins-slave-swarm-dockerfile"><a href="#jenkins-slave-swarm-dockerfile" class="headerlink" title="jenkins-slave-swarm-dockerfile"></a>jenkins-slave-swarm-dockerfile</h3><h2 id="碰到的问题"><a href="#碰到的问题" class="headerlink" title="碰到的问题"></a>碰到的问题</h2><h3 id="场景一-jenkins-master为较早创建-需要扩展jenkins-slave"><a href="#场景一-jenkins-master为较早创建-需要扩展jenkins-slave" class="headerlink" title="场景一:jenkins-master为较早创建,需要扩展jenkins-slave"></a>场景一:jenkins-master为较早创建,需要扩展jenkins-slave</h3><p>jenkins-master为较早创建的,其中全局工具配置里jdk路径、maven路径、工作空间路径等都是已经确定好的.在创建jenkins-slave时,需要保持与jenkins-master一致.(或者修改主master的相关路径)</p>
+<ul>
+<li>jdk安装路径一致</li>
+<li>maven安装路径一致</li>
+<li>工作空间(workspace)路径一致<br>jenkins-&gt;全局工具配置</li>
+</ul>
+<p>jenkins-&gt;系统设置<br>Jenkins默认的内置工作空间为系统用户的根目录下，其文件夹名称为”.jenkins”.如果设置了JENKINS_HOME则使用.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/13/GitLab安装篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/10/13/GitLab安装篇/" itemprop="url">GitLab安装篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-13T17:03:57+08:00">
+                2018-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  838
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Foreword"><a href="#Foreword" class="headerlink" title="Foreword"></a>Foreword</h2><p>最近准备迁移公司的svn仓库,记录下自己学习及迁移过程.</p>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>GitLab目前提供三个版本:(以下都是docker镜像)</p>
+<ul>
+<li><a href="https://hub.docker.com/r/gitlab/gitlab-ce/" target="_blank" rel="noopener">GitLab Community Edition</a></li>
+<li><a href="https://hub.docker.com/r/gitlab/gitlab-ee/" target="_blank" rel="noopener">GitLab Enterprise Edition</a></li>
+<li><a href="https://hub.docker.com/r/gitlab/gitlab-runner/" target="_blank" rel="noopener">GitLab Runner</a></li>
+</ul>
+<p>只是为了满足基本使用,以CE版本安装.</p>
+<h3 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h3><ul>
+<li><p>运行环境要求</p>
+<p>4G内存(最低2G)、4核或8核CPU</p>
+</li>
+</ul>
+<p>启动GitLab是比较简单.但在正式开始使用之前,对它的配置有个全面的了解是很有必要的.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d \</span><br><span class="line">  --hostname 192.168.1.222 \</span><br><span class="line">  --publish 443:443 --publish 80:80 --publish 22:22 \</span><br><span class="line">  --name gitlab \</span><br><span class="line">  --restart always \</span><br><span class="line">  --volume /data/gitlab/config:/etc/gitlab \</span><br><span class="line">  --volume /data/gitlab/logs:/var/log/gitlab \</span><br><span class="line">  --volume /data/gitlab/data:/var/opt/gitlab \</span><br><span class="line">  --network host \</span><br><span class="line">  gitlab/gitlab-ce:latest</span><br><span class="line"># 443 https访问端口,80 http访问端口, 22 docker容器端口.</span><br><span class="line"># /data/gitlab/config配置文件目录</span><br><span class="line"># /data/gitlab/logs日志存储目录</span><br><span class="line"># /data/gitlab/data应用数据存储目录</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>--env GITLAB_OMNIBUS_CONFIG=&quot;&quot;</code></p>
+<p>该参数可以覆盖容器中GitLab的配置文件/etc/gitlab/gitlab.rb.具体参数详见<a href="https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template" target="_blank" rel="noopener">gitlab.rb.template</a></p>
+</li>
+</ul>
+<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><ul>
+<li><a href="https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template" target="_blank" rel="noopener">gitlab.rb配置详情</a></li>
+</ul>
+<p>GitLab启动加载的配置文件为gitlab.rb,先创建出来.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ touch /data/gitlab/config/gitlab.rb</span><br></pre></td></tr></table></figure>
+<h4 id="邮件通知配置"><a href="#邮件通知配置" class="headerlink" title="邮件通知配置"></a>邮件通知配置</h4><p>邮件的配置方式比较多,这里以<strong>阿里云企业邮箱</strong>为主.(以下提供链接)</p>
+<ul>
+<li><a href="https://docs.gitlab.com/omnibus/settings/smtp.html" target="_blank" rel="noopener">SMTP</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;smtp_enable&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_address&apos;] = &quot;smtp.qiye.aliyun.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_port&apos;] = 465</span><br><span class="line">gitlab_rails[&apos;smtp_user_name&apos;] = &quot;username@your domain&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_password&apos;] = &quot;password&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_domain&apos;] = &quot;your domain&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_authentication&apos;] = &quot;login&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_enable_starttls_auto&apos;] = false</span><br><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = true</span><br></pre></td></tr></table></figure>
+<h5 id="测试邮箱"><a href="#测试邮箱" class="headerlink" title="测试邮箱"></a>测试邮箱</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># ssh到Gitlab的docker容器中.</span><br><span class="line">$ docker exec -ti gitlab /bin/bash</span><br><span class="line">$ gitlab-rails console</span><br><span class="line">$ Notify.test_email(&apos;destination_email@address.com&apos;, &apos;Message Subject&apos;, &apos;Message Body&apos;).deliver_now</span><br></pre></td></tr></table></figure>
+<h4 id="配置外部访问的URL"><a href="#配置外部访问的URL" class="headerlink" title="配置外部访问的URL"></a>配置外部访问的URL</h4><p>不使用内置的nginx时可以不配置.</p>
+<ul>
+<li>支持https</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 配置文件中添加如下,则访问GitLab的路径就是:http://gitlab.example.com</span><br><span class="line">external_url &quot;http://gitlab.example.com&quot;</span><br><span class="line">external_url &quot;https://gitlab.example.com&quot;</span><br><span class="line"># 重新加载配置</span><br><span class="line">$ gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+<h4 id="配置支持Https"><a href="#配置支持Https" class="headerlink" title="配置支持Https"></a>配置支持Https</h4><p>GitLab安装时默认绑定安装了一个内置的Nginx.</p>
+<h5 id="使用内置Nginx"><a href="#使用内置Nginx" class="headerlink" title="使用内置Nginx"></a>使用内置Nginx</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 域名可以自己注册,如果没有,只能使用ip.</span><br><span class="line">external_url &quot;https://gitlab.example.com&quot;</span><br><span class="line"># 兼容http方式.</span><br><span class="line">nginx[&apos;redirect_http_to_https&apos;] = true</span><br><span class="line"># 配置GitLab证书.可以使用自生成的,也可以使用收费的.如startssl.</span><br><span class="line">nginx[&apos;ssl_certificate&apos;] = &quot;/etc/gitlab/ssl/gitlab.example.com.crt&quot;</span><br><span class="line">nginx[&apos;ssl_certificate_key&apos;] = &quot;/etc/gitlab/ssl/gitlab.example.com.key&quot;</span><br><span class="line"># </span><br><span class="line"> nginx[&apos;proxy_set_headers&apos;] = &#123;</span><br><span class="line">  &quot;X-Forwarded-Proto&quot; =&gt; &quot;http&quot;,</span><br><span class="line">  &quot;CUSTOM_HEADER&quot; =&gt; &quot;VALUE&quot;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="使用外部Nginx"><a href="#使用外部Nginx" class="headerlink" title="使用外部Nginx"></a>使用外部Nginx</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 关闭内置nginx</span><br><span class="line">nginx[&apos;enable&apos;] = false</span><br><span class="line"># 配置访问用户.Debian/Ubuntu the default user is www-data for both Apache/Nginx whereas for RHEL/CentOS the Nginx user is nginx.</span><br><span class="line">web_server[&apos;external_users&apos;] = [&apos;www-data&apos;,&apos;nginx&apos;]</span><br><span class="line"># 配置nginx服务器ip白名单</span><br><span class="line">gitlab_rails[&apos;trusted_proxies&apos;] = [&apos;192.168.1.0/24&apos;, &apos;192.168.2.1&apos;, &apos;2001:0db8::/32&apos; ]</span><br><span class="line"># Define the external url</span><br><span class="line">external_url &apos;http://git.example.com&apos;</span><br><span class="line"># Disable the built-in nginx</span><br><span class="line">nginx[&apos;enable&apos;] = false</span><br><span class="line"># Disable the built-in unicorn</span><br><span class="line">unicorn[&apos;enable&apos;] = false</span><br><span class="line"># Set the internal API URL</span><br><span class="line">gitlab_rails[&apos;internal_api_url&apos;] = &apos;http://git.example.com&apos;</span><br><span class="line"># Define the web server process user (ubuntu/nginx)</span><br><span class="line">web_server[&apos;external_users&apos;] = [&apos;www-data&apos;]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><a href="https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https" target="_blank" rel="noopener">Enable https</a></li>
+</ul>
+<h4 id="配置Git-Repository数据存储路径"><a href="#配置Git-Repository数据存储路径" class="headerlink" title="配置Git Repository数据存储路径"></a>配置Git Repository数据存储路径</h4><p>Git repository数据存储的默认路径是:/var/opt/gitlab/git-data.</p>
+<p>注:如果采用了docker镜像方式,在启动时已经指定了宿主机的目录/data/gitlab/data,所以下面的配置可以不用.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># default修改存储目录,alternative增加一个存储目录</span><br><span class="line">git_data_dirs(&#123;</span><br><span class="line">  &quot;default&quot; =&gt; &#123; &quot;path&quot; =&gt; &quot;/var/opt/gitlab/git-data&quot; &#125;,</span><br><span class="line">  &quot;alternative&quot; =&gt; &#123; &quot;path&quot; =&gt; &quot;/mnt/nas/git-data&quot; &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="GitLab重新加载配置"><a href="#GitLab重新加载配置" class="headerlink" title="GitLab重新加载配置"></a>GitLab重新加载配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+<p>#### </p>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fw84q9ykaij30vy082gly.jpg" alt="image-20181014223921033"></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://docs.gitlab.com/omnibus/docker/" target="_blank" rel="noopener">GitLab Docker Images</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/10/10/gh-ost使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -394,7 +1367,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,882
+                  2,891
                 </span>
               
 
@@ -490,7 +1463,10 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">./gh-ost \</span><br><span class="line">--aliyun-rds=true \</span><br><span class="line">--allow-on-master \</span><br><span class="line">--host= --port= --database= --table= --conf=/opt/account.cnf \</span><br><span class="line">--alter=&quot;ADD COLUMN platform int(2) DEFAULT NULL COMMENT &apos;所属平台&apos;&quot; \</span><br><span class="line">--chunk-size=5000 \</span><br><span class="line">--concurrent-rowcount \</span><br><span class="line">--cut-over=atomic \</span><br><span class="line">--cut-over-lock-timeout-seconds=3 \</span><br><span class="line">--initially-drop-ghost-table=true \</span><br><span class="line">--initially-drop-old-table=true \</span><br><span class="line">--initially-drop-socket-file=true \</span><br><span class="line">--timestamp-old-table=true \</span><br><span class="line">--verbose \</span><br><span class="line">--serve-socket-file=/tmp/gh-ost.test.sock \</span><br><span class="line">--switch-to-rbr \</span><br><span class="line">--execute</span><br><span class="line"></span><br><span class="line"># --conf设置登录mysql的用户名和密码文件的绝对路径.内容格式如下.</span><br><span class="line">[client]</span><br><span class="line">user=gh-ost</span><br><span class="line">password=123456</span><br><span class="line"># --aliyun-rds=true针对使用阿里云的RDS.</span><br><span class="line"># --allow-on-master没有从节点时,直接连接主mysql时指定.</span><br><span class="line"># --alter表结构操作,如我这里添加字段&quot;ADD COLOUM platform int(2) DEFAULT NULL COMMENT &apos;所属平台&apos;&quot;</span><br><span class="line"># --chunk-size每次复制数据的数量,默认是1000,允许100~100,000之间.</span><br><span class="line"># --concurrent-rowcount一边复制数据一边计算数据量</span><br><span class="line"># --cut-over数据复制的最后一步,安全的对原表和新表进行切换.默认是atomic,而two-step则不安全.</span><br><span class="line"># --cut-over-lock-timeout-seconds执行cut-over时间.默认3秒,可以不用配置.</span><br><span class="line"># --cut-over-exponential-backoff执行cut-over失败后执行指数级等待.</span><br><span class="line"># --exponential-backoff-max-interval执行指数级等待的最大时间间隔.默认是64.如:</span><br><span class="line"># --exact-rowcount真实计算数据总量,执行count()操作.个人觉得没必要,比较耗时.</span><br><span class="line"># --initially-drop-ghost-table(建议使用)清除以前操作遗留下的ghost表</span><br><span class="line"># --initially-drop-old-table(建议使用)清除以前操作遗留下的旧表</span><br><span class="line"># --initially-drop-socket-file(建议使用)清除以前遗留的socket文件</span><br><span class="line"># --timestamp-old-table旧表加上时间戳</span><br><span class="line"># --verbose日志界别debug</span><br><span class="line"># --serve-socket-file=/tmp/gh-ost.test.sock </span><br><span class="line"># --panic-flag-file=/tmp/gh-ost.panic.flag(暂时不清楚,先不使用)</span><br><span class="line"># --switch-to-rbr(建议添加)这样不用关注mysql的bin log的格式.让gh-ost去执行设置bin-log格式操作.</span><br></pre></td></tr></table></figure>
 <h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="gh-ost参数详解"><a href="#gh-ost参数详解" class="headerlink" title="gh-ost参数详解"></a>gh-ost参数详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">-aliyun-rds</span><br><span class="line">  	set to &apos;true&apos; when you execute on Aliyun RDS.</span><br><span class="line">-allow-master-master</span><br><span class="line">  	explicitly allow running in a master-master setup</span><br><span class="line">-allow-nullable-unique-key</span><br><span class="line">  	allow gh-ost to migrate based on a unique key with nullable columns. As long as no NULL values exist, this should be OK. If NULL values exist in chosen key, data may be corrupted. Use at your own risk!</span><br><span class="line">-allow-on-master</span><br><span class="line">  	allow this migration to run directly on master. Preferably it would run on a replica</span><br><span class="line">-alter string</span><br><span class="line">  	alter statement (mandatory)</span><br><span class="line">-approve-renamed-columns ALTER</span><br><span class="line">  	in case your ALTER statement renames columns, gh-ost will note that and offer its interpretation of the rename. By default gh-ost does not proceed to execute. This flag approves that gh-ost&apos;s interpretation is correct</span><br><span class="line">-ask-pass</span><br><span class="line">  	prompt for MySQL password</span><br><span class="line">-assume-master-host string</span><br><span class="line">  	(optional) explicitly tell gh-ost the identity of the master. Format: some.host.com[:port] This is useful in master-master setups where you wish to pick an explicit master, or in a tungsten-replicator where gh-ost is unable to determine the master</span><br><span class="line">-assume-rbr</span><br><span class="line">  	set to &apos;true&apos; when you know for certain your server uses &apos;ROW&apos; binlog_format. gh-ost is unable to tell, event after reading binlog_format, whether the replication process does indeed use &apos;ROW&apos;, and restarts replication to be certain RBR setting is applied. Such operation requires SUPER privileges which you might not have. Setting this flag avoids restarting replication and you can proceed to use gh-ost without SUPER privileges</span><br><span class="line">-check-flag</span><br><span class="line">  	Check if another flag exists/supported. This allows for cross-version scripting. Exits with 0 when all additional provided flags exist, nonzero otherwise. You must provide (dummy) values for flags that require a value. Example: gh-ost --check-flag --cut-over-lock-timeout-seconds --nice-ratio 0</span><br><span class="line">-chunk-size int</span><br><span class="line">  	amount of rows to handle in each iteration (allowed range: 100-100,000) (default 1000)</span><br><span class="line">-concurrent-rowcount</span><br><span class="line">  	(with --exact-rowcount), when true (default): count rows after row-copy begins, concurrently, and adjust row estimate later on; when false: first count rows, then start row copy (default true)</span><br><span class="line">-conf string</span><br><span class="line">  	Config file</span><br><span class="line">-critical-load string</span><br><span class="line">  	Comma delimited status-name=threshold, same format as --max-load. When status exceeds threshold, app panics and quits</span><br><span class="line">-critical-load-hibernate-seconds int</span><br><span class="line">  	When nonzero, critical-load does not panic and bail out; instead, gh-ost goes into hibernate for the specified duration. It will not read/write anything to from/to any server</span><br><span class="line">-critical-load-interval-millis int</span><br><span class="line">  	When 0, migration immediately bails out upon meeting critical-load. When non-zero, a second check is done after given interval, and migration only bails out if 2nd check still meets critical load</span><br><span class="line">-cut-over string</span><br><span class="line">  	choose cut-over type (default|atomic, two-step) (default &quot;atomic&quot;)</span><br><span class="line">-cut-over-exponential-backoff</span><br><span class="line">  	Wait exponentially longer intervals between failed cut-over attempts. Wait intervals obey a maximum configurable with &apos;exponential-backoff-max-interval&apos;).</span><br><span class="line">-cut-over-lock-timeout-seconds int</span><br><span class="line">  	Max number of seconds to hold locks on tables while attempting to cut-over (retry attempted when lock exceeds timeout) (default 3)</span><br><span class="line">-database string</span><br><span class="line">  	database name (mandatory)</span><br><span class="line">-debug</span><br><span class="line">  	debug mode (very verbose)</span><br><span class="line">-default-retries int</span><br><span class="line">  	Default number of retries for various operations before panicking (default 60)</span><br><span class="line">-discard-foreign-keys</span><br><span class="line">  	DANGER! This flag will migrate a table that has foreign keys and will NOT create foreign keys on the ghost table, thus your altered table will have NO foreign keys. This is useful for intentional dropping of foreign keys</span><br><span class="line">-dml-batch-size int</span><br><span class="line">  	batch size for DML events to apply in a single transaction (range 1-100) (default 10)</span><br><span class="line">-exact-rowcount</span><br><span class="line">  	actually count table rows as opposed to estimate them (results in more accurate progress estimation)</span><br><span class="line">-execute</span><br><span class="line">  	actually execute the alter &amp; migrate the table. Default is noop: do some tests and exit</span><br><span class="line">-exponential-backoff-max-interval int</span><br><span class="line">  	Maximum number of seconds to wait between attempts when performing various operations with exponential backoff. (default 64)</span><br><span class="line">-force-named-cut-over</span><br><span class="line">  	When true, the &apos;unpostpone|cut-over&apos; interactive command must name the migrated table</span><br><span class="line">-force-table-names string</span><br><span class="line">  	table name prefix to be used on the temporary tables</span><br><span class="line">-heartbeat-interval-millis int</span><br><span class="line">  	how frequently would gh-ost inject a heartbeat value (default 100)</span><br><span class="line">-help</span><br><span class="line">  	Display usage</span><br><span class="line">-hooks-hint string</span><br><span class="line">  	arbitrary message to be injected to hooks via GH_OST_HOOKS_HINT, for your convenience</span><br><span class="line">-hooks-path string</span><br><span class="line">  	directory where hook files are found (default: empty, ie. hooks disabled). Hook files found on this path, and conforming to hook naming conventions will be executed</span><br><span class="line">-host string</span><br><span class="line">  	MySQL hostname (preferably a replica, not the master) (default &quot;127.0.0.1&quot;)</span><br><span class="line">-initially-drop-ghost-table</span><br><span class="line">  	Drop a possibly existing Ghost table (remains from a previous run?) before beginning operation. Default is to panic and abort if such table exists</span><br><span class="line">-initially-drop-old-table</span><br><span class="line">  	Drop a possibly existing OLD table (remains from a previous run?) before beginning operation. Default is to panic and abort if such table exists</span><br><span class="line">-initially-drop-socket-file</span><br><span class="line">  	Should gh-ost forcibly delete an existing socket file. Be careful: this might drop the socket file of a running migration!</span><br><span class="line">-master-password string</span><br><span class="line">  	MySQL password on master, if different from that on replica. Requires --assume-master-host</span><br><span class="line">-master-user string</span><br><span class="line">  	MySQL user on master, if different from that on replica. Requires --assume-master-host</span><br><span class="line">-max-lag-millis int</span><br><span class="line">  	replication lag at which to throttle operation (default 1500)</span><br><span class="line">-max-load string</span><br><span class="line">  	Comma delimited status-name=threshold. e.g: &apos;Threads_running=100,Threads_connected=500&apos;. When status exceeds threshold, app throttles writes</span><br><span class="line">-migrate-on-replica</span><br><span class="line">  	Have the migration run on a replica, not on the master. This will do the full migration on the replica including cut-over (as opposed to --test-on-replica)</span><br><span class="line">-nice-ratio float</span><br><span class="line">  	force being &apos;nice&apos;, imply sleep time per chunk time; range: [0.0..100.0]. Example values: 0 is aggressive. 1: for every 1ms spent copying rows, sleep additional 1ms (effectively doubling runtime); 0.7: for every 10ms spend in a rowcopy chunk, spend 7ms sleeping immediately after</span><br><span class="line">-ok-to-drop-table</span><br><span class="line">  	Shall the tool drop the old table at end of operation. DROPping tables can be a long locking operation, which is why I&apos;m not doing it by default. I&apos;m an online tool, yes?</span><br><span class="line">-panic-flag-file string</span><br><span class="line">  	when this file is created, gh-ost will immediately terminate, without cleanup</span><br><span class="line">-password string</span><br><span class="line">  	MySQL password</span><br><span class="line">-port int</span><br><span class="line">  	MySQL port (preferably a replica, not the master) (default 3306)</span><br><span class="line">-postpone-cut-over-flag-file string</span><br><span class="line">  	while this file exists, migration will postpone the final stage of swapping tables, and will keep on syncing the ghost table. Cut-over/swapping would be ready to perform the moment the file is deleted.</span><br><span class="line">-quiet</span><br><span class="line">  	quiet</span><br><span class="line">-replica-server-id uint</span><br><span class="line">  	server id used by gh-ost process. Default: 99999 (default 99999)</span><br><span class="line">-replication-lag-query string</span><br><span class="line">  	Deprecated. gh-ost uses an internal, subsecond resolution query</span><br><span class="line">-serve-socket-file string</span><br><span class="line">  	Unix socket file to serve on. Default: auto-determined and advertised upon startup</span><br><span class="line">-serve-tcp-port int</span><br><span class="line">  	TCP port to serve on. Default: disabled</span><br><span class="line">-skip-foreign-key-checks</span><br><span class="line">  	set to &apos;true&apos; when you know for certain there are no foreign keys on your table, and wish to skip the time it takes for gh-ost to verify that</span><br><span class="line">-skip-renamed-columns ALTER</span><br><span class="line">  	in case your ALTER statement renames columns, gh-ost will note that and offer its interpretation of the rename. By default gh-ost does not proceed to execute. This flag tells gh-ost to skip the renamed columns, i.e. to treat what gh-ost thinks are renamed columns as unrelated columns. NOTE: you may lose column data</span><br><span class="line">-stack</span><br><span class="line">  	add stack trace upon error</span><br><span class="line">-switch-to-rbr</span><br><span class="line">  	let this tool automatically switch binary log format to &apos;ROW&apos; on the replica, if needed. The format will NOT be switched back. I&apos;m too scared to do that, and wish to protect you if you happen to execute another migration while this one is running</span><br><span class="line">-table string</span><br><span class="line">  	table name (mandatory)</span><br><span class="line">-test-on-replica</span><br><span class="line">  	Have the migration run on a replica, not on the master. At the end of migration replication is stopped, and tables are swapped and immediately swap-revert. Replication remains stopped and you can compare the two tables for building trust</span><br><span class="line">-test-on-replica-skip-replica-stop</span><br><span class="line">  	When --test-on-replica is enabled, do not issue commands stop replication (requires --test-on-replica)</span><br><span class="line">-throttle-additional-flag-file string</span><br><span class="line">  	operation pauses when this file exists; hint: keep default, use for throttling multiple gh-ost operations (default &quot;/tmp/gh-ost.throttle&quot;)</span><br><span class="line">-throttle-control-replicas string</span><br><span class="line">  	List of replicas on which to check for lag; comma delimited. Example: myhost1.com:3306,myhost2.com,myhost3.com:3307</span><br><span class="line">-throttle-flag-file string</span><br><span class="line">  	operation pauses when this file exists; hint: use a file that is specific to the table being altered</span><br><span class="line">-throttle-http string</span><br><span class="line">  	when given, gh-ost checks given URL via HEAD request; any response code other than 200 (OK) causes throttling; make sure it has low latency response</span><br><span class="line">-throttle-query string</span><br><span class="line">  	when given, issued (every second) to check if operation should throttle. Expecting to return zero for no-throttle, &gt;0 for throttle. Query is issued on the migrated server. Make sure this query is lightweight</span><br><span class="line">-timestamp-old-table</span><br><span class="line">  	Use a timestamp in old table name. This makes old table names unique and non conflicting cross migrations</span><br><span class="line">-tungsten</span><br><span class="line">  	explicitly let gh-ost know that you are running on a tungsten-replication based topology (you are likely to also provide --assume-master-host)</span><br><span class="line">-user string</span><br><span class="line">  	MySQL user</span><br><span class="line">-verbose</span><br><span class="line">  	verbose</span><br><span class="line">-version</span><br><span class="line">  	Print version &amp; exit</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://github.com/github/gh-ost" target="_blank" rel="noopener">gh-ost github</a></li>
+<li><p><a href="https://github.com/github/gh-ost" target="_blank" rel="noopener">gh-ost github</a></p>
+</li>
+<li><p><a href="https://www.cnblogs.com/zhoujinyi/p/9187421.html" target="_blank" rel="noopener">MySQL在线DDL gh-ost 使用说明</a></p>
+</li>
 </ul>
 
           
@@ -1245,1438 +2221,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/29/docker实战之zookeeper集群/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/29/docker实战之zookeeper集群/" itemprop="url">docker实战之zookeeper集群</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-29T10:11:16+08:00">
-                2018-08-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  700
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  4
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
-<li>centos7</li>
-<li>zookeeper 3.4.12</li>
-<li>docker 18.03.1-ce</li>
-</ul>
-<h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>基于docker创建zookeeper集群.</p>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>开始之前,先梳理下几个关键问题:</p>
-<ul>
-<li>zookeeper的配置文件、日志、数据文件需要映射到宿主机中</li>
-<li>docker hub中提供的镜像,其在容器中zookeeper的路径(需查阅<a href="https://github.com/31z4/zookeeper-docker/blob/0e558d7a6df4031a6be7c1df4ba1e2367666d004/3.4.12/Dockerfile" target="_blank" rel="noopener">dockerfile文件</a>)</li>
-</ul>
-<h3 id="Pull-Image"><a href="#Pull-Image" class="headerlink" title="Pull Image"></a>Pull Image</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull zookeeper:3.4.12</span><br></pre></td></tr></table></figure>
-<h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="create-persistent-directory"><a href="#create-persistent-directory" class="headerlink" title="create persistent directory"></a>create persistent directory</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 创建数据持久目录、日志目录、启动配置文件目录</span><br><span class="line">$ mkdir -p &#123;/opt/zookeeper/conf,/data/zookeeper,/data/logs/zookeeper&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="create-zoo-cfg、myid"><a href="#create-zoo-cfg、myid" class="headerlink" title="create zoo.cfg、myid"></a>create zoo.cfg、myid</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 这里看需要多少节点的集群,配置文件有适当调整,这里以三台为例.</span><br><span class="line">$ vim /opt/zookeeper/conf/zoo.cfg</span><br><span class="line">tickTime=2000</span><br><span class="line">initLimit=10</span><br><span class="line">syncLimit=5</span><br><span class="line">dataDir=/data</span><br><span class="line">dataLogDir=/datalog</span><br><span class="line">clientPort=20181</span><br><span class="line">server.1=58.221.62.131:2888:3888</span><br><span class="line">server.2=58.221.61.57:2888:3888    </span><br><span class="line">server.3=58.221.61.62:2888:3888</span><br><span class="line"># 对应机器,都需要myid文件里的值不能重复.</span><br><span class="line">$ echo 1 &gt; /data/zookeeper/myid</span><br></pre></td></tr></table></figure>
-<h3 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"># 每台机器分别启动,注意替换--name的值</span><br><span class="line">$ docker run -ti --restart always -d \</span><br><span class="line">-v /opt/zookeeper/conf/zoo.cfg:/conf/zoo.cfg \</span><br><span class="line">-v /data/zookeeper:/data \</span><br><span class="line">-v /data/logs/zookeeper:/datalog \</span><br><span class="line">--network host \</span><br><span class="line">--name zoo1 \</span><br><span class="line">zookeeper:3.4.12</span><br><span class="line"># 如果使用--network host参数,则不需要映射端口</span><br><span class="line">-p 20181:20181 \</span><br><span class="line">-p 2888:2888 \</span><br><span class="line">-p 3888:3888 \</span><br><span class="line"># 查询容器日志,需要全部启动才不会报错.</span><br><span class="line">$ docker logs -t zoo1</span><br><span class="line"># 查看集群,stat</span><br><span class="line">$ telnet 58.221.62.131 20181</span><br><span class="line">Trying 58.221.61.57...</span><br><span class="line">Connected to 58.221.61.57.</span><br><span class="line">Escape character is &apos;^]&apos;.</span><br><span class="line">stat # 输入</span><br><span class="line">Zookeeper version: 3.4.12-e5259e437540f349646870ea94dc2658c4e44b3b, built on 03/27/2018 03:55 GMT</span><br><span class="line">Clients:</span><br><span class="line"> /58.221.62.131:52061[0](queued=0,recved=1,sent=0)</span><br><span class="line"></span><br><span class="line">Latency min/avg/max: 0/2/17</span><br><span class="line">Received: 16</span><br><span class="line">Sent: 15</span><br><span class="line">Connections: 1</span><br><span class="line">Outstanding: 0</span><br><span class="line">Zxid: 0x100000bb0</span><br><span class="line">Mode: follower</span><br><span class="line">Node count: 1009</span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"></span><br><span class="line"># 以下只做记录,不会出现这种问题.可用于其他docker容器启动报错排查参考.</span><br><span class="line">mkdir: can&apos;t create directory &apos;/opt/&apos;: Permission denied</span><br><span class="line"># 查看容器使用用户</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;whoami &amp;&amp; id&quot;</span><br><span class="line"># 查询容器中zookeeper目录权限</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;ls -la&quot;</span><br><span class="line">......</span><br><span class="line">drwxr-xr-x 2 zookeepe zookeepe 4096 Jun 12 01:28 bin</span><br><span class="line">-rw-rw-r-- 1 zookeepe zookeepe 87945 Mar 27 04:32 build.xml</span><br><span class="line">drwxr-xr-x 2 zookeepe zookeepe 6 Jun 12 01:28 conf</span><br><span class="line">....</span><br><span class="line"># 查询容器启动用户id</span><br><span class="line">$ docker run -ti --rm --entrypoint=&quot;/bin/bash&quot; zookeeper:3.4.12 -c &quot;cat /etc/passwd | grep zookeeper&quot;</span><br><span class="line">zookeeper:x:1000:1000:Linux User,,,:/home/zookeeper:</span><br><span class="line"># 修改目录权限所属用户</span><br><span class="line">$ chown -R 1000:1000 /opt/zookeeper</span><br></pre></td></tr></table></figure>
-<h3 id="Don’t-Forget"><a href="#Don’t-Forget" class="headerlink" title="Don’t Forget"></a>Don’t Forget</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 防火墙添加端口</span><br><span class="line">## zookeeper访问端口,和配置文件中的clientPort一致</span><br><span class="line">$ firewall-cmd --add-port=20181/tcp --permanent</span><br><span class="line">$ firewall-cmd --add-port=2888/tcp --permanent</span><br><span class="line">$ firewall-cmd --add-port=3888/tcp --permanent</span><br><span class="line">$ firewall-cmd --reload</span><br></pre></td></tr></table></figure>
-<h2 id="Use-Ansible-playbook"><a href="#Use-Ansible-playbook" class="headerlink" title="Use Ansible-playbook"></a>Use Ansible-playbook</h2><p>待完成</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="docker-zookeeper"><a href="#docker-zookeeper" class="headerlink" title="docker zookeeper"></a><a href="https://hub.docker.com/_/zookeeper/" target="_blank" rel="noopener">docker zookeeper</a></h3><h3 id="Docker部署Zookeeper集群"><a href="#Docker部署Zookeeper集群" class="headerlink" title="Docker部署Zookeeper集群"></a><a href="https://www.waitig.com/docker%E9%83%A8%E7%BD%B2zookeeper%E9%9B%86%E7%BE%A4.html" target="_blank" rel="noopener">Docker部署Zookeeper集群</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/27/Spring-boot之Actuator理解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/27/Spring-boot之Actuator理解/" itemprop="url">Spring boot之Actuator理解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-27T11:26:44+08:00">
-                2018-08-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-boot/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring boot</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  2,070
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  10
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
-<li>Spring boot 2.0.4</li>
-<li>Jdk1.8</li>
-</ul>
-<h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>今天生产上的日志文件把磁盘撑爆了,非常悲剧.既然出了问题,就得找到原因以及解决方案.(一劳永逸)</p>
-<p>通过梳理,识别出以下几个问题:</p>
-<ul>
-<li>代码中的日志没有行至有效的规范.debug和info没有明确的规范.</li>
-<li>有些debug日志有助于生产上排查错误,需要动态切换日志级别的能力.</li>
-</ul>
-<p>针对日志规范问题,每个人的见解不一样,我自己的梳理在《Java日志规范看法》中.</p>
-<p>根据第二个问题,发现spring boot actuator提供了这个能力,这就促使我去研究一番.</p>
-<h2 id="Spring-Boot-Actuator"><a href="#Spring-Boot-Actuator" class="headerlink" title="Spring Boot Actuator"></a>Spring Boot Actuator</h2><p>○ Spring Boot includes a number of additional features to help you monitor and manage your application when you push it to production. You can choose to manage and monitor your application by using HTTP endpoints or with JMX. Auditing, health, and metrics gathering can also be automatically applied to your application.</p>
-<p>☆ Spring boot 提供了以HTTP或JMX管理和监控应用程序.适用于应用程序的审计、健康情况、度量收集.</p>
-<h3 id="依赖包"><a href="#依赖包" class="headerlink" title="依赖包"></a>依赖包</h3><p>maven项目</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</span><br><span class="line">	&lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="提供的端点"><a href="#提供的端点" class="headerlink" title="提供的端点"></a>提供的端点</h3><ul>
-<li>详细用法参考<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</li>
-</ul>
-<p>下表提供了16个请求端点,HTTP和JMX都可以使用.另外4个端点在使用web时可以用.</p>
-<ul>
-<li>请求前缀为/actuators</li>
-</ul>
-<p>例如:以http方式,监测应用程序健康情况:/actuators/health</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:[port]/actuator/health</span><br><span class="line">&#123;&quot;status&quot;:&quot;UP&quot;&#125;</span><br></pre></td></tr></table></figure>
-<p>列表:</p>
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Description</th>
-<th>Enabled by default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>auditevents</code></td>
-<td>Exposes audit events information for the current application.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>beans</code></td>
-<td>Displays a complete list of all the Spring beans in your application.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>conditions</code></td>
-<td>Shows the conditions that were evaluated on configuration and auto-configuration classes and the reasons why they did or did not match.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>configprops</code></td>
-<td>Displays a collated list of all <code>@ConfigurationProperties</code>.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>env</code></td>
-<td>Exposes properties from Spring’s <code>ConfigurableEnvironment</code>.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>flyway</code></td>
-<td>Shows any Flyway database migrations that have been applied.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>health</code></td>
-<td>Shows application health information.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>httptrace</code></td>
-<td>Displays HTTP trace information (by default, the last 100 HTTP request-response exchanges).</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>info</code></td>
-<td>Displays arbitrary application info.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>loggers</code></td>
-<td>Shows and modifies the configuration of loggers in the application.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>liquibase</code></td>
-<td>Shows any Liquibase database migrations that have been applied.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>metrics</code></td>
-<td>Shows ‘metrics’ information for the current application.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>mappings</code></td>
-<td>Displays a collated list of all <code>@RequestMapping</code> paths.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>scheduledtasks</code></td>
-<td>Displays the scheduled tasks in your application.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>sessions</code></td>
-<td>Allows retrieval and deletion of user sessions from a Spring Session-backed session store. Not available when using Spring Session’s support for reactive web applications.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>shutdown</code></td>
-<td>Lets the application be gracefully shutdown.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>threaddump</code></td>
-<td>Performs a thread dump.</td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p>○ If your application is a web application (Spring MVC, Spring WebFlux, or Jersey),you can use the following additional endpoints.</p>
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Description</th>
-<th>Enabled by default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>heapdump</code></td>
-<td>Returns a GZip compressed <code>hprof</code> heap dump file.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>jolokia</code></td>
-<td>Exposes JMX beans over HTTP (when Jolokia is on the classpath, not available for WebFlux).</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>logfile</code></td>
-<td>Returns the contents of the logfile (if <code>logging.file</code> or <code>logging.path</code> properties have been set). Supports the use of the HTTP <code>Range</code> header to retrieve part of the log file’s content.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>prometheus</code></td>
-<td>Exposes metrics in a format that can be scraped by a Prometheus server.</td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<h4 id="开启端点"><a href="#开启端点" class="headerlink" title="开启端点"></a>开启端点</h4><ul>
-<li>actuator中提供的20个端点,默认级别开关级别如下:</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>JMX</th>
-<th>Web</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>auditevents</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>beans</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>conditions</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>configprops</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>env</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>flyway</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>health</code></td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>heapdump</code></td>
-<td>N/A</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>httptrace</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>info</code></td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>jolokia</code></td>
-<td>N/A</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>logfile</code></td>
-<td>N/A</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>loggers</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>liquibase</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>metrics</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>mappings</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>prometheus</code></td>
-<td>N/A</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>scheduledtasks</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>sessions</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>shutdown</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>threaddump</code></td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><p>JMX</p>
-<p>除prometheus、logfile、jolokia、heapdump没有提供外,其余端点默认开启.</p>
-</li>
-<li><p>Web</p>
-<p>默认只开启health、info端点.</p>
-</li>
-</ul>
-<p>正确打开姿势:</p>
-<ul>
-<li><p>JMX</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.jmx.exposure.include</span><br><span class="line"># 关闭 management.endpoints.jmx.exposure.exclude</span><br><span class="line"># 如关闭mappings、shutdown端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=mappings,shutdown</span><br><span class="line"># 如关闭所有端点.</span><br><span class="line">management.endpoints.jmx.exposure.exclude=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Web</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 打开 management.endpoints.web.exposure.include</span><br><span class="line"># 关闭 management.endpoints.web.exposure.exclude</span><br><span class="line"># 如打开env、mappings端点</span><br><span class="line">management.endpoints.web.exposure.include=env,mappings</span><br><span class="line"># 如打开所有端点</span><br><span class="line">management.endpoints.web.exposure.include=*</span><br><span class="line"># YAML中*有特殊含义,需要用&quot;*&quot;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h4 id="端点详细用法"><a href="#端点详细用法" class="headerlink" title="端点详细用法"></a>端点详细用法</h4><p>请求前缀为/actuators.具体用法参考文档<a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/actuator-api//html/#overview" target="_blank" rel="noopener">Usage</a>.</p>
-<h4 id="配置端点缓存"><a href="#配置端点缓存" class="headerlink" title="配置端点缓存"></a>配置端点缓存</h4><p>○ Endpoints automatically cache responses to read operations that do not take any parameters. </p>
-<p>☆ 官方说是默认缓存读取操作的无参端点返回值.至于具体时间只能看源码了.</p>
-<p>对应的源码类为:EndpointAutoConfiguration、EndpointIdTimeToLivePropertyFunction</p>
-<p>正确配置姿势如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># The prefix management.endpoint.&lt;name&gt; is used to uniquely identify the endpoint that is being configured.</span><br><span class="line"># 如配置bean端点返回值缓存时间为10秒</span><br><span class="line">management.endpoint.beans.cache.time-to-live=10s</span><br></pre></td></tr></table></figure>
-<h4 id="自定义端点路径"><a href="#自定义端点路径" class="headerlink" title="自定义端点路径"></a>自定义端点路径</h4><ul>
-<li><p>base-path</p>
-<p>默认值是:/actuator</p>
-</li>
-<li><p>path-mapping</p>
-<p>端点映射路径,默认是官方提供的20个端点名称.</p>
-</li>
-</ul>
-<p>完整请求路径为:[base-path]+[path-mapping]</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 原health端点为:/actuator/health,现在改为:/manager/healthcheck</span><br><span class="line">management.endpoints.web.base-path=/manager</span><br><span class="line">management.endpoints.web.path-mapping.health=healthcheck</span><br></pre></td></tr></table></figure>
-<h4 id="自定义端点"><a href="#自定义端点" class="headerlink" title="自定义端点"></a>自定义端点</h4><p>○ If you add a <code>@Bean</code> annotated with <code>@Endpoint</code>, any methods annotated with <code>@ReadOperation</code>, <code>@WriteOperation</code>, or <code>@DeleteOperation</code> are automatically exposed over JMX and, in a web application, over HTTP as well. Endpoints can be exposed over HTTP using Jersey, Spring MVC, or Spring WebFlux.</p>
-<p>○ You can also write technology-specific endpoints by using <code>@JmxEndpoint</code> or <code>@WebEndpoint</code>. These endpoints are restricted to their respective technologies. For example, <code>@WebEndpoint</code> is exposed only over HTTP and not over JMX.</p>
-<p>○ You can write technology-specific extensions by using <code>@EndpointWebExtension</code> and <code>@EndpointJmxExtension</code>. These annotations let you provide technology-specific operations to augment an existing endpoint.</p>
-<p>○ Finally, if you need access to web-framework-specific functionality, you can implement Servlet or Spring <code>@Controller</code> and <code>@RestController</code> endpoints at the cost of them not being available over JMX or when using a different web framework.</p>
-<p>☆ actuator可以提供JMX和HTTP两种方式,所以也提供对应实现的方式.</p>
-<ul>
-<li><code>@Endpoint</code>针对JMX和HTTP.</li>
-<li><code>@JmxEndpoint</code>或<code>@EndpointJmxExtension</code>只针对JMX.</li>
-<li><code>@WebEndpoint</code>或<code>@EndpointWebExtension</code>只针对HTTP.</li>
-<li><code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> 这三个用于指定请求方式.</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>Operation</th>
-<th>HTTP method</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>@ReadOperation</code></td>
-<td><code>GET</code></td>
-</tr>
-<tr>
-<td><code>@WriteOperation</code></td>
-<td><code>POST</code></td>
-</tr>
-<tr>
-<td><code>@DeleteOperation</code></td>
-<td><code>DELETE</code></td>
-</tr>
-</tbody>
-</table>
-<h5 id="☆-使用actuator的自定义端点有特别的意义吗"><a href="#☆-使用actuator的自定义端点有特别的意义吗" class="headerlink" title="☆ 使用actuator的自定义端点有特别的意义吗?"></a>☆ 使用actuator的自定义端点有特别的意义吗?</h5><p>目前看,针对HTTP的方式,与平常我自己暴露端点也没区别.但针对JMX监控的话,这就是它优势之处了.</p>
-<p>另外,个人认为没有特殊要求,使用<code>@Endpoint</code>更好,既提供了JMX监控端点,也同时提供了HTTP监控端点.</p>
-<h5 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h5><p>○ To allow the input to be mapped to the operation method’s parameters, Java code implementing an endpoint should be compiled with <code>-parameters</code>, and Kotlin code implementing an endpoint should be compiled with <code>-java-parameters</code>. This will happen automatically if you are using Spring Boot’s Gradle plugin or if you are using Maven and <code>spring-boot-starter-parent</code>.</p>
-<p>☆ 在使用<code>@ReadOperation</code>等时,默认是按照参数名匹配入参,如果需要参数数量自动匹配,需要在spring boot时添加<code>-parameters</code>.</p>
-<h6 id="新增端点"><a href="#新增端点" class="headerlink" title="新增端点"></a>新增端点</h6><ul>
-<li>使用<code>@Endpoint</code>、<code>@ReadOperation</code>, <code>@WriteOperation</code>, <code>@DeleteOperation</code> </li>
-</ul>
-<p>例子:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">@Endpoint(id = &quot;custom-health&quot;)</span><br><span class="line">public class CustomHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health2(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter: &quot; + name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health3(@Selector String name, @Selector String name2) &#123;</span><br><span class="line">        return &quot;custom-end-point get parameter1: &quot; + name +&quot;,parameter2: &quot; + name2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @WriteOperation</span><br><span class="line">    public String writeOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point post&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @DeleteOperation</span><br><span class="line">    public String deleteOperation(@Selector String name) &#123;</span><br><span class="line">        return &quot;custom-end-point delete&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>启动时,使用-parameters参数.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 调用health2方法 http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/hello</span><br><span class="line">custom-end-point get parameter: hello</span><br><span class="line"></span><br><span class="line"># 调用health3方法,参数名必须相同,&#123;angstring&#125;用任意字符串替换就行.http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;/&#123;anystring&#125;</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/hello/world</span><br><span class="line">custom-end-point get parameter1: hello,parameter2: world</span><br></pre></td></tr></table></figure>
-<p>启动时,不使用-parameters参数.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 调用health无参方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health</span><br><span class="line">health</span><br><span class="line"></span><br><span class="line"># 调用health2方法</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/name</span><br><span class="line">&#123;&quot;timestamp&quot;:&quot;2018-08-27T11:04:06.709+0000&quot;,&quot;status&quot;:400,&quot;error&quot;:&quot;Bad Request&quot;,&quot;message&quot;:&quot;Missing parameters: name&quot;,&quot;path&quot;:&quot;/actuator/custom-health/p1&quot;&#125;</span><br><span class="line"></span><br><span class="line">只能通过以下方式才能请求到health2方法,参数名必须相同.&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;?name=hello</span><br><span class="line">custom-end-point get parameter: hello</span><br><span class="line"></span><br><span class="line"># 调用health3方法,参数名必须相同,&#123;angstring&#125;用任意字符串替换就行.</span><br><span class="line">$ curl http://localhost:[port]/actuator/custom-health/&#123;anystring&#125;/&#123;anystring&#125;?name=hello&amp;name=world</span><br><span class="line">custom-end-point get parameter1: hello,parameter2: world</span><br></pre></td></tr></table></figure>
-<p>☆ 总结:actuator中端点的多参数请求方式,不按照参数名匹配.所以需要在启动时添加-parameters参数.</p>
-<ul>
-<li>使用<code>WebEndpointExtension</code>或<code>@EndpointJmxExtension</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">@Endpoint(id = &quot;myhealth&quot;)</span><br><span class="line">public class MyHealthEndpoint &#123;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public String health() &#123;</span><br><span class="line">        return &quot;health&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@EndpointWebExtension(endpoint = MyHealthEndpoint.class)</span><br><span class="line">public class MyHealthWebEndpointExtension &#123;</span><br><span class="line"></span><br><span class="line">    private final MyHealthEndpoint delegate;</span><br><span class="line"></span><br><span class="line">    public MyHealthWebEndpointExtension(MyHealthEndpoint delegate) &#123;</span><br><span class="line">        this.delegate = delegate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @ReadOperation</span><br><span class="line">    public WebEndpointResponse&lt;String&gt; getHealth() &#123;</span><br><span class="line">        return new WebEndpointResponse&lt;&gt;(&quot;health&quot;, 200);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class ActuatorConfiguration &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    public MyHealthEndpoint myHealthEndpoint() &#123;</span><br><span class="line">        return new MyHealthEndpoint();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnEnabledEndpoint</span><br><span class="line">    @ConditionalOnBean(&#123;MyHealthEndpoint.class&#125;)</span><br><span class="line">    public MyHealthWebEndpointExtension myHealthWebEndpointExtension(</span><br><span class="line">            MyHealthEndpoint delegate) &#123;</span><br><span class="line">        return new MyHealthWebEndpointExtension(delegate);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"># application.yml</span><br><span class="line">management:</span><br><span class="line">  endpoints:</span><br><span class="line">    myhealth:</span><br><span class="line">      enabled: true</span><br></pre></td></tr></table></figure>
-<h6 id="覆盖原端点"><a href="#覆盖原端点" class="headerlink" title="覆盖原端点"></a>覆盖原端点</h6><p>目前覆盖原端点只能通过重载的方式.我这里测试了health端点的覆盖.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyHealthIndicator implements HealthIndicator &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Health health() &#123;</span><br><span class="line">        return Health.down().build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"># 再次请求Health端点,返回值就为&#123;&quot;status&quot;:&quot;DOWN&quot;&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h2><h3 id="端点默认缓存的默认时间是多少"><a href="#端点默认缓存的默认时间是多少" class="headerlink" title="端点默认缓存的默认时间是多少?"></a>端点默认缓存的默认时间是多少?</h3><h3 id="官网还有更多关于监控文章待学习"><a href="#官网还有更多关于监控文章待学习" class="headerlink" title="官网还有更多关于监控文章待学习."></a>官网还有更多关于监控文章待学习.</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="spring-boot-2-0-4-doc"><a href="#spring-boot-2-0-4-doc" class="headerlink" title="spring-boot-2.0.4-doc"></a><a href="https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">spring-boot-2.0.4-doc</a></h3><h3 id="Custom-Endpoint-in-Spring-Boot-Actuator"><a href="#Custom-Endpoint-in-Spring-Boot-Actuator" class="headerlink" title="Custom Endpoint in Spring Boot Actuator"></a><a href="https://www.javadevjournal.com/spring-boot/spring-boot-actuator-custom-endpoint/" target="_blank" rel="noopener">Custom Endpoint in Spring Boot Actuator</a></h3><h3 id="How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0"><a href="#How-to-make-the-Endpoint-id-“health”-working-in-Spring-Boot-2-0" class="headerlink" title="How to make the @Endpoint(id = “health”) working in Spring Boot 2.0?"></a><a href="https://stackoverflow.com/questions/46796899/how-to-make-the-endpointid-health-working-in-spring-boot-2-0" target="_blank" rel="noopener">How to make the <code>@Endpoint(id = “health”)</code> working in Spring Boot 2.0?</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/23/kubernetes的DNS理解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/23/kubernetes的DNS理解/" itemprop="url">kubernetes的DNS理解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-23T11:24:32+08:00">
-                2018-08-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,335
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  6
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>对于k8s的DNS理解还是有些模糊,这里梳理阅读相关文章后的理解.</p>
-<ul>
-<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/coredns/" target="_blank" rel="noopener">Using CoreDNS for Service Discovery</a></li>
-<li><a href="https://kubernetes.io/cn/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank" rel="noopener">在 Kubernetes 中配置私有 DNS 和上游域名服务器</a></li>
-<li><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank" rel="noopener">DNS for Services and Pods</a></li>
-<li><a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/" target="_blank" rel="noopener">Customizing DNS Service</a></li>
-</ul>
-<h2 id="Kubernetes提供的DNS服务"><a href="#Kubernetes提供的DNS服务" class="headerlink" title="Kubernetes提供的DNS服务"></a>Kubernetes提供的DNS服务</h2><p>DNS是kubernetes内置的Pod服务.包含三个容器:</p>
-<ul>
-<li><p>kubedns</p>
-<p>监测kubernetes的master节点对Services和Endpoints的变化,并且保留在内存中,服务DNS查询.</p>
-</li>
-<li><p>dnsmasq</p>
-<p>缓存DNS,提高查询效率.</p>
-</li>
-<li><p>sidecars</p>
-<p>为dnsmasq和kubedns提供健康检查的端点.</p>
-</li>
-</ul>
-<h3 id="Kube-DNS和CoreDNS"><a href="#Kube-DNS和CoreDNS" class="headerlink" title="Kube-DNS和CoreDNS"></a>Kube-DNS和CoreDNS</h3><p>kubernetes提供了两种DNS服务</p>
-<ul>
-<li>kube-dns</li>
-<li>CoreDNS</li>
-</ul>
-<p>从v1.11版本开始,CoreDNS已经是GA版本了,且已经作为Kubernetes的DNS服务.(<a href="https://coredns.io/" target="_blank" rel="noopener">CoreDNS</a>已经作为CNCF的独立项目)</p>
-<p>kube-dns是在1.9版本前使用.</p>
-<p>在v1.11版本之后,(不建议)如果还想继续使用kube-dns,则在初始化集群是配置以下参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubeadm init --feature-gates=CoreDNS=false</span><br></pre></td></tr></table></figure>
-<h3 id="配置kube-dns的存根域和上游DNS服务器"><a href="#配置kube-dns的存根域和上游DNS服务器" class="headerlink" title="配置kube-dns的存根域和上游DNS服务器"></a>配置kube-dns的存根域和上游DNS服务器</h3><p>这里有两个概念:stub domains 和upstream nameservers.这里我翻译为存根域和上游DNS服务器.</p>
-<ul>
-<li>upstreamNameservers,会覆盖node节点上的/etc/resolv.conf文件,且最多配置三个upstream nameservers.</li>
-</ul>
-<p>例子:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: kube-dns</span><br><span class="line">  namespace: kube-system</span><br><span class="line">data:</span><br><span class="line">  stubDomains: |</span><br><span class="line">    &#123;&quot;acme.local&quot;: [&quot;1.2.3.4&quot;]&#125;</span><br><span class="line">  upstreamNameservers: |</span><br><span class="line">    [&quot;8.8.8.8&quot;, &quot;8.8.4.4&quot;]</span><br></pre></td></tr></table></figure>
-<p>DNS请求如果后缀有<code>acme.local</code>,则返回DNS Server的地址1.2.3.4.</p>
-<table>
-<thead>
-<tr>
-<th>Domain name</th>
-<th>Server answering the query</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>kubernetes.default.svc.cluster.local</td>
-<td>kube-dns</td>
-</tr>
-<tr>
-<td>foo.acme.local</td>
-<td>custom DNS (1.2.3.4)</td>
-</tr>
-<tr>
-<td>widget.com</td>
-<td>upstream DNS (one of 8.8.8.8, 8.8.4.4)</td>
-</tr>
-</tbody>
-</table>
-<h4 id="Pod设置dnsPolicy对DNS查询的影响"><a href="#Pod设置dnsPolicy对DNS查询的影响" class="headerlink" title="Pod设置dnsPolicy对DNS查询的影响"></a>Pod设置dnsPolicy对DNS查询的影响</h4><p>当在pod中设置的dnsPolicy为<code>default</code> 和<code>None</code>,则自定义的stub domain和upstream nameservers不会生效.</p>
-<p>当dnsPolicy为<code>ClusterFirst</code>后</p>
-<ul>
-<li><p>未配置了存根域和upstream</p>
-<p>如果咩有匹配的domain后缀,如<code>www.kubernetes.io</code>则去查找upstream nameserver.</p>
-</li>
-<li><p>配置自定义存根域和upstream</p>
-<p>首先查找kube-dns的DNS cache.</p>
-<p>再查找自定义的stub domain,即图中的custom DNS.</p>
-<p>最后查找upstream DNS.</p>
-<p><img src="/var/folders/42/6wkj60592196pl_8sdtb8tl00000gn/T/abnerworks.Typora/image-20180824174249533.png" alt="image-20180824174249533"></p>
-</li>
-</ul>
-<h3 id="配置CoreDNS的存根域和上游DNS服务器"><a href="#配置CoreDNS的存根域和上游DNS服务器" class="headerlink" title="配置CoreDNS的存根域和上游DNS服务器"></a>配置CoreDNS的存根域和上游DNS服务器</h3><p>CoreDNS提供链条插件式扩展,非常灵活.CoreDNS安装后默认包含了30个插件.CoreDNS的功能可以由一个或多个插件组成.只要会go语言,以及指导DNS工作原理就可以开发插件.</p>
-<p>CoreDNS的配置文件Corefile.且语法规则如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">coredns.io &#123;</span><br><span class="line">    file coredns.io.signed &#123;</span><br><span class="line">        transfer to * 185.49.140.62</span><br><span class="line">    &#125;</span><br><span class="line">    prometheus</span><br><span class="line">    errors</span><br><span class="line">    log</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>详细信息可浏览官网<a href="https://coredns.io/manual/toc/" target="_blank" rel="noopener">CoreDNS</a>.</p>
-<p>在v1.10版本后,kubeadm支持自动转换ConfigMap为Corefile.</p>
-<p>Example:</p>
-<p>kubedns使用以下配置.stubDomain存根域及upstream上游域.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  federations: |</span><br><span class="line">    &#123;&quot;foo&quot; : &quot;foo.feddomain.com&quot;&#125;</span><br><span class="line">  stubDomains: |</span><br><span class="line">    &#123;&quot;abc.com&quot; : [&quot;1.2.3.4&quot;], &quot;my.cluster.local&quot; : [&quot;2.3.4.5&quot;]&#125;</span><br><span class="line">  upstreamNameservers: |</span><br><span class="line">    [&quot;8.8.8.8&quot;, &quot;8.8.4.4&quot;]</span><br><span class="line">kind: ConfigMap</span><br></pre></td></tr></table></figure>
-<p>等价的Corefile配置文件为:</p>
-<ul>
-<li>For federations:</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">federation cluster.local &#123;</span><br><span class="line">       foo foo.feddomain.com</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>For stubDomains:</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">abc.com:53 &#123;</span><br><span class="line">    errors</span><br><span class="line">    cache 30</span><br><span class="line">    proxy . 1.2.3.4</span><br><span class="line">&#125;</span><br><span class="line">my.cluster.local:53 &#123;</span><br><span class="line">    errors</span><br><span class="line">    cache 30</span><br><span class="line">    proxy . 2.3.4.5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>完整配置如下:DNS使用UDP协议,且端口为53</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">.:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        health</span><br><span class="line">        kubernetes cluster.local  in-addr.arpa ip6.arpa &#123;</span><br><span class="line">           upstream  8.8.8.8 8.8.4.4</span><br><span class="line">           pods insecure</span><br><span class="line">           fallthrough in-addr.arpa ip6.arpa</span><br><span class="line">        &#125;</span><br><span class="line">        federation cluster.local &#123;</span><br><span class="line">           foo foo.feddomain.com</span><br><span class="line">        &#125;</span><br><span class="line">        prometheus :9153</span><br><span class="line">        proxy .  8.8.8.8 8.8.4.4</span><br><span class="line">        cache 30</span><br><span class="line">    &#125;</span><br><span class="line">    abc.com:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        cache 30</span><br><span class="line">        proxy . 1.2.3.4</span><br><span class="line">    &#125;</span><br><span class="line">    my.cluster.local:53 &#123;</span><br><span class="line">        errors</span><br><span class="line">        cache 30</span><br><span class="line">        proxy . 2.3.4.5</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h3 id="DNS中的记录生成规则"><a href="#DNS中的记录生成规则" class="headerlink" title="DNS中的记录生成规则"></a>DNS中的记录生成规则</h3><p>DNS包含A记录和SRV记录.A记录就是ip和域名的映射,SRV记录是端口映射.</p>
-<h4 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h4><p>Service分为Headless和非Headless.(Headless Service:<code>.spec.clusterIP</code>设置为None)</p>
-<p>Service创建之后,默认会生成一条DNS映射的A记录,格式为:<code>[.metadata.name].[namespace].svc.cluster.local</code>.</p>
-<p>还会生成一条DNS映射的SRV(端口)记录,格式为:<code>_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster.local</code>.</p>
-<p>对非Headless的Service,端口的DNS映射就是:<code>[.metadata.name].[namespace].svc.cluster.local</code>.</p>
-<p>对于Headless的Service,目前还不是特别明白.暂且先将原文描述贴下来.For a headless service, this resolves to multiple answers, one for each pod that is backing the service, and contains the port number and the domain name of the pod of the form <code>auto-generated-name.my-svc.my-namespace.svc.cluster.local</code>.</p>
-<h4 id="Pod"><a href="#Pod" class="headerlink" title="Pod"></a>Pod</h4><p>创建Pod会生成一条DNS的A记录:<code>pod-ip-address.my-namespace.pod.cluster.local</code>.</p>
-<p>在集群中查找Pod,可以通过这种格式<code>[.metadata.name].[.spec.subdomain].[namespace].svc.cluster.local</code>查找.</p>
-<h3 id="Pod的DNS规则"><a href="#Pod的DNS规则" class="headerlink" title="Pod的DNS规则"></a>Pod的DNS规则</h3><p> 设置字段:<code>.spec.dsnPolicy</code>.有四种规则:</p>
-<ul>
-<li><p>Default</p>
-<p>虽然名字是Default,但是不是默认规则.</p>
-<p>The Pod inherits the name resolution configuration from the node that the pods run on</p>
-</li>
-<li><p>ClusterFirst</p>
-<p>集群规则优先,如果没有查询到,则去上游域名服务器查询.集群DNS服务和上游DNS服务都可以配置.</p>
-</li>
-<li><p>ClusterFirstWithHostNet</p>
-<p>For Pods running with hostNetwork, you should explicitly set its DNS policy</p>
-</li>
-<li><p>None</p>
-<p>忽略在kubernetes环境DNS配置,并使用自定义的DNS配置.<code>.spec.dsnConfig</code></p>
-</li>
-</ul>
-<h4 id="如何手动设置Pod中的DNS解析配置"><a href="#如何手动设置Pod中的DNS解析配置" class="headerlink" title="如何手动设置Pod中的DNS解析配置"></a>如何手动设置Pod中的DNS解析配置</h4><p>需要在集群中开启功能支持,<code>--feature-gates=CustomPodDNS=true</code>.</p>
-<p>例如:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  namespace: default</span><br><span class="line">  name: dns-example</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test</span><br><span class="line">      image: nginx</span><br><span class="line">  dnsPolicy: &quot;None&quot;</span><br><span class="line">  dnsConfig:</span><br><span class="line">    nameservers:</span><br><span class="line">      - 1.2.3.4</span><br><span class="line">    searches:</span><br><span class="line">      - ns1.svc.cluster.local</span><br><span class="line">      - my.dns.search.suffix</span><br><span class="line">    options:</span><br><span class="line">      - name: ndots</span><br><span class="line">        value: &quot;2&quot;</span><br><span class="line">      - name: edns0</span><br></pre></td></tr></table></figure>
-<p>运行后,会在Pod中的/etc/resolv.conf文件中生成以下内容:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nameserver 1.2.3.4</span><br><span class="line">search ns1.svc.cluster.local my.dns.search.suffix</span><br><span class="line">options ndots:2 edns0</span><br></pre></td></tr></table></figure>
-<h3 id="自定义DNS服务"><a href="#自定义DNS服务" class="headerlink" title="自定义DNS服务"></a>自定义DNS服务</h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/22/DNS-for-Services-and-Pods翻译/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/22/DNS-for-Services-and-Pods翻译/" itemprop="url">DNS for Services and Pods翻译</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-22T15:40:34+08:00">
-                2018-08-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  748
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/" target="_blank" rel="noopener">原文链接</a></h2><h2 id="DNS-for-Services-and-Pods"><a href="#DNS-for-Services-and-Pods" class="headerlink" title="DNS for Services and Pods"></a>DNS for Services and Pods</h2><p>这篇文章是kubernetes关于DNS的概述.</p>
-<ul>
-<li>Introduction</li>
-<li>Services</li>
-<li>Pods</li>
-</ul>
-<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>Kubernetes DNS 在集群中调度一个DNS Pod和Service,并配置kubelets去告诉独立的容器使用DNS Service’s IP去解析DNS名称.</p>
-<h4 id="What-things-get-DNS-names"><a href="#What-things-get-DNS-names" class="headerlink" title="What things get DNS names?"></a>What things get DNS names?</h4><p>在集群中的每个service都会被分配一个DNS名称.默认情况下,客户端发起的Pod的DNS搜索包括Pod的namespace和集群默认的域名.这里有个例子说明:</p>
-<p>假设一个Service名称为foo,在kubernetes中的namespace为bar.一个运行在namespace为bar的pod,通过简便的DNS查询到名称为foo的Service.一个运行在namespace为quux的pod,可以在DNS中通过搜索名称为foo.bar,并查到这个容器.</p>
-<p>下面的章节详细的说明了支持的record类型以及支持的布局设计.</p>
-<h3 id="Services"><a href="#Services" class="headerlink" title="Services"></a>Services</h3><h4 id="A-Record"><a href="#A-Record" class="headerlink" title="A Record"></a>A Record</h4><p>正常(not headless)Services会被分配一个这种格式的DNS A 记录<code>my-svc.my-namespace.svc.cluster.local</code>.这个解析集群的Service Ip.</p>
-<p>Headless(没有cluster ip)Services会被分配一个这种格式的DNS A记录<code>my-svc.my-namespace.svc.cluster.local</code>.和正常的Services不同的是,通过解析Pod中的一组Ip.</p>
-<h4 id="SRV-Record"><a href="#SRV-Record" class="headerlink" title="SRV Record"></a>SRV Record</h4><p>SRV记录是在正常或Headless Service创建时指定端口.每个指定的端口,SRV记录的格式是: <code>_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster.local</code>.对于headless serviec来说,这个解析会得到多个结果,pod中的容器端口号和子域名格式为:<code>auto-generated-name.my-svc.my-namespace.svc.cluster.local</code>.</p>
-<h3 id="Pods"><a href="#Pods" class="headerlink" title="Pods"></a>Pods</h3><h4 id="A-Record-1"><a href="#A-Record-1" class="headerlink" title="A Record"></a>A Record</h4><p>Pods会被分配这种格式的一条DNS A记录:<code>pod-ip-address.my-namespace.pod.cluster.local</code></p>
-<p>例如:一个pod的ip是1.2.3.4,namespace为default,DNS为cluster.local的DNS记录为:1-2-3-4.default.pod.cluster.local</p>
-<h4 id="Pod’s-hostname-and-subdomain-fields"><a href="#Pod’s-hostname-and-subdomain-fields" class="headerlink" title="Pod’s hostname and subdomain fields"></a>Pod’s hostname and subdomain fields</h4><p>创建pod时,它的hostname默认为Pod中的metadata.name的值.</p>
-<p>Pod的spec有个hostname字段选项,用来指定pod的hostname.而<code>.spec.hostname</code>优先级高于<code>.metadata.name</code>.例如:给一个pod的hostname设置为”my-host”,那么这个pod的名称就是”my-host”.</p>
-<p>Pod的spec有个subdomain字段选项,用来指定pod的子域名.例如:一个pod的hostname设置为”foo”,subdomain设置为”bar”,namespace为”my-namespace”,则它的查询名称就为:<code>foo.bar.my-namespace.svc.cluster.local</code></p>
-<p>例子:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: default-subdomain</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    name: busybox</span><br><span class="line">  clusterIP: None</span><br><span class="line">  ports:</span><br><span class="line">  - name: foo # Actually, no port is needed.</span><br><span class="line">    port: 1234</span><br><span class="line">    targetPort: 1234</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: busybox1</span><br><span class="line">  labels:</span><br><span class="line">    name: busybox</span><br><span class="line">spec:</span><br><span class="line">  hostname: busybox-1</span><br><span class="line">  subdomain: default-subdomain</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    command:</span><br><span class="line">      - sleep</span><br><span class="line">      - &quot;3600&quot;</span><br><span class="line">    name: busybox</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: busybox2</span><br><span class="line">  labels:</span><br><span class="line">    name: busybox</span><br><span class="line">spec:</span><br><span class="line">  hostname: busybox-2</span><br><span class="line">  subdomain: default-subdomain</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    command:</span><br><span class="line">      - sleep</span><br><span class="line">      - &quot;3600&quot;</span><br><span class="line">    name: busybox</span><br></pre></td></tr></table></figure>
-<p>如果存在一个headless service和一个pod在同一个namespace中,并且headless service的名称和pod中的subdomain名称相同,kubernetes的DNS服务一样查询到这个Service.例如:上面配置中,一个Pod的hostname是”busybox-1”,subdomain是default-subdomain,而headless service命名为”default-subdomain”.那么这个DNS为<code>busybox-1.default-subdomain.my-namespace.svc.cluster.local</code></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/21/kubernetes常用命令/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/21/kubernetes常用命令/" itemprop="url">kubernetes常用命令</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T14:19:18+08:00">
-                2018-08-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
-                    <span itemprop="name">kubernetes</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,810
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  9
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><h3 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># nginx-deployment.yaml</span><br><span class="line">$ vim nginx-deployment.yaml</span><br><span class="line">apiVersion: apps/v1 # 1.11版本之后</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-deployment</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3 # 3个副本</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx # 与template.metadata.labels一致</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br></pre></td></tr></table></figure>
-<h4 id="创建Deployments"><a href="#创建Deployments" class="headerlink" title="创建Deployments"></a>创建Deployments</h4><ul>
-<li>record参数设置为true,在Deployment revision时方便命令记录,以及在describe时能够看到Annotations中指令记录</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f nginx-deployment.yaml --record</span><br><span class="line">deployment &quot;nginx-deployment&quot; created</span><br></pre></td></tr></table></figure>
-<h4 id="查看发布历史记录"><a href="#查看发布历史记录" class="headerlink" title="查看发布历史记录"></a>查看发布历史记录</h4><ul>
-<li>rollout 字面是上线意思,我理解为发布.</li>
-</ul>
-<p>替换metadata.name,即上面文件中的nginx-deployment名称.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># kubectl rollout history deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment</span><br><span class="line"># 如果在创建Deployments时没有使用--record,没有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         &lt;none&gt;</span><br><span class="line"># 如果在创建时指定--record,会有命令记录.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
-<p>查看历史版本的具体信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl rollout history deployment/nginx-deployment --revision=1</span><br><span class="line">deployments &quot;nginx-deployment&quot; with revision #1</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:	app=nginx</span><br><span class="line">	pod-template-hash=2777190766</span><br><span class="line">  Annotations:	kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:	nginx</span><br><span class="line">    Port:	80/TCP</span><br><span class="line">    Host Port:	0/TCP</span><br><span class="line">    Environment:	&lt;none&gt;</span><br><span class="line">    Mounts:	&lt;none&gt;</span><br><span class="line">  Volumes:	&lt;none&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="查看Deployments"><a href="#查看Deployments" class="headerlink" title="查看Deployments"></a>查看Deployments</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get deployment [metadata.name](可选)</span><br><span class="line"># 不指定deployment的名字将查询全部的deployments.如下:</span><br><span class="line">NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">hello-node-deployment   1         1         1            1           17m</span><br><span class="line">nginx-deployment        1         1         1            1           4m</span><br></pre></td></tr></table></figure>
-<h4 id="查看RS-ReplicaSet"><a href="#查看RS-ReplicaSet" class="headerlink" title="查看RS(ReplicaSet)"></a>查看RS(ReplicaSet)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get rs</span><br><span class="line">NAME                              DESIRED   CURRENT   READY     AGE</span><br><span class="line">nginx-deployment-966857787        1         1         1         5m</span><br></pre></td></tr></table></figure>
-<h4 id="更新Deployments-自动rollout"><a href="#更新Deployments-自动rollout" class="headerlink" title="更新Deployments(自动rollout)"></a>更新Deployments(自动rollout)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 方式一,修改文件中的spec.template.spec.containers[0].image值</span><br><span class="line">kubectl edit deployment/[metadata.name]</span><br><span class="line">$ kubectl edit deployment/nginx-deployment</span><br><span class="line"># 方式二 </span><br><span class="line">kubectl set image deployment [metadata.name] [spec.spec.containers.name]=镜像名称</span><br><span class="line">$ kubectl set image deployment nginx-deployment nginx=nginx:1.7.9</span><br></pre></td></tr></table></figure>
-<h4 id="查看发布状态"><a href="#查看发布状态" class="headerlink" title="查看发布状态"></a>查看发布状态</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># kubectl rollout status deployment/[metadata.name]</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 2 out of 3 new replicas have been updated...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 1 old replicas are pending termination...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
-<h4 id="查看deployment详细信息"><a href="#查看deployment详细信息" class="headerlink" title="查看deployment详细信息"></a>查看deployment详细信息</h4><ul>
-<li>关注Events,记录了发布的过程.实际是创建了一个新的ReplicaSet-&gt;nginx-deployment-6ccc5f4cbb,然后逐渐下原来的ReplicaSet-&gt;nginx-deployment-966857787的Pod.</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># kubectl describe deployment/[metadata.name]</span><br><span class="line">$ kubectl describe deployment/nginx-deployment</span><br><span class="line">Name:                   nginx-deployment</span><br><span class="line">Namespace:              default</span><br><span class="line">CreationTimestamp:      Tue, 21 Aug 2018 15:18:18 +0800</span><br><span class="line">Labels:                 app=nginx</span><br><span class="line">Annotations:            deployment.kubernetes.io/revision=2</span><br><span class="line">                        kubernetes.io/change-cause=kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">Selector:               app=nginx</span><br><span class="line">Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable</span><br><span class="line">StrategyType:           RollingUpdate</span><br><span class="line">MinReadySeconds:        0</span><br><span class="line">RollingUpdateStrategy:  25% max unavailable, 25% max surge</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:  app=nginx</span><br><span class="line">  Containers:</span><br><span class="line">   nginx:</span><br><span class="line">    Image:        nginx:1.7.9</span><br><span class="line">    Port:         80/TCP</span><br><span class="line">    Host Port:    0/TCP</span><br><span class="line">    Environment:  &lt;none&gt;</span><br><span class="line">    Mounts:       &lt;none&gt;</span><br><span class="line">  Volumes:        &lt;none&gt;</span><br><span class="line">Conditions:</span><br><span class="line">  Type           Status  Reason</span><br><span class="line">  ----           ------  ------</span><br><span class="line">  Available      True    MinimumReplicasAvailable</span><br><span class="line">  Progressing    True    NewReplicaSetAvailable</span><br><span class="line">OldReplicaSets:  &lt;none&gt;</span><br><span class="line">NewReplicaSet:   nginx-deployment-6ccc5f4cbb (3/3 replicas created)</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason             Age   From                   Message</span><br><span class="line">  ----    ------             ----  ----                   -------</span><br><span class="line">  Normal  ScalingReplicaSet  4m    deployment-controller  Scaled up replica set nginx-deployment-966857787 to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 2</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 1</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled up replica set nginx-deployment-6ccc5f4cbb to 3</span><br><span class="line">  Normal  ScalingReplicaSet  3m    deployment-controller  Scaled down replica set nginx-deployment-966857787 to 0</span><br></pre></td></tr></table></figure>
-<h4 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h4><ul>
-<li><p>回滚之后,revision对应记录就会消失</p>
-</li>
-<li><p>undo是回滚到上一个版本的操作.</p>
-<p>假设有三个版本:nginx:1.4.7, nginx:1.7.9, nginx:1.9.7, nginx:1.10.3,当前版本为nginx:1.10.3.</p>
-<p>1、假如指定to-revision回滚到1.7.9版本,再执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
-<p>2、第一次执行undo(不指定to-revision),回滚到1.9.7版本,再次执行undo(不指定to-revision),则恢复到1.10.3版本.</p>
-<p>3、第一次指定to-revision回滚到1.7.9,第二次指定to-revision回滚到1.9.7,第三次指定to-revision回滚到1.4.7,第四次指定undo(不指定to-revison),则是回滚到1.9.7.</p>
-</li>
-</ul>
-<p>假设有三个版本:nginx:1.7.9,nginx:1.9.7,nginx:1.10.3,当前版本为nginx:1.10.3.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 查看发布历史记录</span><br><span class="line">$ kubectl rollout history deployment/nginx-deployment </span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">3         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
-<p>第一次执行undo回退到前一个版本,即nginx:1.9.7.如果第二次再执行,又会回滚到原版本,即nginx:1.10.3.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># kubectl rollout undo deployment/[metatdata.name]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里查看下发布历史记录,发现revision为3的记录消失了.</span><br><span class="line">deployments &quot;nginx-deployment&quot;</span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">2         kubectl create --filename=nginx-deployment.yaml --record=true</span><br><span class="line">4         kubectl create --filename=nginx-deployment.yaml --record=true</span><br></pre></td></tr></table></figure>
-<p>指定to-revision回退到指定历史</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># kubectl rollout undo deployment/[metadata.name] --to-revision=[number]</span><br><span class="line">$ kubectl rollout undo deployment/nginx-deployment --to-revision=2</span><br><span class="line">deployment.extensions/nginx-deployment</span><br><span class="line"># 这里如果执行undo但不指定--to-revision,则恢复导原来版本.</span><br></pre></td></tr></table></figure>
-<h4 id="Deployment扩容"><a href="#Deployment扩容" class="headerlink" title="Deployment扩容"></a>Deployment扩容</h4><p>指定 扩容/缩容 副本数量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># kubectl scale deployment/[metadata.name] --replicas=[number]</span><br><span class="line">$ kubectl scale deployment/nginx-deployment --replicas=6</span><br><span class="line">deployment.extensions/nginx-deployment scaled</span><br><span class="line"># 查看扩容状态</span><br><span class="line">$ kubectl rollout status deployment/nginx-deployment</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 3 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 4 of 6 updated replicas are available...</span><br><span class="line">Waiting for deployment &quot;nginx-deployment&quot; rollout to finish: 5 of 6 updated replicas are available...</span><br><span class="line">deployment &quot;nginx-deployment&quot; successfully rolled out</span><br></pre></td></tr></table></figure>
-<p>当集群启用horizontal pod autoscaling后,可以根据CPU利用率,在范围内扩容或缩容.(todo还不知道怎么做)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ $ kubectl autoscale deployment nginx-deployment --min=10 --max=15 --cpu-percent=80</span><br><span class="line">deployment &quot;nginx-deployment&quot; autoscaled</span><br></pre></td></tr></table></figure>
-<h4 id="设置Deployments发布历史记录"><a href="#设置Deployments发布历史记录" class="headerlink" title="设置Deployments发布历史记录"></a>设置Deployments发布历史记录</h4><p>在nginx-deployment.yaml中设置spec.revisionHistoryLimits属性,默认是保留全部历史记录.可以不用去理会.</p>
-<h4 id="设置Deployments发布策略"><a href="#设置Deployments发布策略" class="headerlink" title="设置Deployments发布策略"></a>设置Deployments发布策略</h4><p><code>spec.strategy</code> 指定新的Pod替换旧的Pod的策略。 <code>spec.strategy.type</code> 可以是<code>Recreate</code>或者是 <code>RollingUpdate</code>。<code>RollingUpdate</code>是默认值。</p>
-<ul>
-<li>Recreate 指在创建出新的Pod之前会杀掉已经存在的Pod.(强烈建议不使用)</li>
-<li>RollingUpdate 指滚动升级.逐步一个一个交替升级.可以指定<code>maxUnavailable</code> 和 <code>maxSurge</code> 来控制 rolling update 进程。<ul>
-<li>maxUnavaiables <code>.spec.strategy.rollingUpdate.maxUnavailable</code>指定在升级的过程中不可用的Pod数量.默认为1,也可以设置为百分比.如设置为30%,则原来的ReplicaSet会立刻缩容到70%.</li>
-<li>maxSurge <code>.spec.strategy.rollingUpdate.maxSurge</code>指定在升级过程中,新老Pod的总数的最大值.如设置为30%,启动rolling update后新的ReplicatSet将会立即扩容,新老Pod的总数不能超过期望的Pod数量的130%。</li>
-</ul>
-</li>
-</ul>
-<h4 id="Pause设置"><a href="#Pause设置" class="headerlink" title="Pause设置"></a>Pause设置</h4><p><code>.spec.paused</code>是可以可选配置项，boolean值。默认为false.</p>
-<p>如果设置paused后,对Deployment中的PodTemplateSpec的修改都不会触发新的rollout。</p>
-<h2 id="后续需要学习"><a href="#后续需要学习" class="headerlink" title="后续需要学习"></a>后续需要学习</h2><h3 id="如何在集群中启用了horizontal-pod-autoscaling"><a href="#如何在集群中启用了horizontal-pod-autoscaling" class="headerlink" title="如何在集群中启用了horizontal pod autoscaling"></a>如何在集群中启用了horizontal pod autoscaling</h3><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="Kubernetes-apis"><a href="#Kubernetes-apis" class="headerlink" title="Kubernetes apis"></a><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11" target="_blank" rel="noopener">Kubernetes apis</a></h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2726,7 +2275,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2737,7 +2286,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2748,7 +2297,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">47</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2809,7 +2358,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">29.1k</span>
+    <span title="Site words total count">32.3k</span>
   
 </div>
 
