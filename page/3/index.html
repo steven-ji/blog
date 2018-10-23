@@ -309,6 +309,576 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/15/Kubernetes-Pods指定镜像仓库/" itemprop="url">Kubernetes Pods指定镜像仓库</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-15T22:49:52+08:00">
+                2018-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  521
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>在创建pod时,image是从哪个仓库下载?应该如何指定公司的Regitry?最佳实践是什么?带着这些问题,记录自己的爬坑经历.</p>
+<h2 id="镜像建议"><a href="#镜像建议" class="headerlink" title="镜像建议"></a>镜像建议</h2><ul>
+<li>对每个镜像都指定明确的版本号(不要使用latest这样的版本号),减少去镜像仓库拉取的消耗.(可以学习kube的api,版本为X.Y.Z. X is the major version, Y is the minor version, and Z is the patch version) </li>
+</ul>
+<h2 id="使用镜像私仓"><a href="#使用镜像私仓" class="headerlink" title="使用镜像私仓"></a>使用镜像私仓</h2><ul>
+<li><p>使用私仓时,需要配置认证信息.</p>
+</li>
+<li><p>pod中指定私仓优先级高于node指定私仓.</p>
+</li>
+</ul>
+<h3 id="在node节点中配置-推荐"><a href="#在node节点中配置-推荐" class="headerlink" title="在node节点中配置(推荐)"></a>在node节点中配置(推荐)</h3><ul>
+<li>与在每个pod中使用ImagePullSecrets相比,少了重复的配置代码.</li>
+</ul>
+<h4 id="配置认证信息"><a href="#配置认证信息" class="headerlink" title="配置认证信息"></a>配置认证信息</h4><ul>
+<li>docker添加私仓认证信息,可参考<a href="https://docs.docker.com/engine/reference/commandline/login/#provide-a-password-using-stdin" target="_blank" rel="noopener">这里</a></li>
+</ul>
+<p>一般使用docker时,默认都是从docker hub上拉取镜像.正常拉取是不需要认证信息的,但在上传时需要认证信息.</p>
+<p>在每个节点上配置登录认证信息.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 默认docker hub的地址是:https://index.docker.io/v1</span><br><span class="line">$ echo [密码] | docker login --username [用户名] --password-stdin [私仓服务器地址]</span><br><span class="line"># 认证后,会在$HOME/.docker/下生成config.json文件.如果指定退出则会删除该文件.</span><br></pre></td></tr></table></figure>
+<h4 id="认证信息优先级"><a href="#认证信息优先级" class="headerlink" title="认证信息优先级"></a>认证信息优先级</h4><ul>
+<li>{–root-dir:-/var/lib/kubelet}/config.json </li>
+</ul>
+<p>默认config.json不存在</p>
+<ul>
+<li>{cwd of kubelet}/config.json </li>
+</ul>
+<p>指定kubelet的工作空间路径,这种方式暂不考虑.</p>
+<ul>
+<li>${HOME}/.docker/config.json </li>
+</ul>
+<p>默认config.json是不存在的</p>
+<ul>
+<li>/.docker/config.json</li>
+</ul>
+<p>默认该目录不存在</p>
+<h3 id="在pod中指定ImagePullSecrets"><a href="#在pod中指定ImagePullSecrets" class="headerlink" title="在pod中指定ImagePullSecrets"></a>在pod中指定ImagePullSecrets</h3><h4 id="创建secret"><a href="#创建secret" class="headerlink" title="创建secret"></a>创建secret</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 实际上在pull镜像时创建一个虚拟的.docker/config.json文件.</span><br><span class="line">$ kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL</span><br></pre></td></tr></table></figure>
+<h4 id="pod中使用imagePulSecrets"><a href="#pod中使用imagePulSecrets" class="headerlink" title="pod中使用imagePulSecrets"></a>pod中使用imagePulSecrets</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apiVersion: apps/v1 # 可以使用kubectl api-versions确定指定的版本</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: foo</span><br><span class="line">  namespace: awesomeapps</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: foo</span><br><span class="line">      image: janedoe/awesomeapp:v1</span><br><span class="line">  imagePullSecrets:</span><br><span class="line">    - name: myregistryke</span><br></pre></td></tr></table></figure>
+<p>以上两种方式,可以结合使用,建议每台node上都先配置认证信息,有需要再使用第二种方式.</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><h3 id="Images"><a href="#Images" class="headerlink" title="Images"></a><a href="https://kubernetes.io/docs/concepts/containers/images/" target="_blank" rel="noopener">Images</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/12/kubernetes之pause容器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/12/kubernetes之pause容器/" itemprop="url">kubernetes之pause容器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T22:29:12+08:00">
+                2018-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  408
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>之前对于docker的理解就是容器,但什么是容器呢?这个也没有去思考,借助pause容器的说明,顺便梳理下docker容器是什么?<br>docker容器实际是利用Linux的namespace和cgroup达到容器化的目的.</p>
+<h2 id="Two-feature-of-Linux-kernel"><a href="#Two-feature-of-Linux-kernel" class="headerlink" title="Two feature of Linux kernel"></a>Two feature of Linux kernel</h2><p>linux有两个重要的特性,namespace和cgroup(control group).他们用于对资源进行隔离.<br>打个比方,就像你去买商品房,每套都是用混泥土墙隔开,保证别人不会闯到你家.这个可以类比为cgroup,而cgroup就是linux对机器的物理资源(cpu,内存,磁盘io)的隔离.买完了房子,那产权当然是属于你,而不是别人(可能有小三),另外,住进去后你要用水、用电、用网络,对其他人也一样,但是每户各自结算,这就像linux环境中的user namespace、network namespace等,属于环境的隔离.<br>由于能力有限,只能先这么去理解.这里罗列左耳朵耗子的文章.</p>
+<ul>
+<li><a href="https://coolshell.cn/articles/17010.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（上）</a></li>
+<li><a href="https://coolshell.cn/articles/17029.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX NAMESPACE（下）</a></li>
+<li><a href="https://coolshell.cn/articles/17049.html" target="_blank" rel="noopener">DOCKER基础技术：LINUX CGROUP</a></li>
+</ul>
+<h2 id="AUFS-、DEVICEMAPPER"><a href="#AUFS-、DEVICEMAPPER" class="headerlink" title="AUFS 、DEVICEMAPPER"></a>AUFS 、DEVICEMAPPER</h2><p>对于这两个的理解,AUFS是文件管理系统,用于对文件进行分层.<br>具体可以看耗子叔的这两篇文章.<br><a href="https://coolshell.cn/articles/17061.html" target="_blank" rel="noopener">DOCKER基础技术：AUFS</a><br><a href="https://coolshell.cn/articles/17200.html" target="_blank" rel="noopener">DOCKER基础技术：DEVICEMAPPER</a></p>
+<h2 id="Pause"><a href="#Pause" class="headerlink" title="Pause"></a>Pause</h2><p>In Kubernetes, the pause container serves as the “parent container” for all of the containers in your pod. The pause container has two core responsibilities. First, it serves as the basis of Linux namespace sharing in the pod. And second, with PID (process ID) namespace sharing enabled, it serves as PID 1 for each pod and reaps zombie processes.<br>对于pause的理解</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><h3 id="What-are-Kubernetes-Pods-Anyway"><a href="#What-are-Kubernetes-Pods-Anyway" class="headerlink" title="What are Kubernetes Pods Anyway?"></a><a href="https://www.ianlewis.org/en/what-are-kubernetes-pods-anyway" target="_blank" rel="noopener">What are Kubernetes Pods Anyway?</a></h3><h3 id="The-Almighty-Pause-Container"><a href="#The-Almighty-Pause-Container" class="headerlink" title="The Almighty Pause Container"></a><a href="https://www.ianlewis.org/en/almighty-pause-container" target="_blank" rel="noopener">The Almighty Pause Container</a></h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/11/kubernetes常见问题汇总/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="溏溏爸爸">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ttbb玩代码">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/blog/2018/08/11/kubernetes常见问题汇总/" itemprop="url">kubernetes常见问题汇总</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T21:25:08+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  144
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="报错-etc-kubernetes-pki-ca-crt-already-exists"><a href="#报错-etc-kubernetes-pki-ca-crt-already-exists" class="headerlink" title="报错:/etc/kubernetes/pki/ca.crt already exists"></a>报错:/etc/kubernetes/pki/ca.crt already exists</h3><ul>
+<li><p>错误描述<br>在node节点操作kubeadm join时报出的错误.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[preflight] Running pre-flight checks.</span><br><span class="line">        [WARNING FileExisting-crictl]: crictl not found in system path</span><br><span class="line">[preflight] Some fatal errors occurred:</span><br><span class="line">        [ERROR Port-10250]: Port 10250 is in use</span><br><span class="line">        [ERROR DirAvailable--etc-kubernetes-manifests]: /etc/kubernetes/manifests is not empty</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists</span><br><span class="line">        [ERROR FileAvailable--etc-kubernetes-kubelet.conf]: /etc/kubernetes/kubelet.conf already exists</span><br><span class="line">[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解决方案:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubeadm reset</span><br><span class="line"># 再次执行kubeadm join</span><br><span class="line">$ kubeadm join &lt;ip&gt;:&lt;port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;*******&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/09/kubernetes之master搭建/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1599,588 +2169,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/08/02/prometheus入门/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/08/02/prometheus入门/" itemprop="url">prometheus技术视图</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-02T23:34:22+08:00">
-                2018-08-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/prometheus/" itemprop="url" rel="index">
-                    <span itemprop="name">prometheus</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  994
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  5
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="https://ws3.sinaimg.cn/large/0069RVTdgy1fuzm0y206ej30kw08ljrx.jpg" alt="Prometheus技术视图"></p>
-<h2 id="Foreward"><a href="#Foreward" class="headerlink" title="Foreward"></a>Foreward</h2><p>在学习每个新技术之前,都有必要弄懂以下6个问题(左耳朵耗子学习模版):</p>
-<ul>
-<li>这个技术出现的背景、初衷和要达到什么样的目标或是要解决什么样的问题</li>
-<li>这个技术的优势和劣势分别是什么,或者说这个技术的 trade-off 是什么。任何技术都有其好坏，在解决一个问题的时候，也会带来新的问题.</li>
-<li>适用的场景(业务场景或技术场景)</li>
-<li>它的组成部分和关键点</li>
-<li>它的底层原理和关键实现</li>
-<li>已有的实现和它之间的对比</li>
-</ul>
-<p>由于最近在搞代理,需要一个监控和报警来保证稳定性.我的需求也很简单,监控500+主机是否存活(通过ping或ssh的方式检测),如果出现问题,立马报警.</p>
-<p>其实官网已经说的很明白了,我也没必要重复搬运,这里只记录自己的使用和比较关注的信息.</p>
-<h2 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h2><ul>
-<li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank" rel="noopener">官网</a></li>
-<li>博客<ul>
-<li><a href="https://en.fabernovel.com/insights/tech-en/alerting-in-prometheus-or-how-i-can-sleep-well-at-night" target="_blank" rel="noopener">https://en.fabernovel.com/insights/tech-en/alerting-in-prometheus-or-how-i-can-sleep-well-at-night</a></li>
-<li><a href="http://ylzheng.com/archives/" target="_blank" rel="noopener">Yunlong blog</a></li>
-<li><a href="https://www.slideshare.net/leecalcote/understanding-and-extending-prometheus-alertmanager" target="_blank" rel="noopener">https://www.slideshare.net/leecalcote/understanding-and-extending-prometheus-alertmanager</a></li>
-<li><a href="https://kairen.github.io/2018/06/29/devops/prometheus-federation/" target="_blank" rel="noopener">了解 Prometheus Federation 功能</a></li>
-<li>[使用Prometheus+grafana打造高逼格监控平台](<a href="http://blog.51cto.com/youerning/2050543" target="_blank" rel="noopener">http://blog.51cto.com/youerning/2050543</a></li>
-<li><a href="https://github.com/1046102779/prometheus" target="_blank" rel="noopener">Prometheus 非官方中文手册</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/24811652" target="_blank" rel="noopener">基于Prometheus的分布式在线服务监控实践</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><ul>
-<li>prometheus 2.3.1</li>
-<li>blackbox_exporter 0.12.0</li>
-<li>alertmanager 0.15.1</li>
-<li>centos 7</li>
-</ul>
-<h2 id="Notices"><a href="#Notices" class="headerlink" title="Notices"></a>Notices</h2><ul>
-<li>Prometheus即是一个CPU密集型（查询）也是一个IO密集型（数据落地）的，CPU数量是多多益善，内存越大越好（来缓存抓取的数据，所以应该减少不必要的业务数据导出），尽量要使用SSD（这个很关键！），因为一旦Prometheus的内存使用量达到阈值会停止抓取数据！这个停止抓取的时间，至少是分钟级，甚至是无法恢复！所以只要有条件就要用SSD.</li>
-</ul>
-<h2 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><h4 id="部署测试场景"><a href="#部署测试场景" class="headerlink" title="部署测试场景"></a>部署测试场景</h4><p>Config prometheus.yml</p>
-<p>blackbox_exporter和alertmanager的安装可以参见另外两篇文章《alertmanager之初体验》、《blackbox_exporter之安装》</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 由于机器数量较多,使用prometheus的服务发现,将所有机器配置到单独的文件中.</span><br><span class="line">$ vim /opt/machine.json</span><br><span class="line">[</span><br><span class="line"> &#123;&quot;targets&quot;:[&quot;122.227.184.61:20065&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d9&quot;&#125;&#125;,</span><br><span class="line">&#123;&quot;targets&quot;:[&quot;122.227.184.61:20063&quot;],&quot;labels&quot;:&#123;&quot;machineName&quot;:&quot;guangzhou77d8&quot;&#125;&#125;,</span><br><span class="line">...</span><br><span class="line">]</span><br><span class="line"># 配置prometheus.yml</span><br><span class="line">$ vim /opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">global:</span><br><span class="line">  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.</span><br><span class="line">  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.</span><br><span class="line">  # scrape_timeout is set to the global default (10s).</span><br><span class="line"># Alertmanager configuration</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: [&quot;10.1.1.26:9093&quot;]  # alertmanager的地址.</span><br><span class="line"># Load rules once and periodically evaluate them according to the global &apos;evaluation_interval&apos;.</span><br><span class="line">rule_files:</span><br><span class="line">  - &quot;/opt/proxy_rules.yml&quot;  # 规则文件.</span><br><span class="line"># A scrape configuration containing exactly one endpoint to scrape:</span><br><span class="line"># Here it&apos;s Prometheus itself.</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &apos;machine_heart&apos;</span><br><span class="line">    metrics_path: /probe</span><br><span class="line">    params:</span><br><span class="line">      module: [ssh_banner]</span><br><span class="line">    file_sd_configs:</span><br><span class="line">    - files: [&apos;/opt/machine.json&apos;]   # 机器地址列表文件</span><br><span class="line">      refresh_interval: 5m</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [address]</span><br><span class="line">      regex: (.*)</span><br><span class="line">      replacement: $&#123;1&#125;</span><br><span class="line">      target_label: __param_target  # 请求http://10.1.1.26:9155的请求参数target</span><br><span class="line">    - source_labels: [__param_target]</span><br><span class="line">      target_label: instance</span><br><span class="line">    - target_label: address</span><br><span class="line">      replacement: 10.1.1.26:9115  # blackbox_exporter的地址.</span><br></pre></td></tr></table></figure>
-<p>Config rules.yml</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ vim /opt/proxy_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: machine_heart</span><br><span class="line">    rules:</span><br><span class="line">    - alert: &apos;ssh&apos;</span><br><span class="line">      expr: probe_success&#123;job=&quot;machine_heart&quot;&#125; &lt; 1</span><br><span class="line">      for: 1m</span><br><span class="line">      labels:</span><br><span class="line">        severity: critical</span><br><span class="line">      # team: &apos;proxy-team&apos;</span><br><span class="line">      annotations:</span><br><span class="line">        summary: &quot;Instance &#123;&#123; $labels.instance &#125;&#125; down.&quot;</span><br><span class="line">        description: &quot;&#123;&#123; $labels.instance &#125;&#125; of job &#123;&#123; $labels.job &#125;&#125; has been down for more than 1 minutes.&quot;</span><br></pre></td></tr></table></figure>
-<p>Config Systemd</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=prometheus.service</span><br><span class="line">Wants=network-online.target</span><br><span class="line">After=network-online.target</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/opt/prometheus-2.3.1/prometheus --config.file=/opt/prometheus-2.3.1/prometheus.yml</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecReload=/bin/kill -s HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"># 启动</span><br><span class="line">$ systemctl enable prometheus &amp;&amp; systemctl start prometheus</span><br></pre></td></tr></table></figure>
-<h4 id="常规部署"><a href="#常规部署" class="headerlink" title="常规部署"></a>常规部署</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># prometheus官网有下载地址</span><br><span class="line">$ cd /opt</span><br><span class="line">$ wget https://github.com/prometheus/prometheus/releases/download/v2.3.2/prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line">$ tar -xvf prometheus-2.3.2.linux-amd64.tar.gz</span><br><span class="line"># 重命名</span><br><span class="line">$ mv prometheus-2.3.2.linux-amd64 prometheus-2.3.2</span><br></pre></td></tr></table></figure>
-<h4 id="Docker部署"><a href="#Docker部署" class="headerlink" title="Docker部署"></a>Docker部署</h4><h4 id="Ansible-playbook部署"><a href="#Ansible-playbook部署" class="headerlink" title="Ansible-playbook部署"></a>Ansible-playbook部署</h4><h4 id="Test-Prometheus"><a href="#Test-Prometheus" class="headerlink" title="Test Prometheus"></a>Test Prometheus</h4><h3 id="关联组件"><a href="#关联组件" class="headerlink" title="关联组件"></a>关联组件</h3>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/05/24/自动化运维工具之OpsManage安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/05/24/自动化运维工具之OpsManage安装/" itemprop="url">自动化运维工具之OpsManage安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-24T17:23:02+08:00">
-                2018-05-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/自动化运维工具/" itemprop="url" rel="index">
-                    <span itemprop="name">自动化运维工具</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  15
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>环境: centos7,opsmanage v2.2.1</li>
-<li><a href="https://github.com/welliamcao/OpsManage" target="_blank" rel="noopener">OpsManage github</a></li>
-</ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://steven-ji.github.io/blog/blog/2018/05/02/架构之定义/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="溏溏爸爸">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/uploads/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ttbb玩代码">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/blog/2018/05/02/架构之定义/" itemprop="url">架构之定义</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-02T09:23:31+08:00">
-                2018-05-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/架构/" itemprop="url" rel="index">
-                    <span itemprop="name">架构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  281
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="架构之定义"><a href="#架构之定义" class="headerlink" title="架构之定义"></a>架构之定义</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前嘴里常说架构师,但并没有去细究它的具体含义.偶然间看到别人分享了极客时间的《从0开始学架构》专栏.读了架构到底是什么这篇文章后,发现自己从来都没有思考过.(人最怕的就是<strong><em>不知道自己不知道</em></strong>)赶紧学习充电.</p>
-<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p><strong>架构:软件系统的顶层结构.</strong>(引用文章的结论).没有知识体系,理解这些概念真的很难.没办法,只能尝试去理解,强行记忆了.</p>
-<p>想要理解,需要几个概念进行比较理解.</p>
-<ul>
-<li><p>系统与子系统</p>
-<p>一些独立的“个体”,互相关联和协作.(个体可以是组件、子系统、模块)</p>
-</li>
-</ul>
-<ul>
-<li><p>模块与组件</p>
-<p>模块是从逻辑角度理解,进行职责上的划分.</p>
-<p>组件是从物理角度理解,便于复用.</p>
-</li>
-<li><p>框架</p>
-<p>1、组件规范;</p>
-<p>2、提供基础功能产品;</p>
-</li>
-</ul>
-<p>架构需要明确系统包含哪些“个体”,并且需要明确个体运作和协作的规则.</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fqwsgmsqhoj31cg0rkgoo.jpg" alt="66091B87-6F9C-4FAD-934A-C3472C2FB399"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2235,7 +2223,7 @@
               
                 <a href="/blog/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2246,7 +2234,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/blog/categories/index.html">
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -2257,7 +2245,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/blog/tags/index.html">
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">50</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -2318,7 +2306,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">32.3k</span>
+    <span title="Site words total count">35.0k</span>
   
 </div>
 
